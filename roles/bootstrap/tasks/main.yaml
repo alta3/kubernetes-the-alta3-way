@@ -1,0 +1,31 @@
+---
+- name: raw apt update 1
+  raw: apt -qqy update
+  become: true
+
+- name: raw apt upgrade 1
+  raw: DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
+  become: true
+
+# double because of having an old image
+- name: raw apt update 2
+  raw: apt -qqy update
+  become: true
+
+- name: raw apt upgrade 2
+  raw: apt -qqy upgrade
+  become: true
+
+- name: raw apt install python
+  raw: apt install -qy python aptitude
+  become: true
+
+#- name: deploy sudoers file
+#  copy:
+#    src: "{{ role_path }}/files/sudoers"
+#    dest: /etc/sudoers
+#    owner: root
+#    group: root
+#    mode: 0440
+#    validate: 'visudo -cf %s'
+#  become: yes
