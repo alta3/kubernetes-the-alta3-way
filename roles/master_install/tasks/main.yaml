@@ -33,10 +33,32 @@
       dest: {{ item.dest }}
     with_items:
     - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /home/student } 
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /home/student } 
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /home/student }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /home/student }
         
   - name: Unpack the etcd binaries on each master
     unarchive:
       src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
       dest: /usr/local/bin
       
-  - name: 
+  - name: Add execute to to the kube
+    file:
+      path: {{ item.path }}
+      mode: {{ item.mode }}
+    with_items:
+    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", mode: u+x }
+    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", mode: u+x } 
+    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", mode: u+x } 
+    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", mode: u+x } 
+  
+  - name: Move kube commands to local path
+    copy:
+     src: {{ item.source }}
+     dest: {{ item.dest }}
+    with_items:
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /home/student } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /home/student } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /home/student }
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /home/student }    
