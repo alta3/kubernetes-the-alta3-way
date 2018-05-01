@@ -1,52 +1,4 @@
-- hosts: masters
-  gather_facts: False
-
-  roles:
-    - bootstrap
-
-- hosts: webservers
-  gather_facts: True
-  roles:
-    - nginx
-    - wordpress
-    - mysql
-    - php
-    - postfix
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
 - hosts: localhost
-
-  vars:
-    k8s_config: "/home/student/k8s-config/encryption-config.yaml"
-    certs: 
-      pub:
-        ca: "/home/student/k8s-certs/ca-key.pem"
-        k8s: "/home/student/k8s-certs/kubernetes-key.pem"
-      pri:
-        ca: "/home/student/k8s-certs/ca.pem"
-        k8s: "/home/student/k8s-certs/kubernetes-pem"
-
 
   tasks:
 
@@ -111,9 +63,15 @@
   - name: Move Certs and Config to /var/lib/kubernetes
     command: mv /home/student/k8s-certs/ca.pem /home/student/k8s-certs/ca-key.pem /home/student/k8s-certs/kubernetes-key.pem /home/student/k8s-certs/kubernetes.pem /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
 
+- hosts: masters
+  gather_facts: False
+
+  roles:
+    - bootstrap
 
 - hosts: masters
+  gather_facts: True
+  roles:
+    - master_install
+    
 
-  include_vars: /home/student/k8s-ansible/vars
-
-  tasks:
