@@ -1,0 +1,14 @@
+- hosts: masters
+  gather_facts: False
+
+  roles:
+    - bootstrap
+
+- hosts: webservers
+  gather_facts: True
+  roles:
+    - nginx
+    - wordpress
+    - mysql
+    - php
+    - postfix
