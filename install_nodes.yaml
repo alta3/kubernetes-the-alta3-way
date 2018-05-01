@@ -1,0 +1,15 @@
+- hosts: localhost
+  roles:
+    - makecerts
+
+- hosts: masters
+  gather_facts: False
+  roles:
+    - bootstrap
+
+- hosts: masters
+  gather_facts: True
+  roles:
+    - master_install
+    - node_install    
+
