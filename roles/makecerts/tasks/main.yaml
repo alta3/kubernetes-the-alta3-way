@@ -18,25 +18,21 @@
     - { url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64", dest: /usr/local/bin/cfssl, mode: 0755 }
     - { url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64", dest: /usr/local/bin/cfssljson, mode: 0755 }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: 0755 }
-    - { url: "https://alta3.com/static/projects/k8s/ca-config.json", dest: /home/student/ca-config.json, mode: 0777 }
-    - { url: "https://alta3.com/static/projects/k8s/ca-csr.json", dest: /home/student/ca-csr.json, mode: 0777 }
-    - { url: "https://alta3.com/static/projects/k8s/kubernetes-csr.json", dest: /home/student/k8s-certs/kubernetes-csr.json, mode: 0777 }
-    - { url: "https://alta3.com/static/projects/k8s/encryption-config.yaml.j2", dest: /home/student/k8s-config/encryption-config.yaml.j2, mode: 0777 }
-   
+    
   - name: Generate a self-signed CA cert for the k8s cloud
     shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
     args:
-      chdir: "/home/student/k8s-certs"
+      chdir: "{{ role_path }}/files"
 
   - name: Generate Certificate for k8s API server
     shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=172.16.3.1,172.16.1.5,172.16.1.6,172.16.1.7,127.0.0.1,kubernetes.default -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
     args:
-      chdir: "/home/student/k8s-certs"
+      chdir: "{{ role_path }}/files"
 
   - name: Generate an encryption key
     shell: ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
     args:
-      chdir: "/home/student/k8s-config"
+      chdir: "{{ role_path }}/files"
 
   - name: Set the encryption key to ansible variable
     shell: echo $ENCRYPTION_KEY  
@@ -44,7 +40,7 @@
 
   - name: Generate the encryption config file
     template: 
-      src: "/home/student/k8s-config/encryption-config.yaml.j2"
+      src: "{{ role_path }}/templates/encryption-config.yaml.j2"
       dest: "/home/student/k8s-config/encryption-config.yaml"
 
   - name: Copy Certs to etcd
