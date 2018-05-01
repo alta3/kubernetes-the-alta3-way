@@ -53,4 +53,4 @@
     - { source: /home/student/k8s-certs/kubernetes-key.pem, dest: "/etc/etcd/kubernetes-key.pem" }
 
   - name: Move Certs and Config to /var/lib/kubernetes
-    command: mv /home/student/k8s-certs/ca.pem /home/student/k8s-certs/ca-key.pem /home/student/k8s-certs/kubernetes-key.pem /home/student/k8s-certs/kubernetes.pem /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
+    command: mv "{{ role_path }}/files/ca.pem" "{{ role_path }}/files/ca-key.pem" "{{ role_path }}/files/kubernetes-key.pem" "{{ role_path }}/files/kubernetes.pem" /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
