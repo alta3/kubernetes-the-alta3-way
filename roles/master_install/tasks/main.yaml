@@ -8,7 +8,7 @@
     - "/var/lib/etcd"
 
   - name: Copy Certs and Config to Masters
-    copy:
+    file:
       src: {{ item.source }}
       dest: {{ item.dest }}
     with_items:
@@ -19,7 +19,7 @@
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /home/student/kubernetes-key.pem }
 
   - name: Copy Certs and Config to Masters etcd
-    copy:
+    file:
       src: {{ item.source }}
       dest: {{ item.dest }}
     with_items:
@@ -27,23 +27,16 @@
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
     become: true
 
-  - name: Download packages for masters
+  - name: Download the etcd binaries on each master
     get_url:
       url: {{ item.url }}
       dest: {{ item.dest }}
     with_items:
     - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest:  }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest:  }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest:  }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest:  }
-
-    
         
   - name: Unpack the etcd binaries on each master
     unarchive:
       src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
       dest: /usr/local/bin
       
-
   - name: 
