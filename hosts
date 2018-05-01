@@ -1,0 +1,9 @@
+[masters]
+master-1 ansible_host= {{ ip.master1 }}, hostname= {{ hname.master1 }}
+master-2 ansible_host= {{ ip.master2 }}, hostname= {{ hname.master2 }}
+master-3 ansible_host= {{ ip.master3 }}, hostname= {{ hname.master3 }}
+
+[nodes]
+node-1 ansible_host= {{ ip.node1 }}, hostname= {{ hname.node1 }}
+node-2 ansible_host= {{ ip.node2 }}, hostname= {{ hname.node2 }}
+node-3 ansible_host= {{ ip.node3 }}, hostname= {{ hname.node3 }}
