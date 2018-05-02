@@ -114,3 +114,8 @@
     - kube-apiserver
     - kube-controller-manager
     - kube-scheduler
+    
+  - name: Allow Kubernetes API Server to fully initialize
+    pause:
+      seconds: 15
+      
