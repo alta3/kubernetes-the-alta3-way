@@ -77,7 +77,21 @@
 ####How do I get that jinja template to run with/against the playbook?
     {{ root_path }}/files  /templates jinja2
     or template module
-
+   
+   ####
+    - name: user env - desktop customizations templates
+       template:
+         src: "{{ item.src }}"
+         dest: "{{ item.dest }}"
+         owner: "{{ student_user }}"
+       become: yes
+       tags: user_env
+       with_items:
+       - { src: "{{ role_path }}/templates/desktop-items-0.conf", dest: "/home/{{ student_user }}/.config/pcmanfm/LXDE/desktop-items-0.conf" }
+       - { src: "{{ role_path }}/templates/lxde-panel", dest: "/home/{{ student_user }}/.config/lxpanel/LXDE/panels/panel" }
+       - { src: "{{ role_path }}/templates/firefox.desktop.j2", dest: "/usr/share/applications/firefox.desktop" }
+   
+   ####
 
   - name: Move the services to /etc/systemd/system
     shell: mv kube-apiserver.service kube-scheduler.service kube-controller-manager.service /etc/systemd/system/
