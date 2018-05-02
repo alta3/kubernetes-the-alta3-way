@@ -69,8 +69,9 @@
      src: {{ item.source }}
      dest: {{ item.dest }}
     with_items:
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/bin } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin }
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin }        
+    - { source: /home/student/ca.pem, dest: /var/lib/kubernetes } 
+    - { source: /home/student/ca-key.pem, dest: /var/lib/kubernetes } 
+    - { source: /home/student/kubernetes-key.pem, dest: /var/lib/kubernetes } 
+    - { source: /home/student/encryption-config.yml, dest: /var/lib/kubernetes } 
+    
 
