@@ -6,6 +6,7 @@
     with_items:
     - "/etc/etcd"
     - "/var/lib/etcd"
+    - "/var/lib/kubernetes"
 
   - name: Copy Certs and Config to Masters
     file:
@@ -53,12 +54,24 @@
     - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", mode: u+x } 
     - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", mode: u+x } 
   
-  - name: Move kube commands to local path
+  - name: Move kube commands to local path # not sure if these should just be moved or what the reason would be to do so.
     copy:
      src: {{ item.source }}
      dest: {{ item.dest }}
     with_items:
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /home/student } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /home/student } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /home/student }
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /home/student }    
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/bin } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin }
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin }   
+    
+  - name: Move certs to /var/lib/kubernetes # not sure if these should just be moved or what the reason would be to do so. seems redundant.
+    command:
+      mv:
+        s
+     src: {{ item.source }}
+     dest: {{ item.dest }}
+    with_items:
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/bin } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin } 
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin }
+    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin }        
