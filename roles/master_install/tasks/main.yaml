@@ -9,7 +9,7 @@
     - "/var/lib/kubernetes"
 
   - name: Copy Certs and Config to Masters
-    file:
+    copy:
       src: {{ item.source }}
       dest: {{ item.dest }}
     with_items:
@@ -20,7 +20,7 @@
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /home/student/kubernetes-key.pem }
 
   - name: Copy Certs and Config to Masters etcd
-    file:
+    copy:
       src: {{ item.source }}
       dest: {{ item.dest }}
     with_items:
@@ -64,7 +64,7 @@
     - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin }
     - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin }   
     
-  - name: Move certs to /var/lib/kubernetes # can the be a command task mv with_items? not sure if these should just be moved or what the reason would be to do so. seems redundant.
+  - name: Move certs to /var/lib/kubernetes
     copy:
      src: {{ item.source }}
      dest: {{ item.dest }}
@@ -74,39 +74,43 @@
     - { source: /home/student/kubernetes-key.pem, dest: /var/lib/kubernetes } 
     - { source: /home/student/encryption-config.yml, dest: /var/lib/kubernetes } 
     
-####How do I get that jinja template to run with/against the playbook?
-    {{ root_path }}/files  /templates jinja2
-    or template module
-   
-   ####
-    - name: user env - desktop customizations templates
-       template:
-         src: "{{ item.src }}"
-         dest: "{{ item.dest }}"
-         owner: "{{ student_user }}"
-       become: yes
-       tags: user_env
-       with_items:
-       - { src: "{{ role_path }}/templates/desktop-items-0.conf", dest: "/home/{{ student_user }}/.config/pcmanfm/LXDE/desktop-items-0.conf" }
-       - { src: "{{ role_path }}/templates/lxde-panel", dest: "/home/{{ student_user }}/.config/lxpanel/LXDE/panels/panel" }
-       - { src: "{{ role_path }}/templates/firefox.desktop.j2", dest: "/usr/share/applications/firefox.desktop" }
-   
-   ####
+  - name: Configure the Kubernetes API Server service
+    template:
+      src: {{ role_path }}/templates/kube-apiserver.service.j2
+      dest: /etc/systemd/system/kube-apiserver.service
+ 
+ - name: Configure the Kubernetes master manager service
+    template:
+      src: {{ role_path }}/templates/kube-controller-manager.service.j2
+      dest: /etc/systemd/system/kube-controller-manager.service
 
-  - name: Move the services to /etc/systemd/system
-    shell: mv kube-apiserver.service kube-scheduler.service kube-controller-manager.service /etc/systemd/system/
-    args: 
-      chdir: /home/student
+ - name: Configure the Kubernetes master scheduler
+    copy:
+      src: {{ role_path }}/templates/kube-scheduler.service
+      dest: /etc/systemd/system/kube-scheduler.service
+ 
+ - name: Reload the daemon for the services
+    service: 
+      name: daemon-reload
+      state: restarted
     become: yes
     
+ - name: Reload the daemon for the services
+    service: 
+      name: {{ item }}
+      state: enable
+    become: yes
+    with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+      
   - name: Reload the daemon for the services
-    shell: systemctl daemon-reload
+    service: 
+      name: {{ item }}
+      state: started
     become: yes
-
-  - name: Enable the services
-    shell: systemctl enable kube-apiserver kube-controller-manager kube-scheduler
-    become: yes
-
-  - name: Start the API server
-    shell: systemctl start kube-apiserver kube-controller-manager kube-scheduler
-    become: yes
+    with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
