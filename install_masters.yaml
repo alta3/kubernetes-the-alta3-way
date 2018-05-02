@@ -1,15 +1,23 @@
-- hosts: localhost
-  roles:
-    - makecerts
-
-- hosts: masters
-  gather_facts: False
-  roles:
-    - bootstrap
+#- hosts: localhost
+#
+#  roles:
+#    - makecerts
+#
+#
+#- hosts: masters
+#  gather_facts: False
+#  vars_files: 
+#  - vars/k8s_vars.yaml
+#
+#  roles:
+#    - bootstrap
+#
 
 - hosts: masters
   gather_facts: True
+  vars_files:
+  - vars/k8s_vars.yaml 
+
   roles:
     - master_install
     
-

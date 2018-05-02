@@ -7,6 +7,7 @@
     - "/etc/etcd"
     - "/var/lib/etcd"
     - "/var/lib/kubernetes"
+    become: yes
 
   - name: Copy Certs and Config to Masters
     copy:
@@ -18,6 +19,7 @@
     - { source: /var/lib/kubernetes/ca-key.pem, dest: /home/student/ca-key.pem } 
     - { source: /var/lib/kubernetes/kubernetes.pem, dest: /home/student/kubernetes.pem }
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /home/student/kubernetes-key.pem }
+    become: yes
 
   - name: Copy Certs and Config to Masters etcd
     copy:
@@ -26,95 +28,72 @@
     with_items:
     - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
-    become: true
+    become: yes
 
   - name: Download the etcd binaries on each master
     get_url:
       url: "{{ item.url }}"
       dest: "{{ item.dest }}"
-    with_items:
-    - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /home/student } 
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /home/student } 
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /home/student }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /home/student }
-        
-  - name: Unpack the etcd binaries on each master
-    unarchive:
-      src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
-      dest: /usr/local/bin
-      
-  - name: Add execute to to the kube
-    file:
-      path: "{{ item.path }}"
       mode: "{{ item.mode }}"
     with_items:
-    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", mode: u+x }
-    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", mode: u+x } 
-    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", mode: u+x } 
-    - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", mode: u+x } 
-  
-  - name: Move kube commands to local path # not sure if these should just be moved or what the reason would be to do so.
-    copy:
-     src: "{{ item.source }}"
-     dest: "{{ item.dest }}"
-    with_items:
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/bin } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin } 
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin }
-    - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin }   
-    
+    - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student/etcd-v3.2.11-linux-amd64.tar.gz, mode: '0664' }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/binkube-apiserver, mode: u+x } 
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin/kube-controller-manager, mode: u+x } 
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin/kube-scheduler, mode: u+x }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: u+x }
+    become: yes
+
+  - name: Unpack the etcd binaries on each master
+    unarchive:
+      remote_src: yes
+      src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
+      dest: /usr/local/bin
+    become: yes
+      
   - name: Move certs to /var/lib/kubernetes
     copy:
      src: "{{ item.source }}"
      dest: "{{ item.dest }}"
     with_items:
-    - { source: /home/student/ca.pem, dest: /var/lib/kubernetes } 
-    - { source: /home/student/ca-key.pem, dest: /var/lib/kubernetes } 
-    - { source: /home/student/kubernetes-key.pem, dest: /var/lib/kubernetes } 
-    - { source: /home/student/encryption-config.yml, dest: /var/lib/kubernetes } 
-    
+    - { source: /var/lib/kubernetes/ca.pem, dest: /var/lib/kubernetes/ca.pem } 
+    - { source: /var/lib/kubernetes/ca-key.pem, dest: /var/lib/kubernetes/ca-key.pem } 
+    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /var/lib/kubernetes/kubernetes-key.pem } 
+    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /var/lib/kubernetes/encryption-config.yaml } 
+    become: yes
+ 
   - name: Configure the Kubernetes API Server service
     template:
       src: "{{ role_path }}/templates/kube-apiserver.service.j2"
       dest: /etc/systemd/system/kube-apiserver.service
- 
+    become: yes 
+
   - name: Configure the Kubernetes master manager service
     template:
       src: "{{ role_path }}/templates/kube-controller-manager.service.j2"
       dest: /etc/systemd/system/kube-controller-manager.service
+    become: yes
 
   - name: Configure the Kubernetes master scheduler
     copy:
-      src: "{{ role_path }}/templates/kube-scheduler.service"
+      src: "{{ role_path }}/files/kube-scheduler.service"
       dest: /etc/systemd/system/kube-scheduler.service
- 
-  - name: Reload the daemon for the services
-    service: 
-      name: daemon-reload
-      state: restarted
+    become: yes 
+
+  - name: Reload systemd manager
+    command: systemctl daemon-reload
     become: yes
     
   - name: Reload the daemon for the services
     service: 
       name: "{{ item }}"
-      state: enable
+      enabled: yes
+      state: restarted
     become: yes
     with_items:
     - kube-apiserver
     - kube-controller-manager
     - kube-scheduler
       
-  - name: Reload the daemon for the services
-    service: 
-      name: "{{ item }}"
-      state: started
-    become: yes
-    with_items:
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-scheduler
-    
   - name: Allow Kubernetes API Server to fully initialize
     pause:
       seconds: 15
@@ -123,15 +102,20 @@
     copy:
       src: "{{ role_path }}/files/rbac-clusterrole.yaml"
       dest: /home/student/rbac-clusterrole.yaml
-      
+    become: yes
+
   - name: Apply the RBAC rules
     shell: kubectl apply -f rbac-clusterrole.yaml
-    
+    args:
+      chdir: /home/student
+    become: yes    
+
   - name: Copy the cluster role bind file to the masters
     copy:
       src: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
       dest: /home/student/rbac-clusterrolebind.yaml
-      
+    become: yes      
+
   - name: Bind the clusterrole to the kubernetes user.
     shell: kubectl apply -f rbac-clusterrolebind.yaml
-    
+    become: yes
