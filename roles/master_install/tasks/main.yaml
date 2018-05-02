@@ -118,4 +118,20 @@
   - name: Allow Kubernetes API Server to fully initialize
     pause:
       seconds: 15
+
+  - name: Copy rbac cluster-role to masters
+    copy:
+      src: {{ role_path }}/files/rbac-clusterrole.yaml
+      dest: /home/student/rbac-clusterrole.yaml
       
+  - name: Apply the RBAC rules
+    shell: kubectl apply -f rbac-clusterrole.yaml
+    
+  - name: Copy the cluster role bind file to the masters
+    copy:
+      src: {{ role_path }}/files/rbac-clusterrolebind.yaml
+      dest: /home/student/rbac-clusterrolebind.yaml
+      
+  - name: Bind the clusterrole to the kubernetes user.
+    shell: kubectl apply -f rbac-clusterrolebind.yaml
+    
