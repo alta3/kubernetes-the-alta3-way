@@ -74,4 +74,25 @@
     - { source: /home/student/kubernetes-key.pem, dest: /var/lib/kubernetes } 
     - { source: /home/student/encryption-config.yml, dest: /var/lib/kubernetes } 
     
+####How do I get that jinja template to run with/against the playbook?
+    {{ root_path }}/files  /templates jinja2
+    or template module
 
+
+  - name: Move the services to /etc/systemd/system
+    shell: mv kube-apiserver.service kube-scheduler.service kube-controller-manager.service /etc/systemd/system/
+    args: 
+      chdir: /home/student
+    become: yes
+    
+  - name: Reload the daemon for the services
+    shell: systemctl daemon-reload
+    become: yes
+
+  - name: Enable the services
+    shell: systemctl enable kube-apiserver kube-controller-manager kube-scheduler
+    become: yes
+
+  - name: Start the API server
+    shell: systemctl start kube-apiserver kube-controller-manager kube-scheduler
+    become: yes
