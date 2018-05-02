@@ -1,4 +1,9 @@
 
+
+
+#-------------------------------------------------------------------------
+# Finish moving the certs we created on beachhead into the masters.
+
   - name: Create directories on masters
     file:
       path: "{{ item }}"
@@ -15,32 +20,33 @@
       dest: '{{ item.dest }}'
     with_items:
     - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml }
-    - { source: /var/lib/kubernetes/ca.pem, dest: /home/student/ca.pem }
+    - { source: /var/lib/kubernetes/ca.pem, dest: /etc/etcd/ca.pem }
     - { source: /var/lib/kubernetes/ca-key.pem, dest: /home/student/ca-key.pem } 
-    - { source: /var/lib/kubernetes/kubernetes.pem, dest: /home/student/kubernetes.pem }
-    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /home/student/kubernetes-key.pem }
-    become: yes
-
-  - name: Copy Certs and Config to Masters etcd
-    copy:
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-    with_items:
     - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
     become: yes
 
-  - name: Download the etcd binaries on each master
+#  - name: Copy Certs and Config to Masters etcd
+#    copy:
+#      src: "{{ item.source }}"
+#      dest: "{{ item.dest }}"
+#    with_items:
+#    - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
+#    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
+#    become: yes
+#
+#-------------------------------------------
+# This is bootstrapping ETCD
+
+
+
+
+
+  - name: Download the etcd binary on each master
     get_url:
-      url: "{{ item.url }}"
-      dest: "{{ item.dest }}"
-      mode: "{{ item.mode }}"
-    with_items:
-    - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student/etcd-v3.2.11-linux-amd64.tar.gz, mode: '0664' }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/binkube-apiserver, mode: u+x } 
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin/kube-controller-manager, mode: u+x } 
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler", dest: /usr/local/bin/kube-scheduler, mode: u+x }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: u+x }
+      url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz"
+      dest: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
+      mode: '0664'
     become: yes
 
   - name: Unpack the etcd binaries on each master
@@ -49,23 +55,72 @@
       src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
       dest: /usr/local/bin
     become: yes
-      
-  - name: Move certs to /var/lib/kubernetes
+
+  - name: etcd service
+    template: 
+      src: "{{ role_path }}/templates/etcd.service.j2"
+      dest: /etc/systemd/system 
+    become: yes    
+
+  - name: Reload systemd manager
+    command: systemctl daemon-reload
+    become: yes
+    
+  - name: Reload the daemon for the services
+    service: 
+      name: etcd.service 
+      enabled: yes
+      state: restarted
+    become: yes
+ 
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------------------------------------
+# BOOTSTRAPPING KUBERNETES 
+# ---------------------------------------------------------------------------------------------------------   
+
+
+  - name: Move certs to /var/lib/kubernetes to support kubernetes API server
     copy:
-     src: "{{ item.source }}"
-     dest: "{{ item.dest }}"
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
     with_items:
     - { source: /var/lib/kubernetes/ca.pem, dest: /var/lib/kubernetes/ca.pem } 
     - { source: /var/lib/kubernetes/ca-key.pem, dest: /var/lib/kubernetes/ca-key.pem } 
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /var/lib/kubernetes/kubernetes-key.pem } 
     - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /var/lib/kubernetes/encryption-config.yaml } 
+    become: yes 
+
+
+# API Server Install
+
+  - name: Download the Kubernetes  APIServer binary
+    get_url:
+      url:  "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver"
+      dest: /usr/local/bin/kube-apiserver,
+      mode: +x 
     become: yes
- 
-  - name: Configure the Kubernetes API Server service
+
+  - name: Push the config file for the API Server
     template:
       src: "{{ role_path }}/templates/kube-apiserver.service.j2"
       dest: /etc/systemd/system/kube-apiserver.service
     become: yes 
+
+
+# Manager Install
+
+  - name: Download the Kubernetes Manager 
+    get_url:
+      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager" 
+      dest: /usr/local/bin/kube-controller-manager
+      mode: +x 
+    become: yes
 
   - name: Configure the Kubernetes master manager service
     template:
@@ -73,11 +128,34 @@
       dest: /etc/systemd/system/kube-controller-manager.service
     become: yes
 
+
+# Scheduler Install
+
+  - name: Download Kubernetes Scheduler 
+    get_url:
+      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler"
+      dest: /usr/local/bin/kube-scheduler 
+      mode: +x
+    become: yes
+
   - name: Configure the Kubernetes master scheduler
     copy:
       src: "{{ role_path }}/files/kube-scheduler.service"
       dest: /etc/systemd/system/kube-scheduler.service
     become: yes 
+
+
+# Install Kubectl
+
+  - name: Download Kubernetes kubectl 
+    get_url:
+      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
+      dest: /usr/local/bin/kubectl,
+      mode: +x 
+    become: yes
+
+
+# Bounce and enable kube services
 
   - name: Reload systemd manager
     command: systemctl daemon-reload
@@ -97,6 +175,13 @@
   - name: Allow Kubernetes API Server to fully initialize
     pause:
       seconds: 15
+
+
+
+#-------------------------------------------------------------------------------------------
+# RBAC setup
+#-------------------------------------------------------------------------------------------
+
 
   - name: Copy rbac cluster-role to masters
     copy:
