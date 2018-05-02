@@ -16,3 +16,4 @@ hname:
   node1: node-1
   node2: node-2
   node3: node-3
+clustercidr: 192.168.0.0/16
