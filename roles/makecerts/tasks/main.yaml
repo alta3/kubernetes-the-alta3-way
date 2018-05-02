@@ -3,22 +3,24 @@
       path: "{{ item }}"
       state: directory
     with_items:
-    - "/home/student/k8s-cert"
+    - "/home/student/k8s-certs"
     - "/home/student/k8s-config"
     - "/etc/etcd"
     - "/var/lib/etcd"
     - "/var/lib/kubernetes"
+    become: yes
 
   - name: Install dependencies with get_url, cfssl, cfssljson, kubectl
     get_url:
-      url: {{ item.url }}
-      dest: {{ item.dest }}
-      mode: {{ item.mode }}
+      url: "{{ item.url }}"
+      dest: "{{ item.dest }}"
+      mode: "{{ item.mode }}"
     with_items:
-    - { url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64", dest: /usr/local/bin/cfssl, mode: 0755 }
-    - { url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64", dest: /usr/local/bin/cfssljson, mode: 0755 }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: 0755 }
-    
+    - { url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64", dest: /usr/local/bin/cfssl, mode: '0755' }
+    - { url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64", dest: /usr/local/bin/cfssljson, mode: '0755' }
+    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: '0755' }
+    become: yes    
+
   - name: Generate a self-signed CA cert for the k8s cloud
     shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
     args:
@@ -44,13 +46,15 @@
       dest: "/home/student/k8s-config/encryption-config.yaml"
 
   - name: Copy Certs to etcd
-    file: 
-      src: {{ item.source }}
-      dest: {{ item.dest }}
+    copy: 
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
     with_items:
-    - { source: /home/student/k8s-certs/ca.pem, dest: "/etc/etcd/ca.pem" }
-    - { source: /home/student/k8s-certs/kubernetes.pem, dest: "/etc/etcd/kubernetes.pem" }
-    - { source: /home/student/k8s-certs/kubernetes-key.pem, dest: "/etc/etcd/kubernetes-key.pem" }
+    - { source: "{{ role_path }}/files/ca.pem", dest: "/etc/etcd/ca.pem" }
+    - { source: "{{ role_path }}/files/kubernetes.pem", dest: "/etc/etcd/kubernetes.pem" }
+    - { source: "{{ role_path }}/files/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem" }
+    become: yes
 
   - name: Move Certs and Config to /var/lib/kubernetes
     command: mv "{{ role_path }}/files/ca.pem" "{{ role_path }}/files/ca-key.pem" "{{ role_path }}/files/kubernetes-key.pem" "{{ role_path }}/files/kubernetes.pem" /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
+    become: yes

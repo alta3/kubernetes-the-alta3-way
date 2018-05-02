@@ -1,7 +1,7 @@
 
   - name: Create directories on masters
     file:
-      path: {{ item }}
+      path: "{{ item }}"
       state: directory
     with_items:
     - "/etc/etcd"
@@ -10,8 +10,8 @@
 
   - name: Copy Certs and Config to Masters
     copy:
-      src: {{ item.source }}
-      dest: {{ item.dest }}
+      src: '{{ item.source }}'
+      dest: '{{ item.dest }}'
     with_items:
     - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml }
     - { source: /var/lib/kubernetes/ca.pem, dest: /home/student/ca.pem }
@@ -21,8 +21,8 @@
 
   - name: Copy Certs and Config to Masters etcd
     copy:
-      src: {{ item.source }}
-      dest: {{ item.dest }}
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
     with_items:
     - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
     - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
@@ -30,8 +30,8 @@
 
   - name: Download the etcd binaries on each master
     get_url:
-      url: {{ item.url }}
-      dest: {{ item.dest }}
+      url: "{{ item.url }}"
+      dest: "{{ item.dest }}"
     with_items:
     - { url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz", dest: /home/student }
     - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /home/student } 
@@ -46,8 +46,8 @@
       
   - name: Add execute to to the kube
     file:
-      path: {{ item.path }}
-      mode: {{ item.mode }}
+      path: "{{ item.path }}"
+      mode: "{{ item.mode }}"
     with_items:
     - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", mode: u+x }
     - { path: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", mode: u+x } 
@@ -56,8 +56,8 @@
   
   - name: Move kube commands to local path # not sure if these should just be moved or what the reason would be to do so.
     copy:
-     src: {{ item.source }}
-     dest: {{ item.dest }}
+     src: "{{ item.source }}"
+     dest: "{{ item.dest }}"
     with_items:
     - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver", dest: /usr/local/bin } 
     - { source: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager", dest: /usr/local/bin } 
@@ -66,8 +66,8 @@
     
   - name: Move certs to /var/lib/kubernetes
     copy:
-     src: {{ item.source }}
-     dest: {{ item.dest }}
+     src: "{{ item.source }}"
+     dest: "{{ item.dest }}"
     with_items:
     - { source: /home/student/ca.pem, dest: /var/lib/kubernetes } 
     - { source: /home/student/ca-key.pem, dest: /var/lib/kubernetes } 
@@ -76,28 +76,28 @@
     
   - name: Configure the Kubernetes API Server service
     template:
-      src: {{ role_path }}/templates/kube-apiserver.service.j2
+      src: "{{ role_path }}/templates/kube-apiserver.service.j2"
       dest: /etc/systemd/system/kube-apiserver.service
  
- - name: Configure the Kubernetes master manager service
+  - name: Configure the Kubernetes master manager service
     template:
-      src: {{ role_path }}/templates/kube-controller-manager.service.j2
+      src: "{{ role_path }}/templates/kube-controller-manager.service.j2"
       dest: /etc/systemd/system/kube-controller-manager.service
 
- - name: Configure the Kubernetes master scheduler
+  - name: Configure the Kubernetes master scheduler
     copy:
-      src: {{ role_path }}/templates/kube-scheduler.service
+      src: "{{ role_path }}/templates/kube-scheduler.service"
       dest: /etc/systemd/system/kube-scheduler.service
  
- - name: Reload the daemon for the services
+  - name: Reload the daemon for the services
     service: 
       name: daemon-reload
       state: restarted
     become: yes
     
- - name: Reload the daemon for the services
+  - name: Reload the daemon for the services
     service: 
-      name: {{ item }}
+      name: "{{ item }}"
       state: enable
     become: yes
     with_items:
@@ -107,7 +107,7 @@
       
   - name: Reload the daemon for the services
     service: 
-      name: {{ item }}
+      name: "{{ item }}"
       state: started
     become: yes
     with_items:
@@ -121,7 +121,7 @@
 
   - name: Copy rbac cluster-role to masters
     copy:
-      src: {{ role_path }}/files/rbac-clusterrole.yaml
+      src: "{{ role_path }}/files/rbac-clusterrole.yaml"
       dest: /home/student/rbac-clusterrole.yaml
       
   - name: Apply the RBAC rules
@@ -129,7 +129,7 @@
     
   - name: Copy the cluster role bind file to the masters
     copy:
-      src: {{ role_path }}/files/rbac-clusterrolebind.yaml
+      src: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
       dest: /home/student/rbac-clusterrolebind.yaml
       
   - name: Bind the clusterrole to the kubernetes user.

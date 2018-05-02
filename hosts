@@ -1,7 +1,7 @@
 [masters]
-master-1 ansible_host= {{ ip.master1 }}, hostname= {{ hname.master1 }}
-master-2 ansible_host= {{ ip.master2 }}, hostname= {{ hname.master2 }}
-master-3 ansible_host= {{ ip.master3 }}, hostname= {{ hname.master3 }}
+172.16.1.5
+172.16.1.6
+172.16.1.7
 
 [nodes]
 node-1 ansible_host= {{ ip.node1 }}, hostname= {{ hname.node1 }}
