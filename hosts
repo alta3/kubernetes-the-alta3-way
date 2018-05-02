@@ -1,7 +1,7 @@
 [masters]
-master-1
-master-2
-master-3
+master-1 hostname=master-1
+master-2 hostname=master-2
+master-3 hostname=master-3
 
 #master-1 ansible_host="{{ ip.master1 }}" hostname="{{ hname.master1 }}"
 #master-2 ansible_host="{{ ip.master2 }}" hostname="{{ hname.master2 }}"
