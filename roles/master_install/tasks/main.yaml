@@ -102,7 +102,7 @@
   - name: Download the Kubernetes  APIServer binary
     get_url:
       url:  "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver"
-      dest: /usr/local/bin/kube-apiserver,
+      dest: /usr/local/bin/kube-apiserver
       mode: +x 
     become: yes
 
@@ -150,7 +150,7 @@
   - name: Download Kubernetes kubectl 
     get_url:
       url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
-      dest: /usr/local/bin/kubectl,
+      dest: /usr/local/bin/kubectl
       mode: +x 
     become: yes
 
