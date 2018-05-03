@@ -28,12 +28,15 @@
     copy:
       src: '{{ item.source }}'
       dest: '{{ item.dest }}'
+      mode: '{{ item.mode }}'
+      owner: student
+      group: student
     with_items:
-    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml }
-    - { source: /var/lib/kubernetes/ca.pem, dest: /etc/etcd/ca.pem }
-    - { source: /var/lib/kubernetes/ca-key.pem, dest: /home/student/ca-key.pem } 
-    - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
-    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
+    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml, mode: "0664" }
+    - { source: /var/lib/kubernetes/ca.pem,                 dest: /etc/etcd/ca.pem,                     mode: "0664" }
+    - { source: /var/lib/kubernetes/ca-key.pem,             dest: /home/student/ca-key.pem,             mode: "0600" } 
+    - { source: /var/lib/kubernetes/kubernetes.pem,         dest: /etc/etcd/kubernetes.pem,             mode: "0664" }
+    - { source: /var/lib/kubernetes/kubernetes-key.pem,     dest: /etc/etcd/kubernetes-key.pem,         mode: "0600" }
     become: yes
 
 #  - name: Copy Certs and Config to Masters etcd
@@ -44,10 +47,10 @@
 #    - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
 #    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
 #    become: yes
-#
+
 #-------------------------------------------
 # This is bootstrapping ETCD
-
+# ------------------------------------------
 
 
 
@@ -63,7 +66,20 @@
     unarchive:
       remote_src: yes
       src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
-      dest: /usr/local/bin
+      dest: /home/student
+    become: yes
+   
+  - name: Move etcd binaries to /usr/local/bin path
+    copy:
+      src: '{{ item.source }}' 
+      dest: '{{ item.dest }}' 
+      remote_src: yes
+      mode: 0775
+      owner: student
+      group: student
+    with_items:
+    - { source: /home/student/etcd-v3.2.11-linux-amd64/etcd, dest: /usr/local/bin/etcd }
+    - { source: /home/student/etcd-v3.2.11-linux-amd64/etcdctl, dest: /usr/local/bin/etcdctl }
     become: yes
 
   - name: Push etcd service config
@@ -99,11 +115,15 @@
     copy:
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
+      mode: "{{ item.mode }}"
+      owner: "{{ item.ug }}"
+      group: "{{ item.ug }}"
     with_items:
-    - { source: /var/lib/kubernetes/ca.pem, dest: /var/lib/kubernetes/ca.pem } 
-    - { source: /var/lib/kubernetes/ca-key.pem, dest: /var/lib/kubernetes/ca-key.pem } 
-    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /var/lib/kubernetes/kubernetes-key.pem } 
-    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /var/lib/kubernetes/encryption-config.yaml } 
+    - { source: /var/lib/kubernetes/ca.pem,                 dest: /var/lib/kubernetes/ca.pem,                 mode: "0664", ug: root } 
+    - { source: /var/lib/kubernetes/ca-key.pem,             dest: /var/lib/kubernetes/ca-key.pem,             mode: "0600", ug: student } 
+    - { source: /var/lib/kubernetes/kubernetes-key.pem,     dest: /var/lib/kubernetes/kubernetes-key.pem,     mode: "0600", ug: student } 
+    - { source: /var/lib/kubernetes/kubernetes.pem,         dest: /var/lib/kubernetes/kubernetes.pem,         mode: "0664", ug: student } 
+    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /var/lib/kubernetes/encryption-config.yaml, mode: "0664", ug: student } 
     become: yes 
 
 
@@ -113,7 +133,9 @@
     get_url:
       url:  "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver"
       dest: /usr/local/bin/kube-apiserver
-      mode: +x 
+      mode: 0775
+      owner: student
+      group: student
     become: yes
 
   - name: Push the config file for the API Server
@@ -129,7 +151,9 @@
     get_url:
       url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager" 
       dest: /usr/local/bin/kube-controller-manager
-      mode: +x 
+      mode: 0775
+      owner: student
+      group: student
     become: yes
 
   - name: Configure the Kubernetes master manager service
@@ -145,7 +169,9 @@
     get_url:
       url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler"
       dest: /usr/local/bin/kube-scheduler 
-      mode: +x
+      mode: 0775
+      owner: student
+      group: student
     become: yes
 
   - name: Configure the Kubernetes master scheduler
@@ -161,7 +187,9 @@
     get_url:
       url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
       dest: /usr/local/bin/kubectl
-      mode: +x 
+      mode: 0775
+      owner: student
+      group: student
     become: yes
 
 
