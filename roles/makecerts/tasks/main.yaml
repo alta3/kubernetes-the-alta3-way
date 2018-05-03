@@ -21,40 +21,101 @@
     - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: '0755' }
     become: yes    
 
-  - name: Generate a self-signed CA cert for the k8s cloud
+# Check if files exist before clobbering a working system
+  - name: Check if  /var/lib/kubernetes/ca.pem exists
+    stat:
+      path: /var/lib/kubernetes/ca.pem 
+    register: ca_pem
+
+  - name: Check if  /var/lib/kubernetes/ca-key.pem exists
+    stat:
+      path: /var/lib/kubernetes/ca-key.pem 
+    register: ca_key_pem
+
+  - name: Check if  /var/lib/kubernetes/kubernetes.pem exists
+    stat:
+      path: /var/lib/kubernetes/kubernetes.pem
+    register: kubernetes_pem
+
+  - name: Check if  /var/lib/kubernetes/kubernetes-key.pem exists
+    stat:
+      path: /var/lib/kubernetes/kubernetes-key.pem
+    register: kubernetes_key_pem
+
+  - name: Check if  /var/lib/kubernetes/encryption-config.yaml exists
+    stat:
+      path: /var/lib/kubernetes/encryption-config.yaml
+    register: encryption_config_yaml
+
+  - set_fact:
+      reload: false
+
+  - set_fact:
+      reload: true
+    when: (ca_pem.stat.exists == false)  or ( ca_key_pem.stat.exists == false ) or (kubernetes_pem.stat.exists == false ) or (kubernetes_key_pem.stat.exists == false )
+
+  
+# Generates ca.pem and ca-key.pem when do not already exist
+  - name: Generate a self-signed CA cert and private key for the k8s cloud
     shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
     args:
       chdir: "{{ role_path }}/files"
+    when: reload 
 
-  - name: Generate Certificate for k8s API server
-    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=172.16.3.1,172.16.1.5,172.16.1.6,172.16.1.7,127.0.0.1,kubernetes.default -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
+# Generates kubernetes.pem and kubernetes-key.pem when do not already exist
+  - name: Generate Certificate and private key for k8s API server
+    shell: cfssl gencert \
+           -ca=ca.pem \
+           -ca-key=ca-key.pem \
+           -config=ca-config.json \
+           -hostname=172.16.3.1,172.16.1.5,172.16.1.6,172.16.1.7,127.0.0.1,kubernetes.default \
+           -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
     args:
       chdir: "{{ role_path }}/files"
+    when: reload
 
   - name: Generate an encryption key
-    shell: ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
+    shell: head -c 32 /dev/urandom | base64
     args:
       chdir: "{{ role_path }}/files"
-
-  - name: Set the encryption key to ansible variable
-    shell: echo $ENCRYPTION_KEY  
     register: encryption_key
+    when: reload
 
   - name: Generate the encryption config file
     template: 
       src: "{{ role_path }}/templates/encryption-config.yaml.j2"
       dest: "/home/student/k8s-config/encryption-config.yaml"
+    when: reload 
 
-  - name: Copy Certs to etcd
+  - name: Copy Kube Certs to etcd
     copy: 
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
     with_items:
-    - { source: "{{ role_path }}/files/ca.pem", dest: "/etc/etcd/ca.pem" }
-    - { source: "{{ role_path }}/files/kubernetes.pem", dest: "/etc/etcd/kubernetes.pem" }
+    - { source: "{{ role_path }}/files/kubernetes.pem",     dest: "/etc/etcd/kubernetes.pem" }
     - { source: "{{ role_path }}/files/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem" }
     become: yes
+    when: reload
+
+  - name: Copy CA Certs to etcd
+    copy: 
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
+    with_items:
+    - { source: "{{ role_path }}/files/ca.pem",             dest: "/etc/etcd/ca.pem" }
+    become: yes
+    when: reload
 
   - name: Move Certs and Config to /var/lib/kubernetes
-    command: mv "{{ role_path }}/files/ca.pem" "{{ role_path }}/files/ca-key.pem" "{{ role_path }}/files/kubernetes-key.pem" "{{ role_path }}/files/kubernetes.pem" /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
+    command: mv {{ role_path }}/files/ca.pem {{ role_path }}/files/ca-key.pem {{ role_path }}/files/kubernetes-key.pem {{ role_path }}/files/kubernetes.pem /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
     become: yes
+    when: reload
+
+
+
+
+
+
+
+
+ 

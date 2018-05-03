@@ -1,3 +1,13 @@
+#-------------------------------------------------------------------------------------
+# Update /etc/hosts to reflect the renaming of controller to master and worker to node
+#------------------------------------------------------------------------------------
+
+  - name: Update /etc/hosts on all masters
+    template: 
+      src: "{{ role_path }}/templates/hosts.j2"
+      dest: /etc/hosts
+    become: yes    
+
 
 
 

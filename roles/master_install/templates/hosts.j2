@@ -1,0 +1,26 @@
+127.0.0.1 controller-1 localhost {{ hostname }}
+
+172.16.1.4 beachhead
+172.16.1.5 controller-1 master-1
+172.16.1.6 controller-2 master-2
+172.16.1.7 controller-3 master-3
+172.16.1.8 worker-1 node-1
+172.16.1.9 worker-2 node-2
+172.16.1.10 worker-3 node-3
+
+$ openstack course hostnames hardcoded
+172.16.1.4 beachhead
+172.16.1.5 controller
+172.16.1.6 compute1
+172.16.1.7 compute2
+172.16.1.5 block1
+172.16.1.5 object1
+
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+
