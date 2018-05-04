@@ -16,10 +16,10 @@
     - "/var/run/kubernetes"
     become: yes
 
-
-#-----------------------------------------------------------------------------
-# Check if files exist before clobbering a working system - certs
-#-----------------------------------------------------------------------------
+#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#-------------------------------------------------------------------------------------------------------------------------------
+# Check if files exist before clobbering a working system - certs - **** THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON****
+#-------------------------------------------------------------------------------------------------------------------------------
 
   - name: Check if node-1.pem exists in the path
     stat:
@@ -65,9 +65,9 @@
     when: (node_1_pem.stat.exists == false) or (node_1_key_pem.stat.exists == false) or (node_2_pem.stat.exists == false) or (node_2_key_pem.stat.exists == false) or (node_3_pem.stat.exists == false) or (node_3_key_pem.stat.exists == false) or (ca_pem.stat.exists == false)
 
 
-#-----------------------------------------------------------------------------
-# Create the Kubelet Client Certificates for each node
-#-----------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------
+# Create the Kubelet Client Certificates for each node -- ****THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON*****
+#--------------------------------------------------------------------------------------------------------------------
 
   - name: Generate the certificate config file for node-1
     template:
@@ -75,7 +75,8 @@
       dest: /home/student/node-1-csr.json 
     when: reload
 
-  - name: Generate the Certificat and Private key for the nodes when they do not already
+
+  - name: Generate the Certificate and Private key for node-1 when it does not already exist
     shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-1,172.16.1.8 -profile=kubernetes node-1-csr.json | cfssljson -bare node-1
     args: 
       chdir: "{{ role_path }}/templates"
@@ -99,15 +100,43 @@
       dest: /home/student/node-3-csr.json 
     when: reload
 
-  - name: Generate the Certificat and Private key for the nodes when they do not already
+  - name: Generate the Certificate and Private key for node-3 when it does not already exist
     shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-3,172.16.1.10 -profile=kubernetes node-3-csr.json | cfssljson -bare node-3
     args: 
       chdir: "{{ role_path }}/templates"
     when: reload
+#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 
 #-----------------------------------------------------------------------------
-# 
+# Copy Certs to the Kubernetes nodes
 #-----------------------------------------------------------------------------
+
+  - name: Copy Certs to Nodes
+    copy:
+      src: '{{ item.source }}'
+      dest: '{{ item.dest }}'
+      mode: '{{ item.mode }}'
+      owner: student
+      group: student
+    with_items:
+    - { source: /var/lib/kubernetes/, dest: /home/student/encryption-config.yaml, mode: "0664" }
+    - { source: /var/lib/kubernetes/ca.pem,                 dest: /var/lib/kubernetes/ca.pem,           mode: "0664" }
+ #where does kubernetes-key.pem and kubernetes.pem go?   - { source: /var/lib/kubernetes/ca-key.pem,             dest: /home/student/ca-key.pem,             mode: "0600" } 
+    - { source: /var/lib/kubernetes/,         dest: /etc/etcd/kubernetes.pem,                           mode: "0664" }
+    - { source: /var/lib/kubernetes/,     dest: ,                                                       mode: "0600" }
+    - { source: /var/lib/kubernetes/node-1.pem,         dest: /var/lib/kubelet/node-1.pem,                 mode: "0600" }
+    - { source: /var/lib/kubernetes/node-1-key.pem,     dest: /var/lib/kubelet/node-1-key.pem,             mode: "0644" }
+    - { source: /var/lib/kubernetes/node-2.pem,         dest: /var/lib/kubelet/node-2.pem,                 mode: "0600" }
+    - { source: /var/lib/kubernetes/node-2-key.pem,     dest: /var/lib/kubelet/node-2-key.pem,             mode: "0644" }
+    - { source: /var/lib/kubernetes/node-3.pem,         dest: /var/lib/kubelet/node-3.pem,                 mode: "0600" }
+    - { source: /var/lib/kubernetes/node-3-key.pem,     dest: /var/lib/kubelet/node-3-key.pem,             mode: "0644" }
+    become: yes
+
+
+
+
+
+
 
 
