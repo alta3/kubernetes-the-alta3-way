@@ -17,3 +17,21 @@ hname:
   node2: node-2
   node3: node-3
 clustercidr: 192.168.0.0/16
+countrycsr: US
+citycsr: Harrisburg
+statecsr: Pennsylvania
+oucsr: Kubernetes The Alta3 Way
+cncsr:
+ cnnode1csr: system:node:node-1
+ cnnode2csr: system:node:node-2
+ cnnode3csr: system:node:node-3
+clusterdns: 172.16.3.10
+podcidr: 192.168.1.0/24
+tlscertfile:
+ node1crtloc: node-1.pem
+ node2crtloc: node-2.pem
+ node3crtloc: node-3.pem
+tlsprivatekeyfile:
+ node1pkloc: node-1-key.pem
+ node2pkloc: node-2-key.pem
+ node3pkloc: node-3-key.pem

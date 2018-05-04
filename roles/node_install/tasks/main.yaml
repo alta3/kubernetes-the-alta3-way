@@ -1,6 +1,113 @@
 
+#-----------------------------------------------------------------------------
+# Create Directories for nodes
+#-----------------------------------------------------------------------------
+
+  - name: create directories for the kubernetes nodes
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+    - "/etc/cni/net.d"
+    - "/opt/cni/bin"
+    - "/var/lib/kubelet"
+    - "/var/lib/kube-proxy"
+    - "/var/lib/kubernetes"
+    - "/var/run/kubernetes"
+    become: yes
 
 
+#-----------------------------------------------------------------------------
+# Check if files exist before clobbering a working system - certs
+#-----------------------------------------------------------------------------
 
+  - name: Check if node-1.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-1.pem
+    register: node_1_pem
+
+  - name: Check if node-1-key.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-1-key.pem
+    register: node_1_key_pem
+
+  - name: Check if node-2.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-2.pem
+    register: node_2_pem
+
+  - name: Check if node-2-key.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-2-key.pem
+    register: node_2_key_pem
+
+  - name: Check if node-3.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-3.pem
+    register: node_3_pem
+
+  - name: Check if node-3-key.pem exists in the path
+    stat:
+      path: /var/lib/kubelet/node-3-key.pem
+    register: node_3_key_pem
+
+# don't think we need this because this will already exist, right?
+#  - name: Check if ca.pem exists in the path
+#    stat:
+#      path: /var/lib/kubelernetes/ca.pem
+#    register: ca_pem
+
+  - set_fact:
+      reload: false
+
+  - set_fact:
+      reload: true
+    when: (node_1_pem.stat.exists == false) or (node_1_key_pem.stat.exists == false) or (node_2_pem.stat.exists == false) or (node_2_key_pem.stat.exists == false) or (node_3_pem.stat.exists == false) or (node_3_key_pem.stat.exists == false) or (ca_pem.stat.exists == false)
+
+
+#-----------------------------------------------------------------------------
+# Create the Kubelet Client Certificates for each node
+#-----------------------------------------------------------------------------
+
+  - name: Generate the certificate config file for node-1
+    template:
+      src: "{{ role_path }}/templates/node-1-csr.json.j2"
+      dest: /home/student/node-1-csr.json 
+    when: reload
+
+  - name: Generate the Certificat and Private key for the nodes when they do not already
+    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-1,172.16.1.8 -profile=kubernetes node-1-csr.json | cfssljson -bare node-1
+    args: 
+      chdir: "{{ role_path }}/templates"
+    when: reload
+
+  - name: Generate the certificate config file for node-2
+    template:
+      src: "{{ role_path }}/templates/node-2-csr.json.j2"
+      dest: /home/student/node-2-csr.json 
+    when: reload
+
+  - name: Generate the Certificate and Private key for node-2 when it does not already exist
+    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-2,172.16.1.9 -profile=kubernetes node-2-csr.json | cfssljson -bare node-2
+    args: 
+      chdir: "{{ role_path }}/templates"
+    when: reload
+
+  - name: Generate the certificate config file for node-3
+    template:
+      src: "{{ role_path }}/templates/node-3-csr.json.j2"
+      dest: /home/student/node-3-csr.json 
+    when: reload
+
+  - name: Generate the Certificat and Private key for the nodes when they do not already
+    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-3,172.16.1.10 -profile=kubernetes node-3-csr.json | cfssljson -bare node-3
+    args: 
+      chdir: "{{ role_path }}/templates"
+    when: reload
+
+
+#-----------------------------------------------------------------------------
+# 
+#-----------------------------------------------------------------------------
 
 

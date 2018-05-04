@@ -1,0 +1,16 @@
+{
+  "CN": "{{ cnnode1csr }}",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ countrycsr }}",
+      "L": "{{ citycsr }}",
+      "O": "system:nodes",
+      "OU": "{{ oucsr }}",
+      "ST": "{{ statecsr }}"
+    }
+  ]
+}
