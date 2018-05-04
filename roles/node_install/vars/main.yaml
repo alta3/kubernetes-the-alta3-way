@@ -1,0 +1,19 @@
+ ip:
+  master1: 172.16.1.5
+  master2: 172.16.1.6
+  master3: 172.16.1.7
+  node1: 172.16.1.8
+  node2: 172.16.1.9
+  node3: 172.16.1.10
+serviceclusteriprange: 172.16.3.0/24
+port:
+  etcdclient: 2379
+  etcds2s: 2380
+hname:
+  master1: master-1
+  master2: master-2
+  master3: master-3
+  node1: node-1
+  node2: node-2
+  node3: node-3
+clustercidr: 192.168.0.0/16
