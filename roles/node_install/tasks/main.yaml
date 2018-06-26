@@ -132,8 +132,22 @@
     - { source: /var/lib/kubernetes/node-3.pem,         dest: /var/lib/kubelet/node-3.pem,                 mode: "0600" }
     - { source: /var/lib/kubernetes/node-3-key.pem,     dest: /var/lib/kubelet/node-3-key.pem,             mode: "0644" }
     become: yes
+#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 
+#-----------------------------------------------------------------------------
+# Node configuration files - (convert to k8s_raw and or command vs shell)
+#-----------------------------------------------------------------------------
+
+
+  - name: Set the config file for node-1
+    shell: kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/home/student/k8s-certs/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=worker-1.kubeconfig
+    args: 
+      chdir: "{{ role_path }}/templates"
+    when: reload
+    
+kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/home/student/k8s-certs/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=worker-1.kubeconfig
+kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/home/student/k8s-certs/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=worker-2.kubeconfig
 
 
 
