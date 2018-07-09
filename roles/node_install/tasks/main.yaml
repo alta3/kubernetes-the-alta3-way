@@ -163,13 +163,78 @@
 #-----------------------------------------------------------------------------
 
 
-  - name: 
-    shell
+
+  - name: Set the credentials for worker-1
+    shell: kubectl config set-credentials system:node:worker-1 --client-certificate=/home/student/k8s-certs/worker-1.pem --client-key=/home/student/k8s-certs/worker-1-key.pem --embed-certs=true --kubeconfig=worker-1.kubeconfig
     args:
       chdir: "{{ role_path }}/templates"
     when: reload
     
+  - name: Set the credentials for worker-2
+    shell: kubectl config set-credentials system:node:worker-2 --client-certificate=/home/student/k8s-certs/worker-2.pem --client-key=/home/student/k8s-certs/worker-2-key.pem --embed-certs=true --kubeconfig=worker-2.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload
     
+  - name: Set the credentials for worker-3
+    shell: kubectl config set-credentials system:node:worker-3 --client-certificate=/home/student/k8s-certs/worker-3.pem --client-key=/home/student/k8s-certs/worker-3-key.pem --embed-certs=true --kubeconfig=worker-3.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload    
+
+
+#-----------------------------------------------------------------------------
+# Node configuration files - Set-context default (convert to k8s_raw and or command vs shell)
+#-----------------------------------------------------------------------------
+
+
+
+  - name: Set the context default for worker-1
+    shell: kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:worker-1 --kubeconfig=worker-1.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload
+    
+  - name: Set the context default for worker-2
+    shell: kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:worker-2 --kubeconfig=worker-2.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload
+    
+  - name: Set the context default for worker-3
+    shell: kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:worker-3 --kubeconfig=worker-3.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload    
+
+
+
+#-----------------------------------------------------------------------------
+# Node configuration files - Use-context default (convert to k8s_raw and or command vs shell)
+#-----------------------------------------------------------------------------
+
+
+
+  - name: Use the context default for worker-1
+    shell: kubectl config use-context default --kubeconfig=worker-1.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload
+    
+  - name: Use the context default for worker-2
+    shell: kubectl config use-context default --kubeconfig=worker-2.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload
+    
+  - name: Use the context default for worker-3
+    shell: kubectl config use-context default --kubeconfig=worker-3.kubeconfig
+    args:
+      chdir: "{{ role_path }}/templates"
+    when: reload    
+
+
+
 
 
 https://docs.ansible.com/ansible/2.5/modules/k8s_raw_module.html
