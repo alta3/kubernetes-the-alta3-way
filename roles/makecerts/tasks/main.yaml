@@ -85,6 +85,7 @@
     template: 
       src: "{{ role_path }}/templates/encryption-config.yaml.j2"
       dest: "/home/student/k8s-config/encryption-config.yaml"
+    become: yes  
     when: reload 
 
   - name: Copy Kube Certs to etcd
