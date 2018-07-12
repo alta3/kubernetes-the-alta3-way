@@ -13,12 +13,12 @@ ExecStart=/usr/local/bin/etcd \
   --peer-trusted-ca-file=/etc/etcd/ca.pem \
   --peer-client-cert-auth \
   --client-cert-auth \
-  --initial-advertise-peer-urls https://{{ ansible_host }}:{{ port.etcds2s }} \
-  --listen-peer-urls https://{{ ansible_host }}:{{ port.etcds2s }} \
-  --listen-client-urls https://{{ ansible_host }}:{{ port.etcdclient }},http://127.0.0.1:{{ port.etcdclient }} \
-  --advertise-client-urls https://{{ ansible_host }}:{{ port.etcdclient }} \
+  --initial-advertise-peer-urls https://{{ ansible_host }}:{{ etcdport.etcds2s }} \
+  --listen-peer-urls https://{{ ansible_host }}:{{ etcdport.etcds2s }} \
+  --listen-client-urls https://{{ ansible_host }}:{{ etcdport.etcdclient }},http://127.0.0.1:{{ etcdport.etcdclient }} \
+  --advertise-client-urls https://{{ ansible_host }}:{{ etcdport.etcdclient }} \
   --initial-cluster-token etcd-cluster-0 \
-  --initial-cluster master-1=https://{{ ip.master1 }}:{{port.etcds2s}},master-2=https://{{ ip.master2 }}:{{ port.etcds2s }},master-3=https://{{ ip.master3 }}:{{ port.etcds2s }} \
+  --initial-cluster master-1=https://{{ ip.master1 }}:{{etcdport.etcds2s}},master-2=https://{{ ip.master2 }}:{{ etcdport.etcds2s }},master-3=https://{{ ip.master3 }}:{{ etcdport.etcds2s }} \
   --initial-cluster-state new \
   --data-dir=/var/lib/etcd
 Restart=on-failure

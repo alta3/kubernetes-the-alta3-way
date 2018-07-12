@@ -6,7 +6,7 @@ ip:
   node2: 172.16.1.9
   node3: 172.16.1.10
 serviceclusteriprange: 172.16.3.0/24
-port:
+etcdport:
   etcdclient: 2379
   etcds2s: 2380
 hname:
