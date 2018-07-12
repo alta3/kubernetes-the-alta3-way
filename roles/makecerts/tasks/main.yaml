@@ -114,10 +114,11 @@
 
   - name: Change permissions to allow copying of keys to Masters
     file:
-      path: "item.path"
-      with_items:
-      - { path: "/var/lib/kubernetes/ca-key.pem", mode: '0664' }
-      - { path: "/var/lib/kubernetes/kubernetes-key.pem", mode: '0664' }
+      mode: "{{ item.mode }}"
+      path: "{{ item.path }}"
+    with_items:
+    - { path: "/var/lib/kubernetes/ca-key.pem", mode: '0664' }
+    - { path: "/var/lib/kubernetes/kubernetes-key.pem", mode: '0664' }
 
 
 
