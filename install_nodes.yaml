@@ -6,13 +6,13 @@
     - node_install
 
 
-#- hosts: masters
-#  gather_facts: False
-#  vars_files: 
-#  - vars/k8s_vars.yaml
+- hosts: nodes
+  gather_facts: False
+  vars_files: 
+  - vars/k8s_vars.yaml
 
-# roles:
-#    - bootstrap
+ roles:
+    - node_install
 
 
 #- hosts: masters

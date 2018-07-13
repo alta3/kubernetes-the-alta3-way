@@ -16,6 +16,8 @@
     - "/var/run/kubernetes"
     become: yes
 
+
+
 #/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #-------------------------------------------------------------------------------------------------------------------------------
 # Check if files exist before clobbering a working system - certs - **** THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON****
@@ -65,6 +67,7 @@
     when: (node_1_pem.stat.exists == false) or (node_1_key_pem.stat.exists == false) or (node_2_pem.stat.exists == false) or (node_2_key_pem.stat.exists == false) or (node_3_pem.stat.exists == false) or (node_3_key_pem.stat.exists == false) or (ca_pem.stat.exists == false)
 
 
+
 #--------------------------------------------------------------------------------------------------------------------
 # Create the Kubelet Client Certificates for each node -- ****THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON*****
 #--------------------------------------------------------------------------------------------------------------------
@@ -105,8 +108,10 @@
     args: 
       chdir: "{{ role_path }}/templates"
     when: reload
-#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
+
+
+#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 #-----------------------------------------------------------------------------
 # Copy Certs to the Kubernetes nodes
@@ -135,10 +140,10 @@
 #/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 
+
 #-----------------------------------------------------------------------------
 # Node configuration files - Setting the cluster (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
-
 
   - name: Set the config file for node-1
     shell: kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/var/lib/kubernetes/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=node-1.kubeconfig
@@ -162,8 +167,6 @@
 # Node configuration files - Setting the credentials (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
 
-
-
   - name: Set the credentials for node-1
     shell: kubectl config set-credentials system:node:node-1 --client-certificate=/home/student/k8s-certs/node-1.pem --client-key=/home/student/k8s-certs/node-1-key.pem --embed-certs=true --kubeconfig=node-1.kubeconfig
     args:
@@ -186,8 +189,6 @@
 #-----------------------------------------------------------------------------
 # Node configuration files - Set-context default (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
-
-
 
   - name: Set the context default for node-1
     shell: kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:node-1 --kubeconfig=node-1.kubeconfig
@@ -213,8 +214,6 @@
 # Node configuration files - Use-context default (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
 
-
-
   - name: Use the context default for node-1
     shell: kubectl config use-context default --kubeconfig=node-1.kubeconfig
     args:
@@ -239,7 +238,6 @@
 # Node configuration files - Generating cert and key (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
 
-
   - name: Generate kube-proxy client cert and private key
     shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
     args:
@@ -263,8 +261,6 @@
 # Node configuration - Generating client authentication config file (convert to k8s_raw and or command vs shell)
 #-----------------------------------------------------------------------------
 
-    
- 
   - name: create the client auth config file using the ca cert
     shell: kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/home/student/k8s-certs/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=kube-proxy.kubeconfig 
     args:
@@ -290,6 +286,15 @@
     when: reload    
 
 
+#-----------------------------------------------------------------------------
+# Node configuration - Generating client authentication config file (convert to k8s_raw and or command vs shell)
+#-----------------------------------------------------------------------------
+
+  - name: Copy configuration files out to kubernetes nodes
+    copy: #Does this need to be each own separate config file? like node-1.kubeconfig?
+      src: "{{ k8sconfigdir }}/kube-proxy.kubeconfig"
+      dest: "{{ ansible_host }}:~/{{ hostname }}.kubeconfig"
+   #become: yes
 
 ##### Step nine from the 03-workers.md is the next step.
 
