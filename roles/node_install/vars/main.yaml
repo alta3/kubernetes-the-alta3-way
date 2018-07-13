@@ -35,3 +35,5 @@ tlsprivatekeyfile:
  node1pkloc: node-1-key.pem
  node2pkloc: node-2-key.pem
  node3pkloc: node-3-key.pem
+k8sconfigdir: /home/student/k8s-config/
+k8scertsdir: /home/student/k8s-certs/
