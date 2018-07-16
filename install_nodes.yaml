@@ -13,13 +13,3 @@
 
  roles:
     - node_install
-
-
-#- hosts: masters
-#  gather_facts: True
-#  vars_files:
-#  - vars/k8s_vars.yaml 
-#
-#  roles:
-#    - master_install
-    
