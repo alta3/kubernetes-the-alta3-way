@@ -59,9 +59,6 @@
 #      path: /var/lib/kubelernetes/ca.pem
 #    register: ca_pem
 
-
-
-#TODO add some comment to these sections, and maybe rename reload to generate_keys etc
   - set_fact:
       reload: false
 
@@ -75,20 +72,24 @@
 # Create the Kubelet Client Certificates for each node -- ****THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON*****
 #--------------------------------------------------------------------------------------------------------------------
 
-  - name: Generate the certificate config file for nodes (file same on all nodes)
+  - name: Generate the certificate config file for node-1
     template:
-      src: "{{ role_path }}/templates/node-csr.json.j2"
-      dest: "/home/student/node-csr.json" 
+      src: "{{ role_path }}/templates/node-1-csr.json.j2"
+      dest: /home/student/node-1-csr.json 
     when: reload
 
 
-  - name: Generate the specific certificate and Private key for each node when it does not already exist
-    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-1,172.16.1.8 -profile=kubernetes node-csr.json | cfssljson -bare node-1
-    #shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname={{ inventory_hostname }},{{ TODO, ip of host needs }} -profile=kubernetes node-csr.json | cfssljson -bare node-1
+  - name: Generate the Certificate and Private key for node-1 when it does not already exist
+    shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-1,172.16.1.8 -profile=kubernetes node-1-csr.json | cfssljson -bare node-1
     args: 
       chdir: "{{ role_path }}/templates"
     when: reload
 
+  - name: Generate the certificate config file for node-2
+    template:
+      src: "{{ role_path }}/templates/node-2-csr.json.j2"
+      dest: /home/student/node-2-csr.json 
+    when: reload
 
   - name: Generate the Certificate and Private key for node-2 when it does not already exist
     shell: cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -hostname=node-2,172.16.1.9 -profile=kubernetes node-2-csr.json | cfssljson -bare node-2
@@ -299,59 +300,6 @@
 
 
 ####https://docs.ansible.com/ansible/2.5/modules/k8s_raw_module.html
-
-
-
-#-----------------------------------------------------------------------------
-# Bootstrap Kubernetes Nodes
-#-----------------------------------------------------------------------------
-
-  - name: Install socat on the kubernetes nodes
-    apt: 
-      name: socat
-      state: present
-
-
-
-#
-  - name: Download the Node binaries
-    shell: 
-wget -q --show-progress --https-only --timestamping https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
-wget -q --show-progress --https-only --timestamping https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz
-wget -q --show-progress --https-only --timestamping https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
-wget -q --show-progress --https-only --timestamping https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-proxy
-wget -q --show-progress --https-only --timestamping https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubelet
-
-
-
-
-
-
-
-  - name: Create the install directories
-    file: 
-sudo mkdir -p /etc/cni/net.d /opt/cni/bin /var/lib/kubelet /var/lib/kube-proxy /var/lib/kubernetes /var/run/kubernetes
-
-
-
-
-  - name: install the kubernetes binaries
-student@worker-1:~$ sudo tar -xvf cni-plugins-amd64-v0.6.0.tgz -C /opt/cni/bin/
-student@worker-1:~$ sudo tar -xvf cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz -C /
-student@worker-1:~$ chmod +x kubectl kube-proxy kubelet
-student@worker-1:~$ sudo mv kubectl kube-proxy kubelet /usr/local/bin/
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

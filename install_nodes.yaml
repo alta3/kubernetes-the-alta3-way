@@ -11,5 +11,5 @@
   vars_files: 
   - vars/k8s_vars.yaml
 
- roles:
+  roles:
     - node_install
