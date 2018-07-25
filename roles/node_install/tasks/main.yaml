@@ -76,6 +76,9 @@
     - { source: "/var/lib/kubernetes/ca.pem", dest: "/var/lib/kubernetes/ca.pem", mode: "0664" }
     - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/etc/etcd/kubernetes.pem", mode: "0664" }
     - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem", mode: "0600" }
+    - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/var/lib/kubernetes.pem", mode: "0664" }
+    - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/var/lib/kubernetes-key.pem", mode: "0600" }
+    - { source: "/var/lib/kubernetes/{{ inventory_hostname }}.pem", dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem", mode: "0600" }
     - { source: "/var/lib/kubernetes/{{ inventory_hostname }}.pem", dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem", mode: "0600" }
     - { source: "/var/lib/kubernetes/{{ inventory_hostname }}-key.pem",  dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem", mode: "0644" }
     become: yes
@@ -188,8 +191,8 @@
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
     with_items: 
-    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kube-proxy.kubeconfig", mode: "0600" } #TODO what is the mode here?
-    - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kube-proxy/kube-proxy.kubeconfig", mode: "0600" }
+    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig", mode: "0600" } #TODO what is the mode here?
+    - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kubelet/kubeconfig", mode: "0600" }
     become: yes
 
 
@@ -219,14 +222,14 @@
     file: 
       path: "{{ item }}"
       state: directory
-      mode: 
+      mode: "0750" 
     with_items: 
-    - /etc/cni/net.d
-    - /opt/cni/bin
-    - /var/lib/kubelet
-    - /var/lib/kube-proxy
-    - /var/lib/kubernetes
-    - /var/run/kubernetes
+    - "/etc/cni/net.d/"
+    - "/opt/cni/bin/"
+    - "/var/lib/kubelet/"
+    - "/var/lib/kube-proxy/"
+    - "/var/lib/kubernetes/"
+    - "/var/run/kubernetes/"
     become: yes
 
 #-----------------------------------------------------------------------------
@@ -236,41 +239,91 @@
   - name: Download the Node binaries
     get_url:
       url: "{{ item }}"
-      dest: "/home/student/"
+      dest: "/usr/local/bin/"
       mode: "0755"
     become: yes 
     with_items:
-    - https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
-    - https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz
     - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
     - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-proxy
     - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubelet
 
-
-
-  - name: Create the install directories
-    file: 
-sudo mkdir -p /etc/cni/net.d /opt/cni/bin /var/lib/kubelet /var/lib/kube-proxy /var/lib/kubernetes /var/run/kubernetes
-
-
-
-
   - name: install the kubernetes binaries
-student@worker-1:~$ sudo tar -xvf cni-plugins-amd64-v0.6.0.tgz -C /opt/cni/bin/
-student@worker-1:~$ sudo tar -xvf cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz -C /
-student@worker-1:~$ chmod +x kubectl kube-proxy kubelet
-student@worker-1:~$ sudo mv kubectl kube-proxy kubelet /usr/local/bin/
+    unarchive:
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
+    with_items:
+    - { source: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
+    - { source: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
 
 
+#/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
+#-----------------------------------------------------------------------------
+# Configure CNI Networking 
+#-----------------------------------------------------------------------------
+#/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
+
+  - name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
+    template:
+      src: "{{ role_path }}/templates/10-bridge.conf.j2"
+      dest: "/etc/cni/net.d/10-bridge.conf"
+    become: yes
+
+  - name: Create the 99-loopback.conf file for each node. 
+    copy: 
+      src: "{{ role_path }}/files/99-loopback.conf"
+      dest: "/etc/cni/net.d"
+    become: yes    
+
+  - name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
+    copy: 
+      src: "{{role_path}}/files/{{ inventory_hostname }}-pod-routes"
+      dest: "/etc/network/if-up.d/pod-routes"
+      mode: "0755"
+    become: yes
 
 
+#-----------------------------------------------------------------------------
+# Configure the Kubelet
+#-----------------------------------------------------------------------------
 
 
+  - name: Create the kubelet.service config file for each node
+    template:
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
+    with_items:    
+    - { source: "{{ role_path }}/templates/kubelet.service.j2", dest: "/etc/systemd/system/kubelet.service" }
+    - { source: "{{ role_path }}/templates/kube-proxy.service.j2", dest: "/etc/systemd/system/kube-proxy.service" }
+    become: yes
 
 
+#-----------------------------------------------------------------------------
+# Start the Worker Services 
+#-----------------------------------------------------------------------------
 
+  - name: Do a reload of the daemons
+    systemd: 
+      daemon_reload: yes
 
+  - name: Enable the new services
+    systemd:
+      enabled: yes
+      name: "{{ item }}"
+    with_items:
+    - "containerd"
+    - "cri-containerd"
+    - "kubelet"
+    - "kube-proxy"
 
+  - name: Start the services
+    systemd: 
+      state: restarted #TODO check if not having this set to started causes any havoc
+      name: "{{ item }}"
+    with_items:
+    - "containerd"
+    - "cri-containerd"
+    - "kubelet"
+    - "kube-proxy"
 
 
 
