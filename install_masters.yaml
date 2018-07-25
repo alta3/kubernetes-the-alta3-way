@@ -19,5 +19,5 @@
   - vars/k8s_vars.yaml 
 
   roles:
-    - master_install
+   - #master_install
     
