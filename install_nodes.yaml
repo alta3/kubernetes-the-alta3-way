@@ -1,11 +1,3 @@
-- hosts: localhost
-  gather_facts: True
-  vars_files:
-
-  roles:
-    - node_install
-
-
 - hosts: nodes
   gather_facts: False
   vars_files: 
