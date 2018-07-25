@@ -26,7 +26,7 @@
     stat:
       path: "/var/lib/kubelet/{{ inventory_hostname }}.pem"
     register: pem_exists
-    #register: "{{ hostvars[inventory_hostname][inventory_hostname + '_pem'] }}"
+    become: yes
 
   - name: fix issues
     debug:
@@ -36,10 +36,12 @@
     stat:
       path: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem"
     register: pem_key_exists
+    become: yes
 
   - name: fix more issues
     debug: 
       var: pem_key_exists
+
 #TODO add some comment to these sections, and maybe rename reload to generate_keys etc
 #  - set_fact:
 #      reload: false
@@ -47,6 +49,7 @@
   - set_fact:
       reload: "(pem_exists.stat.exists == false) or (pem_key_exists.stat.exists == false)"
 
+#TODO: get rid of next 3 lines once working system
 #  - set_fact:
 #      reload: true
 #    when: ({{ inventory_hostname }}_pem.stat.exists == false) or ({{ inventory_hostname }}_key_pem.stat.exists == false)
@@ -282,22 +285,21 @@
     get_url:
       url: "{{ item.url }}"
       dest: "{{ item.dest }}"
-      mode: "0755"
-    become: yes 
+      #mode: "0755"
     with_items:
     - { url: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
     - { url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
+    become: yes 
 
-
-
-#  - name: install the kubernetes binaries
-#    unarchive:
-#      src: "{{ item.source }}"
-#      dest: "{{ item.dest }}"
-#    with_items:
-#    - { source: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
-#    - { source: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
-#    become: yes
+  - name: unarchive the kubernetes binaries
+    unarchive:
+      remote_src: yes
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
+    with_items:
+    - { source: "/opt/cni/bin/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
+    - { source: "/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
+    become: yes
 
 
 #/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
@@ -348,6 +350,7 @@
   - name: Do a reload of the daemons
     systemd: 
       daemon_reload: yes
+    become: yes  
 
   - name: Enable the new services
     systemd:
@@ -358,6 +361,7 @@
     - "cri-containerd"
     - "kubelet"
     - "kube-proxy"
+    become: yes
 
   - name: Start the services
     systemd: 
@@ -368,7 +372,7 @@
     - "cri-containerd"
     - "kubelet"
     - "kube-proxy"
-
+    become: yes
 
 
 
