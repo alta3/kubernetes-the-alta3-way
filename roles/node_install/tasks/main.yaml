@@ -243,7 +243,7 @@
     apt: 
       name: socat
       state: present
-
+    become: yes
 
 #-----------------------------------------------------------------------------
 # Create Directories for Installation of Node Binaries 
@@ -278,13 +278,26 @@
     - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-proxy
     - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubelet
 
-  - name: install the kubernetes binaries
-    unarchive:
-      src: "{{ item.source }}"
+  - name: Download Node binaries that are tarred
+    get_url:
+      url: "{{ item.url }}"
       dest: "{{ item.dest }}"
+      mode: "0755"
+    become: yes 
     with_items:
-    - { source: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
-    - { source: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
+    - { url: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
+    - { url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
+
+
+
+#  - name: install the kubernetes binaries
+#    unarchive:
+#      src: "{{ item.source }}"
+#      dest: "{{ item.dest }}"
+#    with_items:
+#    - { source: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
+#    - { source: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
+#    become: yes
 
 
 #/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
