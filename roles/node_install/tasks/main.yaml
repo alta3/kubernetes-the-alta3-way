@@ -28,7 +28,7 @@
     register: pem_exists
     become: yes
 
-  - name: fix issues
+  - name: fix issues #TODO: remove when system is working???
     debug:
       var: pem_exists
 
@@ -38,7 +38,7 @@
     register: pem_key_exists
     become: yes
 
-  - name: fix more issues
+  - name: fix more issues #TODO: remove when system is working???
     debug: 
       var: pem_key_exists
 

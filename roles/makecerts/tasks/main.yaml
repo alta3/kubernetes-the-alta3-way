@@ -134,6 +134,17 @@
     become: yes
     when: reload
 
+  - name: Copy admin certs to dir #TODO: which directory is this going into, what is it even needed for, and who should the owner be, student or root?
+    copy:
+      src: "{{ item.source }}"
+      dest: "{{ item.dest }}"
+    with_items:
+    - { source: "{{ role_path }}/files/admin.pem", dest: "/var/lib/kubernetes/admin.pem", mode: "0644" }
+    - { source: "{{ role_path }}/files/admin-key.pem", dest: "/var/lib/kubernetes/admin-key.pem", mode: "0600" }
+    become: yes
+    when: reload
+
+
   - name: Change permissions to allow copying of keys to Masters
     file:
       mode: "{{ item.mode }}"
@@ -141,5 +152,3 @@
     with_items:
     - { path: "/var/lib/kubernetes/ca-key.pem", mode: '0664' }
     - { path: "/var/lib/kubernetes/kubernetes-key.pem", mode: '0664' }
-
-
