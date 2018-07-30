@@ -374,7 +374,3 @@
     - "kube-proxy"
     become: yes
 
-
-
-
-

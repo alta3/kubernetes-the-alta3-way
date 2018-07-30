@@ -17,3 +17,7 @@ hname:
   node2: node-2
   node3: node-3
 clustercidr: 192.168.0.0/16
+countrycsr: US
+citycsr: Harrisburg
+statecsr: Pennsylvania
+oucsr: Kubernetes The Alta3 Way

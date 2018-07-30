@@ -1,0 +1,42 @@
+#``````````````````````````````````````````````````````````
+# Install fping
+#``````````````````````````````````````````````````````````
+
+ - name: install fping for checking if nodes are alive
+   apt:
+    name: fping
+    state: present
+   become: yes
+
+
+#``````````````````````````````````````````````````````````
+# Setup nginx
+#``````````````````````````````````````````````````````````
+
+ - name: Install nginx for ??
+   apt:
+    name: nginx
+    state: present
+   become: yes
+
+ - name: Create the config file for nginx
+   template:
+     src: "{{ role_path }}/templates/nginx.conf.j2"
+     dest: "/etc/nginx/nginx.conf"
+   become: yes
+
+ - name: Start the nginx service
+   systemd:
+     name: nginx
+     daemon_reload: yes
+     state: started
+     enabled: yes
+   become: yes
+
+
+#``````````````````````````````````````````````````````````
+# Locally configure kubernetes
+#``````````````````````````````````````````````````````````
+
+
+
