@@ -84,7 +84,7 @@
       chdir: "{{ role_path }}/files"
     when: reload
 
-  - name: Generate an encryption key
+  - name: Generate an encryption key #TODO: not sure if this works.. where is the full command ENCRYPTION_KEY=$(head...)
     shell: head -c 32 /dev/urandom | base64
     args:
       chdir: "{{ role_path }}/files"
