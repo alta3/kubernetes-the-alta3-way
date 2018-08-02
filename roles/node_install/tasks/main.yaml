@@ -6,6 +6,7 @@
     file:
       path: "{{ item }}"
       state: directory
+      mode: "0755"
     with_items:
     - "/etc/cni/net.d"
     - "/opt/cni/bin"
@@ -16,6 +17,30 @@
     - "/etc/etcd"
     become: yes
 
+
+#``````````````````````````````````````````````````````````
+# Setup nginx on the nodes
+#``````````````````````````````````````````````````````````
+
+ - name: Install nginx for ??
+   apt:
+    name: nginx
+    state: present
+   become: yes
+
+ - name: Create the config file for nginx
+   template:
+     src: "{{ role_path }}/templates/nginx.conf.j2"
+     dest: "/etc/nginx/nginx.conf"
+   become: yes
+
+ - name: Start the nginx service
+   systemd:
+     name: nginx
+     daemon_reload: yes
+     state: started
+     enabled: yes
+   become: yes
 
 
 #/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
@@ -28,9 +53,9 @@
     register: pem_exists
     become: yes
 
-  - name: fix issues #TODO: remove when system is working???
-    debug:
-      var: pem_exists
+#  - name: fix issues #TODO: remove when system is working???
+#    debug:
+#      var: pem_exists
 
   - name: Check if node-x-key.pem exists in the path
     stat:
@@ -38,9 +63,9 @@
     register: pem_key_exists
     become: yes
 
-  - name: fix more issues #TODO: remove when system is working???
-    debug: 
-      var: pem_key_exists
+#  - name: fix more issues #TODO: remove when system is working???
+#    debug: 
+#      var: pem_key_exists
 
 #TODO add some comment to these sections, and maybe rename reload to generate_keys etc
 #  - set_fact:
@@ -224,8 +249,10 @@
     copy:
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
+      group: student
+      owner: student
     with_items: 
-    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig", mode: "0600" } #TODO what is the mode here?
+    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig", mode: "0600" }
     - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kubelet/kubeconfig", mode: "0600" }
     become: yes
 
@@ -251,20 +278,20 @@
 #-----------------------------------------------------------------------------
 # Create Directories for Installation of Node Binaries 
 #-----------------------------------------------------------------------------
-
-  - name: Create the install directories
-    file: 
-      path: "{{ item }}"
-      state: directory
-      mode: "0750" 
-    with_items: 
-    - "/etc/cni/net.d/"
-    - "/opt/cni/bin/"
-    - "/var/lib/kubelet/"
-    - "/var/lib/kube-proxy/"
-    - "/var/lib/kubernetes/"
-    - "/var/run/kubernetes/"
-    become: yes
+#TODO: I think this section can be removed.. already done previously
+#  - name: Create the install directories
+#    file: 
+#      path: "{{ item }}"
+#      state: directory
+#      mode: "0750" 
+#    with_items: 
+#    - "/etc/cni/net.d/"
+#    - "/opt/cni/bin/"
+#    - "/var/lib/kubelet/"
+#    - "/var/lib/kube-proxy/"
+#    - "/var/lib/kubernetes/"
+#    - "/var/run/kubernetes/"
+#    become: yes
 
 #-----------------------------------------------------------------------------
 # Downloading and Installing Node Binaries 

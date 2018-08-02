@@ -11,9 +11,9 @@ events {
 stream {
 	upstream kube_apiserver {
 		least_conn;
-		server {{ master1 }}:6443;
-		server {{ master2 }}:6443;
-		server {{ master3 }}:6443;
+		server {{ ip.master1 }}:6443;
+		server {{ ip.master2 }}:6443;
+		server {{ ip.master3 }}:6443;
 	}
 
 	server {
