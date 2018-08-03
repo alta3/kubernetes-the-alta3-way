@@ -1,5 +1,6 @@
 - hosts: localhost
-
+  vars_files: 
+  - vars/k8s_vars.yaml
   roles:
     - makecerts
 

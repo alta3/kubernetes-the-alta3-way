@@ -67,17 +67,20 @@
 #    debug: 
 #      var: pem_key_exists
 
-#TODO add some comment to these sections, and maybe rename reload to generate_keys etc
-#  - set_fact:
-#      reload: false
-
+# Set reload to true by default to reload pem keys
   - set_fact:
-      reload: "(pem_exists.stat.exists == false) or (pem_key_exists.stat.exists == false)"
+      reload: true
+
+#  - set_fact:
+#      reload: "(pem_exists.stat.exists == false) or (pem_key_exists.stat.exists == false)"
 
 #TODO: get rid of next 3 lines once working system
-#  - set_fact:
-#      reload: true
-#    when: ({{ inventory_hostname }}_pem.stat.exists == false) or ({{ inventory_hostname }}_key_pem.stat.exists == false)
+#If either pem or -key.pem does not exist then we will reload all keys. Note the override switch force_reload if set to true, will always cause the pem keys to be recalculated.
+  - set_fact:
+      reload: false
+    when: (pem_exists and pem_key_exists) and not force_reload
+   # when: ({{ inventory_hostname }}_pem.stat.exists == false) or ({{ inventory_hostname }}_key_pem.stat.exists == false)
+
 
 #--------------------------------------------------------------------------------------------------------------------
 # Create the Kubelet Client Certificates for each node -- ****THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON*****
@@ -86,13 +89,18 @@
     local_action: 
       module: template 
       src: "{{ role_path }}/templates/node-csr.json.j2" 
-      dest: "/home/student/node-csr.json"
+      dest: "/home/student/{{ inventory_hostname }}-csr.json"
     when: reload
     #become: yes 
 
   - name: Generate the specific certificate and Private key for each node when it does not already exist
     local_action:
-      module: shell cfssl gencert -ca=/var/lib/kubernetes/ca.pem -ca-key=/var/lib/kubernetes/ca-key.pem -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json -hostname={{ inventory_hostname }},{{ ansible_host }} -profile=kubernetes /home/student/node-csr.json | cfssljson -bare {{ inventory_hostname }}
+      module: shell cfssl gencert \
+              -ca=/var/lib/kubernetes/ca.pem \
+              -ca-key=/var/lib/kubernetes/ca-key.pem \
+              -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json \
+              -hostname={{ inventory_hostname }},{{ ansible_host }} \
+              -profile=kubernetes /home/student/{{ inventory_hostname }}-csr.json | cfssljson -bare {{ inventory_hostname }}
     args: 
       chdir: "/home/student/"
     when: reload
@@ -118,8 +126,8 @@
     - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem", mode: "0600" }
     - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/var/lib/kubernetes.pem", mode: "0664" }
     - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/var/lib/kubernetes-key.pem", mode: "0600" }
-    - { source: "/home/student/{{ inventory_hostname }}.pem", dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem", mode: "0600" }
-    - { source: "/home/student/{{ inventory_hostname }}-key.pem",  dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem", mode: "0644" }
+    - { source: "/home/student/{{ inventory_hostname }}.pem", dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem", mode: "0664" }
+    - { source: "/home/student/{{ inventory_hostname }}-key.pem",  dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem", mode: "0600" }
     become: yes
 #/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
@@ -131,12 +139,14 @@
 
   - name: Set the config file for each node
     local_action:
-      module: shell kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/var/lib/kubernetes/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig={{ inventory_hostname }}.kubeconfig
-    #shell: kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/var/lib/kubernetes/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=node-1.kubeconfig
+      module: shell kubectl config set-cluster kubernetes-the-alta3-way \
+              --certificate-authority=/var/lib/kubernetes/ca.pem \
+              --embed-certs=true --server=https://127.0.0.1:6443 \
+              --kubeconfig={{ inventory_hostname }}.kubeconfig
       args: 
         chdir: "{{ k8sconfigdir }}"
     become: yes
-    # when: reload
+    when: reload
 
 
 #-----------------------------------------------------------------------------
@@ -145,12 +155,14 @@
 
   - name: Set the credentials for each node
     local_action:
-      module: shell kubectl config set-credentials system:node:{{ inventory_hostname }} --client-certificate=/home/student/{{ inventory_hostname }}.pem --client-key=/home/student/{{ inventory_hostname }}-key.pem --embed-certs=true --kubeconfig={{ inventory_hostname }}.kubeconfig
-    #shell: kubectl config set-credentials system:node:node-1 --client-certificate=/home/student/k8s-certs/node-1.pem --client-key=/home/student/k8s-certs/node-1-key.pem --embed-certs=true --kubeconfig=node-1.kubeconfig
+      module: shell kubectl config set-credentials system:node:{{ inventory_hostname }} \
+              --client-certificate=/home/student/{{ inventory_hostname }}.pem \
+              --client-key=/home/student/{{ inventory_hostname }}-key.pem \
+              --embed-certs=true --kubeconfig={{ inventory_hostname }}.kubeconfig
       args:
         chdir: "{{ k8sconfigdir }}"
     become: yes
-   # when: reload
+    when: reload
     
 
 #-----------------------------------------------------------------------------
@@ -159,12 +171,14 @@
 
   - name: Set the context default for each node
     local_action:
-      module: shell kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:{{ inventory_hostname }} --kubeconfig={{ inventory_hostname }}.kubeconfig
-    #shell: kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=system:node:node-1 --kubeconfig=node-1.kubeconfig
+      module: shell kubectl config set-context default \
+              --cluster=kubernetes-the-alta3-way \
+              --user=system:node:{{ inventory_hostname }} \
+              --kubeconfig={{ inventory_hostname }}.kubeconfig
       args:
         chdir: "{{ k8sconfigdir }}"
     become: yes
-   # when: reload
+    when: reload
 
     
 #-----------------------------------------------------------------------------
@@ -173,12 +187,12 @@
 
   - name: Use the context default for each node
     local_action:
-      module: shell kubectl config use-context default --kubeconfig={{ inventory_hostname }}.kubeconfig
-    #shell: kubectl config use-context default --kubeconfig=node-1.kubeconfig
+      module: shell kubectl config use-context default \
+              --kubeconfig={{ inventory_hostname }}.kubeconfig
       args:
         chdir: "{{ k8sconfigdir }}" 
     become: yes
-   # when: reload
+    when: reload
     
 
 #-----------------------------------------------------------------------------
@@ -186,11 +200,14 @@
 #-----------------------------------------------------------------------------
   - name: Generate kube-proxy client cert and private key (kube-proxy-key.pem & kube-proxy.pem)
     local_action: 
-      module: shell cfssl gencert -ca=/var/lib/kubernetes/ca.pem -ca-key=/var/lib/kubernetes/ca-key.pem -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json -profile=kubernetes /home/student/git/kubernetes-the-alta3-way/roles/node_install/files/kube-proxy-csr.json | cfssljson -bare kube-proxy
+      module: shell cfssl gencert -ca=/var/lib/kubernetes/ca.pem \
+              -ca-key=/var/lib/kubernetes/ca-key.pem \
+              -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json \
+              -profile=kubernetes /home/student/git/kubernetes-the-alta3-way/roles/node_install/files/kube-proxy-csr.json | cfssljson -bare kube-proxy
       args:
         chdir: "{{ k8scertsdir }}"
     become: yes
-   # when: reload #TODO change this to be creates (shell) so its part of the module parameters and reduces the need for when: reloads
+    when: reload #TODO change this to be creates (shell) so its part of the module parameters and reduces the need for when: reloads
 
 
 #-----------------------------------------------------------------------------
@@ -199,35 +216,47 @@
 
   - name: create the client auth config file using the ca cert
     local_action: 
-      module: shell kubectl config set-cluster kubernetes-the-alta3-way --certificate-authority=/var/lib/kubernetes/ca.pem --embed-certs=true --server=https://127.0.0.1:6443 --kubeconfig=kube-proxy.kubeconfig 
+      module: shell kubectl config set-cluster kubernetes-the-alta3-way \
+              --certificate-authority=/var/lib/kubernetes/ca.pem \
+              --embed-certs=true \
+              --server=https://127.0.0.1:6443 \
+              --kubeconfig=kube-proxy.kubeconfig 
       args:
         chdir: "{{ k8sconfigdir }}" 
     become: yes
-   # when: reload
+    when: reload
     
   - name: add the kube-proxy cert and key to the config
     local_action:
-      module: shell kubectl config set-credentials kube-proxy --client-certificate=/home/student/k8s-certs/kube-proxy.pem --client-key=/home/student/k8s-certs/kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig 
+      module: shell kubectl config set-credentials kube-proxy \
+              --client-certificate=/home/student/k8s-certs/kube-proxy.pem \
+              --client-key=/home/student/k8s-certs/kube-proxy-key.pem \
+              --embed-certs=true \
+              --kubeconfig=kube-proxy.kubeconfig 
       args:
         chdir: "{{ k8sconfigdir }}" 
     become: yes
-   # when: reload
+    when: reload
     
   - name: set the config user to be kube-proxy
     local_action:
-      module: shell kubectl config set-context default --cluster=kubernetes-the-alta3-way --user=kube-proxy --kubeconfig=kube-proxy.kubeconfig
+      module: shell kubectl config set-context default \
+              --cluster=kubernetes-the-alta3-way \
+              --user=kube-proxy \
+              --kubeconfig=kube-proxy.kubeconfig
       args:
         chdir: "{{ k8sconfigdir }}" 
     become: yes
-   # when: reload
+    when: reload
 
   - name: set the default kubeconfig to be kube-proxy.kubeconfig
     local_action: 
-      module: shell kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+      module: shell kubectl config use-context default \
+              --kubeconfig=kube-proxy.kubeconfig
       args:
         chdir: "{{ k8sconfigdir }}" 
     become: yes
-   # when: reload
+    when: reload
 
 
 #-----------------------------------------------------------------------------
@@ -249,11 +278,12 @@
     copy:
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
+      mode: "0600"
       group: student
       owner: student
     with_items: 
-    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig", mode: "0600" }
-    - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kubelet/kubeconfig", mode: "0600" }
+    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig" }
+    - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kubelet/kubeconfig" }
     become: yes
 
 

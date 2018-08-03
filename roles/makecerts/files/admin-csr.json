@@ -7,10 +7,10 @@
   "names": [
     {
       "C": "US",
-      "L": "{{ citycsr }}",
+      "L": "Harrisburg",
       "O": "system:masters",
-      "OU": "{{ oucsr }}",
-      "ST": "{{ statecsr }}"
+      "OU": "Kubernetes The Alta3 Way",
+      "ST": "Pennsylvania"
     }
   ]
 }

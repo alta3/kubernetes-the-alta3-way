@@ -1,14 +1,14 @@
 {
-  "CN": "system:node:{{ inventory_hostname }}",
+  "CN": "admin",
   "key": {
     "algo": "rsa",
     "size": 2048
   },
   "names": [
     {
-      "C": "{{ countrycsr }}",
+      "C": "US",
       "L": "{{ citycsr }}",
-      "O": "system:nodes",
+      "O": "system:masters",
       "OU": "{{ oucsr }}",
       "ST": "{{ statecsr }}"
     }

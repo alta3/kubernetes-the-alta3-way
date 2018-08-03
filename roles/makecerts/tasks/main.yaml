@@ -58,12 +58,20 @@
     register: admin_key_pem
 
   - set_fact:
-      reload: false
+      reload: true
 
   - set_fact:
-      reload: true
-    when: (ca_pem.stat.exists == false)  or ( ca_key_pem.stat.exists == false ) or (kubernetes_pem.stat.exists == false ) or (kubernetes_key_pem.stat.exists == false ) or (admin_pem.stat.exists == false ) or (admin_key_pem.stat.exists == false )
+      reload: false
+    when: (ca_pem and ca_key_pem and kubernetes_pem and kubernetes_key_pem and encryption_config_yaml and admin_pem and admin_key_pem) and not force_reload
 
+#  - set_fact:
+#      reload: false
+#
+#  - set_fact:
+#      reload: true
+#    when: (ca_pem.stat.exists == false)  or ( ca_key_pem.stat.exists == false ) or (kubernetes_pem.stat.exists == false ) or (kubernetes_key_pem.stat.exists == false ) or (admin_pem.stat.exists == false ) or (admin_key_pem.stat.exists == false )
+
+  
   
 # Generates ca.pem and ca-key.pem when do not already exist
   - name: Generate a self-signed CA cert and private key for the k8s cloud
@@ -92,6 +100,7 @@
     when: reload
 
 #Generate the admin certificates to setup for 
+
   - name: Generate admin certificates 
     shell: cfssl gencert \
            -ca=ca.pem \
@@ -139,8 +148,10 @@
       src: "{{ item.source }}"
       dest: "{{ item.dest }}"
     with_items:
-    - { source: "{{ role_path }}/files/admin.pem", dest: "/var/lib/kubernetes/admin.pem", mode: "0644" }
-    - { source: "{{ role_path }}/files/admin-key.pem", dest: "/var/lib/kubernetes/admin-key.pem", mode: "0600" }
+    - { source: "{{ role_path }}/files/admin.pem", dest: "/home/student/admin.pem", mode: "0644" }
+    - { source: "{{ role_path }}/files/admin-key.pem", dest: "/home/student/admin-key.pem", mode: "0600" }
+    #- { source: "{{ role_path }}/files/admin.pem", dest: "/var/lib/kubernetes/admin.pem", mode: "0644" }
+    #- { source: "{{ role_path }}/files/admin-key.pem", dest: "/var/lib/kubernetes/admin-key.pem", mode: "0600" }
     become: yes
     when: reload
 
