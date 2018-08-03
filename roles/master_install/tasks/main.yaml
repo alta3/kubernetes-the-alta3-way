@@ -74,7 +74,7 @@
       src: '{{ item.source }}' 
       dest: '{{ item.dest }}' 
       remote_src: yes
-      mode: 0775
+      mode: "0775"
       owner: student
       group: student
     with_items:
