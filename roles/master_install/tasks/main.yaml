@@ -119,7 +119,7 @@
       owner: "{{ item.ug }}"
       group: "{{ item.ug }}"
     with_items:
-    - { source: /var/lib/kubernetes/ca.pem,                 dest: /var/lib/kubernetes/ca.pem,                 mode: "0664", ug: root } 
+    - { source: /var/lib/kubernetes/ca.pem,                 dest: /var/lib/kubernetes/ca.pem,                 mode: "0664", ug: student } 
     - { source: /var/lib/kubernetes/ca-key.pem,             dest: /var/lib/kubernetes/ca-key.pem,             mode: "0600", ug: student } 
     - { source: /var/lib/kubernetes/kubernetes-key.pem,     dest: /var/lib/kubernetes/kubernetes-key.pem,     mode: "0600", ug: student } 
     - { source: /var/lib/kubernetes/kubernetes.pem,         dest: /var/lib/kubernetes/kubernetes.pem,         mode: "0664", ug: student } 
