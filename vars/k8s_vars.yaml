@@ -38,4 +38,4 @@ tlsprivatekeyfile:
 k8sconfigdir: /home/student/k8s-config
 k8scertsdir: /home/student/k8s-certs
 #setting force_reload to true will force the system to recalculate all the certs. By default please set this to false
-force_reload: true
+force_reload: false
