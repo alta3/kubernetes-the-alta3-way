@@ -1,21 +1,8 @@
-ip:
-  master1: 172.16.1.5
-  master2: 172.16.1.6
-  master3: 172.16.1.7
-  node1: 172.16.1.8
-  node2: 172.16.1.9
-  node3: 172.16.1.10
+---
 serviceclusteriprange: 172.16.3.0/24
 etcdport:
   etcdclient: 2379
   etcds2s: 2380
-hname:
-  master1: master-1
-  master2: master-2
-  master3: master-3
-  node1: node-1
-  node2: node-2
-  node3: node-3
 clustercidr: 192.168.0.0/16
 countrycsr: US
 citycsr: Harrisburg
@@ -39,3 +26,36 @@ k8sconfigdir: /home/student/k8s-config
 k8scertsdir: /home/student/k8s-certs
 #setting force_reload to true will force the system to recalculate all the certs. By default please set this to false
 force_reload: false
+
+
+apiserver_cluster_ip: 172.16.3.1 # TODO is this actually the right name for this IP?
+master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }},{% endfor %}"
+
+# dependencies
+cfssl_url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64"
+cfssljson_url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64"
+kubectl_url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
+
+# config and cert dirs
+cert_dir: "{{ ansible_env.HOME }}/k8s-certs"
+config_dir: "{{ ansible_env.HOME }}/k8s-config"
+csr_dir: "{{ config_dir }}/csr/"
+
+# cert config files
+ca_config_file: "{{ config_dir }}/ca-config.json"
+encryption_config_file: "{{ config_dir }}/encryption-config.yaml"
+
+ca_csr_config_file: "{{ csr_dir }}/ca-csr.json"
+k8s_csr_config_file: "{{ csr_dir }}/kubernetes-csr.json"
+admin_csr_config_file: "{{ csr_dir }}/admin-csr.json" 
+
+# generated cert and key files
+ca_pem_file: "{{ cert_dir}}/ca.pem"
+ca_key_file: "{{ cert_dir }}/ca-key.pem"
+k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
+k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
+admin_pem_file: "{{ cert_dir }}/admin.pem"
+admin_key_file: "{{ cert_dir }}/admin-key.pem"
+
+
+

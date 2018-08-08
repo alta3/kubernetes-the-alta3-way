@@ -1,165 +1,91 @@
-  - name: Create directories
-    file: 
-      path: "{{ item }}"
-      state: directory
-    with_items:
-    - "/home/student/k8s-certs"
-    - "/home/student/k8s-config"
-    - "/etc/etcd"
-    - "/var/lib/etcd"
-    - "/var/lib/kubernetes"
-    become: yes
+---
+- name: Create cert directories
+  file: 
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - "{{ cert_dir }}"
+  - "{{ config_dir }}"
+  - "{{ csr_dir }}"
 
-  - name: Install dependencies with get_url -> cfssl, cfssljson, kubectl
-    get_url:
-      url: "{{ item.url }}"
-      dest: "{{ item.dest }}"
-      mode: "{{ item.mode }}"
-    with_items:
-    - { url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64", dest: /usr/local/bin/cfssl, mode: '0755' }
-    - { url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64", dest: /usr/local/bin/cfssljson, mode: '0755' }
-    - { url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl", dest: /usr/local/bin/kubectl, mode: '0755' }
-    become: yes    
+- name: Install dependencies with get_url -> cfssl, cfssljson, kubectl
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+  - { url: "{{ cfssl_url }}", 
+      dest: /usr/local/bin/cfssl, 
+      mode: '0755' }
+  - { url: "{{ cfssljson_url }}", 
+      dest: /usr/local/bin/cfssljson, 
+      mode: '0755' }
+  - { url: "{{ kubectl_url }}",
+      dest: /usr/local/bin/kubectl, 
+      mode: '0755' }
+  become: yes    
 
-# Check if files exist before clobbering a working system
-  - name: Check if  /var/lib/kubernetes/ca.pem exists
-    stat:
-      path: /var/lib/kubernetes/ca.pem 
-    register: ca_pem
-
-  - name: Check if  /var/lib/kubernetes/ca-key.pem exists
-    stat:
-      path: /var/lib/kubernetes/ca-key.pem 
-    register: ca_key_pem
-
-  - name: Check if  /var/lib/kubernetes/kubernetes.pem exists
-    stat:
-      path: /var/lib/kubernetes/kubernetes.pem
-    register: kubernetes_pem
-
-  - name: Check if  /var/lib/kubernetes/kubernetes-key.pem exists
-    stat:
-      path: /var/lib/kubernetes/kubernetes-key.pem
-    register: kubernetes_key_pem
-
-  - name: Check if  /var/lib/kubernetes/encryption-config.yaml exists
-    stat:
-      path: /var/lib/kubernetes/encryption-config.yaml
-    register: encryption_config_yaml
-
-  - name: Check if /home/student/admin.pem exists
-    stat: 
-      path: /home/student/admin.pem
-    register: admin_pem
-
-  - name: Check if /home/student/admin-key.pem exists
-    stat: 
-      path: /home/student/admin-key.pem
-    register: admin_key_pem
-
-  - set_fact:
-      reload: true
-
-  - set_fact:
-      reload: false
-    when: (ca_pem and ca_key_pem and kubernetes_pem and kubernetes_key_pem and encryption_config_yaml and admin_pem and admin_key_pem) and not force_reload
-
-#  - set_fact:
-#      reload: false
-#
-#  - set_fact:
-#      reload: true
-#    when: (ca_pem.stat.exists == false)  or ( ca_key_pem.stat.exists == false ) or (kubernetes_pem.stat.exists == false ) or (kubernetes_key_pem.stat.exists == false ) or (admin_pem.stat.exists == false ) or (admin_key_pem.stat.exists == false )
-
-  
-  
+# Deploy certificate configuration data 
+- name: Deply certificate generation configuration files
+  copy: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+   - { src: "{{ role_path }}/files/ca-config.json",
+       dest: "{{ ca_config_file }}"}
+   # CSR files
+   # TODO replace csr files with j2 templates
+   - { src: "{{ role_path }}/files/ca-csr.json",
+       dest: "{{ ca_csr_config_file }}"}
+   - { src: "{{ role_path }}/files/kubernetes-csr.json",
+       dest: "{{ k8s_csr_config_file }}" } 
+   - { src: "{{ role_path }}/files/admin-csr.json",
+       dest: "{{ admin_csr_config_file }}" } 
+       
 # Generates ca.pem and ca-key.pem when do not already exist
-  - name: Generate a self-signed CA cert and private key for the k8s cloud
-    shell: cfssl gencert -initca ca-csr.json | cfssljson -bare ca
-    args:
-      chdir: "{{ role_path }}/files"
-    when: reload 
+- name: Generate a self-signed CA cert and private key for the k8s cloud
+  shell: "cfssl gencert -initca {{ ca_csr_config_file }} | cfssljson -bare ca"
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ ca_pem_file }}" # also ca-key.pem, ca.csr
 
 # Generates kubernetes.pem and kubernetes-key.pem when do not already exist
-  - name: Generate Certificate and private key for k8s API server
-    shell: cfssl gencert \
-           -ca=ca.pem \
-           -ca-key=ca-key.pem \
-           -config=ca-config.json \
-           -hostname=172.16.3.1,172.16.1.5,172.16.1.6,172.16.1.7,127.0.0.1,kubernetes.default \
-           -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
-    args:
-      chdir: "{{ role_path }}/files"
-    when: reload
-
-  - name: Generate an encryption key #TODO: not sure if this works.. where is the full command ENCRYPTION_KEY=$(head...)
-    shell: head -c 32 /dev/urandom | base64
-    args:
-      chdir: "{{ role_path }}/files"
-    register: encryption_key
-    when: reload
+- name: Generate Certificate and private key for k8s API server
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -hostname={{ apiserver_cluster_ip }},{{ master_ips_csv }},127.0.0.1,kubernetes.default \
+         -profile=kubernetes {{ k8s_csr_config_file }} | cfssljson -bare kubernetes
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ k8s_pem_file }}" # also kubernetes.csr kubernetes-key.pem
 
 #Generate the admin certificates to setup for 
+- name: Generate admin certificates 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes {{ admin_csr_config_file }} | cfssljson -bare admin 
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ admin_pem_file }}" # also admin.csr admin-key.pem
 
-  - name: Generate admin certificates 
-    shell: cfssl gencert \
-           -ca=ca.pem \
-           -ca-key=ca-key.pem \
-           -config=ca-config.json \
-           -profile=kubernetes admin-csr.json | cfssljson -bare admin 
-    args:
-      chdir: "{{ role_path }}/files"
-    when: reload
+- name: Discover if encryption config has already been generated
+  stat: 
+    path: "{{ encryption_config_file }}"
+  register: ecf
 
+- name: Generate an encryption key 
+  shell: head -c 32 /dev/urandom | base64
+  args:
+    creates: "{{ encryption_config_file }}"
+  register: encryption_key # used in template file
+  when: ecf.stat.exists == False
 
-  - name: Generate the encryption config file
-    template: 
-      src: "{{ role_path }}/templates/encryption-config.yaml.j2"
-      dest: "/home/student/k8s-config/encryption-config.yaml"
-    become: yes  
-    when: reload 
-
-  - name: Copy Kube Certs to etcd
-    copy: 
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-    with_items:
-    - { source: "{{ role_path }}/files/kubernetes.pem",     dest: "/etc/etcd/kubernetes.pem" }
-    - { source: "{{ role_path }}/files/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem" }
-    become: yes
-    when: reload
-
-  - name: Copy CA Certs to etcd
-    copy: 
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-    with_items:
-    - { source: "{{ role_path }}/files/ca.pem",             dest: "/etc/etcd/ca.pem" }
-    become: yes
-    when: reload
-
-  - name: Move Certs and Config to /var/lib/kubernetes
-    command: mv {{ role_path }}/files/ca.pem {{ role_path }}/files/ca-key.pem {{ role_path }}/files/kubernetes-key.pem {{ role_path }}/files/kubernetes.pem /home/student/k8s-config/encryption-config.yaml /var/lib/kubernetes/
-    become: yes
-    when: reload
-
-  - name: Copy admin certs to dir #TODO: which directory is this going into, what is it even needed for, and who should the owner be, student or root?
-    copy:
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-    with_items:
-    - { source: "{{ role_path }}/files/admin.pem", dest: "/home/student/admin.pem", mode: "0644" }
-    - { source: "{{ role_path }}/files/admin-key.pem", dest: "/home/student/admin-key.pem", mode: "0600" }
-    #- { source: "{{ role_path }}/files/admin.pem", dest: "/var/lib/kubernetes/admin.pem", mode: "0644" }
-    #- { source: "{{ role_path }}/files/admin-key.pem", dest: "/var/lib/kubernetes/admin-key.pem", mode: "0600" }
-    become: yes
-    when: reload
-
-
-  - name: Change permissions to allow copying of keys to Masters
-    file:
-      mode: "{{ item.mode }}"
-      path: "{{ item.path }}"
-    with_items:
-    - { path: "/var/lib/kubernetes/ca-key.pem", mode: '0664' }
-    - { path: "/var/lib/kubernetes/kubernetes-key.pem", mode: '0664' }
+- name: Generate the encryption config file
+  template: 
+    src: "{{ role_path }}/templates/encryption-config.yaml.j2"
+    dest: "{{ encryption_config_file }}"
+  when: ecf.stat.exists == False
