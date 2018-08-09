@@ -1,25 +1,11 @@
-#-------------------------------------------------------------------------------------
-# Update /etc/hosts to reflect the renaming of controller to master and worker to node
-#------------------------------------------------------------------------------------
-
-  - name: Update /etc/hosts on all masters
-    template: 
-      src: "{{ role_path }}/templates/hosts.j2"
-      dest: /etc/hosts
-    become: yes    
-
-
-
-
 #-------------------------------------------------------------------------
 # Finish moving the certs we created on beachhead into the masters.
 
-  - name: Create directories on masters
+  - name: Create k8s directories on masters
     file:
       path: "{{ item }}"
       state: directory
     with_items:
-    - "/etc/etcd"
     - "/var/lib/etcd"
     - "/var/lib/kubernetes"
     become: yes
@@ -33,10 +19,7 @@
       group: student
     with_items:
     - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml, mode: "0664" }
-    - { source: /var/lib/kubernetes/ca.pem,                 dest: /etc/etcd/ca.pem,                     mode: "0664" }
     - { source: /var/lib/kubernetes/ca-key.pem,             dest: /home/student/ca-key.pem,             mode: "0600" } 
-    - { source: /var/lib/kubernetes/kubernetes.pem,         dest: /etc/etcd/kubernetes.pem,             mode: "0664" }
-    - { source: /var/lib/kubernetes/kubernetes-key.pem,     dest: /etc/etcd/kubernetes-key.pem,         mode: "0600" }
     become: yes
 
 #  - name: Copy Certs and Config to Masters etcd
@@ -48,56 +31,6 @@
 #    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
 #    become: yes
 
-#-------------------------------------------
-# This is bootstrapping ETCD
-# ------------------------------------------
-
-
-
-
-  - name: Download the etcd binary on each master
-    get_url:
-      url: "https://github.com/coreos/etcd/releases/download/v3.2.11/etcd-v3.2.11-linux-amd64.tar.gz"
-      dest: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
-      mode: '0664'
-    become: yes
-
-  - name: Unpack the etcd binaries on each master
-    unarchive:
-      remote_src: yes
-      src: /home/student/etcd-v3.2.11-linux-amd64.tar.gz
-      dest: /home/student
-    become: yes
-   
-  - name: Move etcd binaries to /usr/local/bin path
-    copy:
-      src: '{{ item.source }}' 
-      dest: '{{ item.dest }}' 
-      remote_src: yes
-      mode: "0775"
-      owner: student
-      group: student
-    with_items:
-    - { source: /home/student/etcd-v3.2.11-linux-amd64/etcd, dest: /usr/local/bin/etcd }
-    - { source: /home/student/etcd-v3.2.11-linux-amd64/etcdctl, dest: /usr/local/bin/etcdctl }
-    become: yes
-
-  - name: Push etcd service config
-    template: 
-      src: "{{ role_path }}/templates/etcd.service.j2"
-      dest: /etc/systemd/system/etcd.service 
-    become: yes    
-
-  - name: Reload systemd manager
-    command: systemctl daemon-reload
-    become: yes
-    
-  - name: Reload the daemon for the services
-    systemd: 
-      name: etcd.service 
-      enabled: yes
-      state: restarted
-    become: yes
  
 
 

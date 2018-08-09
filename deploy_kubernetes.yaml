@@ -1,41 +1,51 @@
+---
 - hosts: localhost
   vars_files: 
   - vars/k8s_vars.yaml
   roles:
-    - makecerts
+    - name: makecerts
+      when: run_makecerts
 
 
-- hosts: masters
-  gather_facts: False
-  vars_files: 
-  - vars/k8s_vars.yaml
-
+- hosts: all
+  vars_files:
+  - vars/k8s_vars.yaml 
   roles:
-    - bootstrap
+   - name: bootstrap
+     when: run_bootstrap
 
+- hosts: etcd
+  gather_facts: True
+  vars_files:
+  - vars/k8s_vars.yaml 
+  roles:
+   - name: etcd
+     when: run_etcd
+  tasks: 
+    - meta: end_play
 
 - hosts: masters
   gather_facts: True
   vars_files:
   - vars/k8s_vars.yaml 
-
   roles:
-   - master_install
-  
-  
-- hosts: nodes
-  gather_facts: False
-  vars_files:
-  - vars/k8s_vars.yaml
-
-  roles:
-    - node_install
-
-- hosts: localhost
+   - name: master_install
+     when: run_makecerts
+#  
+#  
+#- hosts: nodes
 #  gather_facts: False
-  vars_files:
-  - vars/k8s_vars.yaml
-
-  roles:
-    - node_config
-
+#  vars_files:
+#  - vars/k8s_vars.yaml
+#
+#  roles:
+#    - node_install
+#
+#- hosts: localhost
+##  gather_facts: False
+#  vars_files:
+#  - vars/k8s_vars.yaml
+#
+#  roles:
+#    - node_config
+#

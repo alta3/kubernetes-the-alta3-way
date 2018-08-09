@@ -1,15 +1,15 @@
 [masters]
-master-1 ansible_host="192.168.34.215" 
-master-2 ansible_host="192.168.34.216"
-master-3 ansible_host="192.168.34.217"
+master-1 ansible_host="192.168.34.215"
+master-2 ansible_host="192.168.34.206"
+master-3 ansible_host="192.168.34.207"
 
 [etcd]
-etcd-1 ansible_host="192.168.34.218" 
-etcd-2 ansible_host="192.168.34.219"
-etcd-3 ansible_host="192.168.34.220"
+etcd-1 ansible_host="192.168.34.208"
+etcd-2 ansible_host="192.168.34.209"
+etcd-3 ansible_host="192.168.34.210"
 
 [nodes]
-node-1 ansible_host="192.168.34.221" cni_host_subnet="192.168.1.0/24"
-node-2 ansible_host="192.168.34.222" cni_host_subnet="192.168.2.0/24"
-node-3 ansible_host="192.168.34.223" cni_host_subnet="192.168.3.0/24"
+node-1 ansible_host="192.168.34.211" cni_host_subnet="192.168.1.0/24"
+node-2 ansible_host="192.168.34.212" cni_host_subnet="192.168.2.0/24"
+node-3 ansible_host="192.168.34.213" cni_host_subnet="192.168.3.0/24"
 

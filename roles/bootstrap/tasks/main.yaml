@@ -7,7 +7,6 @@
   raw: DEBIAN_FRONTEND=noninteractive apt -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
   become: true
 
-# double because of having an old image
 - name: raw apt update 2
   raw: apt -qqy update
   become: true
@@ -20,12 +19,13 @@
   raw: apt install -qy python aptitude
   become: true
 
-#- name: deploy sudoers file
-#  copy:
-#    src: "{{ role_path }}/files/sudoers"
-#    dest: /etc/sudoers
-#    owner: root
-#    group: root
-#    mode: 0440
-#    validate: 'visudo -cf %s'
-#  become: yes
+- name: Update hostname to match inventory 
+  hostname: 
+    name: "{{ inventory_hostname }}"
+  become: true
+
+- name: Update /etc/hosts on all systems
+  template: 
+    src: "{{ role_path }}/templates/hosts.j2"
+    dest: /etc/hosts
+  become: yes    

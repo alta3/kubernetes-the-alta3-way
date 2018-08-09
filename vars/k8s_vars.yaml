@@ -1,8 +1,5 @@
 ---
 serviceclusteriprange: 172.16.3.0/24
-etcdport:
-  etcdclient: 2379
-  etcds2s: 2380
 clustercidr: 192.168.0.0/16
 countrycsr: US
 citycsr: Harrisburg
@@ -28,6 +25,10 @@ k8scertsdir: /home/student/k8s-certs
 force_reload: false
 
 
+run_makecerts: False
+run_bootstrap: False
+run_etcd: True
+
 apiserver_cluster_ip: 172.16.3.1 # TODO is this actually the right name for this IP?
 master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }},{% endfor %}"
 
@@ -37,8 +38,9 @@ cfssljson_url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64"
 kubectl_url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
 
 # config and cert dirs
-cert_dir: "{{ ansible_env.HOME }}/k8s-certs"
-config_dir: "{{ ansible_env.HOME }}/k8s-config"
+localhost_home_dir: "{{ lookup('env', 'HOME') }}"
+cert_dir: "{{ localhost_home_dir }}/k8s-certs"
+config_dir: "{{ localhost_home_dir }}/k8s-config"
 csr_dir: "{{ config_dir }}/csr/"
 
 # cert config files
@@ -56,6 +58,18 @@ k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
 k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
 admin_pem_file: "{{ cert_dir }}/admin.pem"
 admin_key_file: "{{ cert_dir }}/admin-key.pem"
+
+# etcd
+etcd_version: "3.3.9"
+etcd_arch: "amd64"
+etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
+etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
+etcd_url: "https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
+etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
+etcd_port:
+  client: 2379
+  s2s: 2380 
+etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }},{% endfor %}"
 
 
 
