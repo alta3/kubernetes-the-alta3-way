@@ -5,7 +5,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 [Service]
 ExecStart=/usr/local/bin/kube-controller-manager \
   --address=0.0.0.0 \
-  --cluster-cidr={{ clustercidr }} \
+  --cluster-cidr={{ cluster_cidr }} \
   --cluster-name=kubernetes \
   --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \
   --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \
@@ -13,7 +13,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --master=http://127.0.0.1:8080 \
   --root-ca-file=/var/lib/kubernetes/ca.pem \
   --service-account-private-key-file=/var/lib/kubernetes/ca-key.pem \
-  --service-cluster-ip-range={{ serviceclusteriprange }} \
+  --service-cluster-ip-range={{ service_cluster_ip_range }} \
   --v=2
 Restart=on-failure
 RestartSec=5

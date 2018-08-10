@@ -1,6 +1,4 @@
 ---
-serviceclusteriprange: 172.16.3.0/24
-clustercidr: 192.168.0.0/16
 countrycsr: US
 citycsr: Harrisburg
 statecsr: Pennsylvania
@@ -24,18 +22,52 @@ k8scertsdir: /home/student/k8s-certs
 #setting force_reload to true will force the system to recalculate all the certs. By default please set this to false
 force_reload: false
 
-
-run_makecerts: False
-run_bootstrap: False
+# control flow
+run_makecerts: True 
+run_bootstrap: True 
 run_etcd: True
+run_master: True
 
-apiserver_cluster_ip: 172.16.3.1 # TODO is this actually the right name for this IP?
-master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }},{% endfor %}"
+k8s_version: "1.9.0"
 
-# dependencies
+# dependencies and their destinations
 cfssl_url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64"
 cfssljson_url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64"
-kubectl_url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
+
+kubectl:
+  url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+  path: "/usr/local/bin/kubectl"
+
+# master vars
+apiserver_cluster_ip: 172.16.3.1 # TODO is this actually the right name for this IP?
+cluster_cidr: 192.168.0.0/16 #TODO is this pod_cidr?
+service_cluster_ip_range: 172.16.3.0/24
+master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }},{% endfor %}"
+
+master_services: 
+ - display_name: "Kubernetes API Server"
+   name: "kube-apiserver"
+   url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
+   path: "/usr/local/bin/kube-apiserver"
+   mode: "0775"
+   service_j2: "{{ role_path }}/templates/kube-apiserver.service.j2"
+   service_path: "/etc/systemd/system/kube-apiserver.service"
+   
+ - display_name: "Kubernetes Manager"
+   name: "kube-controller-manager"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager" 
+   path: "/usr/local/bin/kube-controller-manager"
+   mode: "0775"
+   service_j2: "{{ role_path }}/templates/kube-controller-manager.service.j2"
+   service_path: "/etc/systemd/system/kube-controller-manager.service"
+   
+ - display_name: "Kubernetes Scheduler"
+   name: "kube-scheduler"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
+   path: "/usr/local/bin/kube-scheduler"
+   mode: "0775"
+   service_j2: "{{ role_path }}/files/kube-scheduler.service"
+   service_path: "/etc/systemd/system/kube-scheduler.service"
 
 # config and cert dirs
 localhost_home_dir: "{{ lookup('env', 'HOME') }}"
@@ -52,7 +84,7 @@ k8s_csr_config_file: "{{ csr_dir }}/kubernetes-csr.json"
 admin_csr_config_file: "{{ csr_dir }}/admin-csr.json" 
 
 # generated cert and key files
-ca_pem_file: "{{ cert_dir}}/ca.pem"
+ca_pem_file: "{{ cert_dir }}/ca.pem"
 ca_key_file: "{{ cert_dir }}/ca-key.pem"
 k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
 k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
@@ -71,5 +103,20 @@ etcd_port:
   s2s: 2380 
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }},{% endfor %}"
 
+# master
+master_k8s_config_dir: "/var/lib/kubernetes"
+master_ca_pem_file: "{{ master_k8s_config_dir }}/ca.pem"
+master_ca_key_file: "{{ master_k8s_config_dir }}/ca-key.pem"
+master_k8s_pem_file: "{{ master_k8s_config_dir }}/kubernetes.pem"
+master_k8s_key_file: "{{ master_k8s_config_dir }}/kubernetes-key.pem"
+master_encryption_config_file: "{{ master_k8s_config_dir }}/encryption-config.yaml"
 
+# rbac configs
+master_rbac_role:
+  file: "{{ role_path }}/files/rbac-clusterrole.yaml"
+  path: "{{ master_k8s_config_dir }}/rbac-clusterrole.yaml"
 
+master_rbac_rolebind:
+  file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
+  path: "{{ master_k8s_config_dir }}/rbac-clusterrolebind.yaml"
+ 

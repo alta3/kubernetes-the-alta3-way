@@ -21,8 +21,6 @@
   roles:
    - name: etcd
      when: run_etcd
-  tasks: 
-    - meta: end_play
 
 - hosts: masters
   gather_facts: True
@@ -30,7 +28,7 @@
   - vars/k8s_vars.yaml 
   roles:
    - name: master_install
-     when: run_makecerts
+     when: run_master
 #  
 #  
 #- hosts: nodes

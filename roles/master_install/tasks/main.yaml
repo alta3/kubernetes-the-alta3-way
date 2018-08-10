@@ -1,177 +1,123 @@
 #-------------------------------------------------------------------------
 # Finish moving the certs we created on beachhead into the masters.
 
-  - name: Create k8s directories on masters
-    file:
-      path: "{{ item }}"
-      state: directory
-    with_items:
-    - "/var/lib/etcd"
-    - "/var/lib/kubernetes"
-    become: yes
+- name: Create k8s directories on masters
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+  - "/var/lib/etcd"
+  - "/var/lib/kubernetes"
+  become: yes
 
-  - name: Copy Certs and Config to Masters
-    copy:
-      src: '{{ item.source }}'
-      dest: '{{ item.dest }}'
-      mode: '{{ item.mode }}'
-      owner: student
-      group: student
-    with_items:
-    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /home/student/encryption-config.yaml, mode: "0664" }
-    - { source: /var/lib/kubernetes/ca-key.pem,             dest: /home/student/ca-key.pem,             mode: "0600" } 
-    become: yes
+- name: Copy Certs and Config to Masters
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
 
-#  - name: Copy Certs and Config to Masters etcd
-#    copy:
-#      src: "{{ item.source }}"
-#      dest: "{{ item.dest }}"
-#    with_items:
-#    - { source: /var/lib/kubernetes/kubernetes.pem, dest: /etc/etcd/kubernetes.pem }
-#    - { source: /var/lib/kubernetes/kubernetes-key.pem, dest: /etc/etcd/kubernetes-key.pem }
-#    become: yes
-
- 
-
-
-
-
-
-
+  with_items:
+   - src: "{{ ca_pem_file }}"
+     dest: "{{ master_ca_pem_file }}"
+     mode: "0664"
+     
+   - src: "{{ ca_key_file }}"
+     dest: "{{ master_ca_key_file }}"
+     mode: "0600" 
+     
+   - src: "{{ k8s_pem_file }}"
+     dest: "{{ master_k8s_pem_file }}"
+     mode: "0664" 
+     
+   - src: "{{ k8s_key_file }}"
+     dest: "{{ master_k8s_key_file }}"
+     mode: "0600" 
+     
+   - src: "{{ encryption_config_file }}"
+     dest: "{{ master_encryption_config_file }}"
+     mode: "0600" 
+  become: yes
 
 #----------------------------------------------------------------------------------------------------------
 # BOOTSTRAPPING KUBERNETES 
 # ---------------------------------------------------------------------------------------------------------   
 
-
-  - name: Move certs to /var/lib/kubernetes to support kubernetes API server
-    copy:
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-      mode: "{{ item.mode }}"
-      owner: "{{ item.ug }}"
-      group: "{{ item.ug }}"
-    with_items:
-    - { source: /var/lib/kubernetes/ca.pem,                 dest: /var/lib/kubernetes/ca.pem,                 mode: "0664", ug: student } 
-    - { source: /var/lib/kubernetes/ca-key.pem,             dest: /var/lib/kubernetes/ca-key.pem,             mode: "0600", ug: student } 
-    - { source: /var/lib/kubernetes/kubernetes-key.pem,     dest: /var/lib/kubernetes/kubernetes-key.pem,     mode: "0600", ug: student } 
-    - { source: /var/lib/kubernetes/kubernetes.pem,         dest: /var/lib/kubernetes/kubernetes.pem,         mode: "0664", ug: student } 
-    - { source: /var/lib/kubernetes/encryption-config.yaml, dest: /var/lib/kubernetes/encryption-config.yaml, mode: "0664", ug: student } 
-    become: yes 
-
-
 # API Server Install
+- name: Download the master service binaries
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ master_services }}"
+  loop_control: 
+    label: "{{ item.display_name }} -> {{ item.path }}"
+  become: yes
 
-  - name: Download the Kubernetes  APIServer binary
-    get_url:
-      url:  "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-apiserver"
-      dest: /usr/local/bin/kube-apiserver
-      mode: 0775
-      owner: student
-      group: student
-    become: yes
+- name: Push the config files for the master services
+  template:
+    src: "{{ item.service_j2 }}"
+    dest: "{{ item.service_path }}"
+  loop: "{{ master_services }}"
+  loop_control: 
+    label: "{{ item.display_name }} -> {{ item.service_path }}"
+  become: yes 
 
-  - name: Push the config file for the API Server
-    template:
-      src: "{{ role_path }}/templates/kube-apiserver.service.j2"
-      dest: /etc/systemd/system/kube-apiserver.service
-    become: yes 
-
-
-# Manager Install
-
-  - name: Download the Kubernetes Manager 
-    get_url:
-      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-controller-manager" 
-      dest: /usr/local/bin/kube-controller-manager
-      mode: 0775
-      owner: student
-      group: student
-    become: yes
-
-  - name: Configure the Kubernetes master manager service
-    template:
-      src: "{{ role_path }}/templates/kube-controller-manager.service.j2"
-      dest: /etc/systemd/system/kube-controller-manager.service
-    become: yes
-
-
-# Scheduler Install
-
-  - name: Download Kubernetes Scheduler 
-    get_url:
-      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-scheduler"
-      dest: /usr/local/bin/kube-scheduler 
-      mode: 0775
-      owner: student
-      group: student
-    become: yes
-
-  - name: Configure the Kubernetes master scheduler
-    copy:
-      src: "{{ role_path }}/files/kube-scheduler.service"
-      dest: /etc/systemd/system/kube-scheduler.service
-    become: yes 
-
-
-# Install Kubectl
-
-  - name: Download Kubernetes kubectl 
-    get_url:
-      url: "https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl"
-      dest: /usr/local/bin/kubectl
-      mode: 0775
-      owner: student
-      group: student
-    become: yes
+- name: Download Kubernetes kubectl 
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+   - url: "{{ kubectl.url }}"
+     dest: "{{ kubectl.path }}"
+     mode: '0755'
+  become: yes    
 
 
 # Bounce and enable kube services
 
-  - name: Reload systemd manager
-    command: systemctl daemon-reload
-    become: yes
-    
-  - name: Reload the daemon for the services
-    service: 
-      name: "{{ item }}"
-      enabled: yes
-      state: restarted
-    become: yes
-    with_items:
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-scheduler
-      
-  - name: Allow Kubernetes API Server to fully initialize
-    pause:
-      seconds: 15
+- name: Reload systemd manager
+  systemd: 
+    daemon_reload: True
+  become: yes
+  
+# TODO make this a handler
+- name: Reload the daemon for the services
+  service: 
+    name: "{{ item.name }}"
+    enabled: yes
+    state: restarted
+  loop: "{{ master_services }}"
+  loop_control: 
+    label: "{{ item.display_name }} Service -> {{ item.name }}"
+  become: yes
 
-
+- name: Allow Kubernetes API Server to fully initialize
+  pause:
+    seconds: 15
 
 #-------------------------------------------------------------------------------------------
 # RBAC setup
 #-------------------------------------------------------------------------------------------
 
+- name: Copy rbac cluster-role to masters
+  copy:
+    src: "{{ master_rbac_role.file }}"
+    dest: "{{ master_rbac_role.path }}"
+  become: yes
 
-  - name: Copy rbac cluster-role to masters
-    copy:
-      src: "{{ role_path }}/files/rbac-clusterrole.yaml"
-      dest: /home/student/rbac-clusterrole.yaml
-    become: yes
+- name: Apply the RBAC rules
+  shell: "kubectl apply -f {{ master_rbac_role.path }}"
+  become: yes    
 
-  - name: Apply the RBAC rules
-    shell: kubectl apply -f rbac-clusterrole.yaml
-    args:
-      chdir: /home/student
-    become: yes    
+- name: Copy the cluster role bind file to the masters
+  copy:
+    src: "{{ master_rbac_rolebind.file }}"
+    dest: "{{ master_rbac_rolebind.path }}"
+  become: yes      
 
-  - name: Copy the cluster role bind file to the masters
-    copy:
-      src: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
-      dest: /home/student/rbac-clusterrolebind.yaml
-    become: yes      
+- name: Bind the clusterrole to the kubernetes user.
+  shell: "kubectl apply -f {{ master_rbac_rolebind.path }}"
+  become: yes
 
-  - name: Bind the clusterrole to the kubernetes user.
-    shell: kubectl apply -f rbac-clusterrolebind.yaml
-    become: yes
+- meta: end_play

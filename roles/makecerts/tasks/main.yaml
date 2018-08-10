@@ -20,8 +20,8 @@
   - { url: "{{ cfssljson_url }}", 
       dest: /usr/local/bin/cfssljson, 
       mode: '0755' }
-  - { url: "{{ kubectl_url }}",
-      dest: /usr/local/bin/kubectl, 
+  - { url: "{{ kubectl.url }}",
+      dest: "{{ kubectl.path }}",
       mode: '0755' }
   become: yes    
 

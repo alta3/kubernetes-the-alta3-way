@@ -1,0 +1,13 @@
+[masters]
+master-1 ansible_host="172.16.1.5"
+master-2 ansible_host="172.16.1.6"
+master-3 ansible_host="172.16.1.7"
+
+[etcd:children]
+masters
+
+[nodes]
+node-1 ansible_host="172.16.1.8" cni_host_subnet="192.168.1.0/24"
+node-2 ansible_host="172.16.1.9" cni_host_subnet="192.168.2.0/24"
+node-3 ansible_host="172.16.1.10" cni_host_subnet="192.168.3.0/24"
+

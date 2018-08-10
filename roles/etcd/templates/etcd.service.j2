@@ -18,11 +18,12 @@ ExecStart=/usr/local/bin/etcd \
   --listen-client-urls https://{{ ansible_host }}:{{ etcd_port.client }},http://127.0.0.1:{{ etcd_port.client }} \
   --advertise-client-urls https://{{ ansible_host }}:{{ etcd_port.client }} \
   --initial-cluster-token etcd-cluster-0 \
-  --initial-cluster {{ etcd_cluster_urls }} 
+  --initial-cluster {{ etcd_cluster_urls }} \
   --initial-cluster-state new \
   --data-dir=/var/lib/etcd
 Restart=on-failure
 RestartSec=5
+Type=notify
 
 [Install]
 WantedBy=multi-user.target
