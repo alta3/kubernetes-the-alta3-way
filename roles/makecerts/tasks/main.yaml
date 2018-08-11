@@ -35,12 +35,19 @@
        dest: "{{ ca_config_file }}"}
    # CSR files
    # TODO replace csr files with j2 templates
-   - { src: "{{ role_path }}/files/ca-csr.json",
-       dest: "{{ ca_csr_config_file }}"}
-   - { src: "{{ role_path }}/files/kubernetes-csr.json",
-       dest: "{{ k8s_csr_config_file }}" } 
-   - { src: "{{ role_path }}/files/admin-csr.json",
-       dest: "{{ admin_csr_config_file }}" } 
+   - src: "{{ role_path }}/files/ca-csr.json"
+     dest: "{{ ca_csr_config_file }}"
+   - src: "{{ role_path }}/files/kubernetes-csr.json"
+     dest: "{{ k8s_csr_config_file }}"
+   - src: "{{ role_path }}/files/admin-csr.json"
+     dest: "{{ admin_csr_config_file }}"
+
+# TODO make all csr generation be from a template
+- name: Generate the certificate config file for nodes (file same on all nodes)
+  template:
+    src: "{{ role_path }}/templates/node-csr.json.j2" 
+    dest: "{{ csr_dir }}/{{ item }}-csr.json"
+  loop: "{{ groups['nodes'] }}"
        
 # Generates ca.pem and ca-key.pem when do not already exist
 - name: Generate a self-signed CA cert and private key for the k8s cloud
@@ -72,6 +79,18 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ admin_pem_file }}" # also admin.csr admin-key.pem
 
+- name: Generate the specific certificate and Private key for each node when it does not already exist
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -hostname={{ hostvars[item].inventory_hostname }},{{ hostvars[item].ansible_host }} \
+         -profile=kubernetes {{ csr_dir }}/{{ hostvars[item].inventory_hostname }}-csr.json | cfssljson -bare {{ hostvars[item].inventory_hostname }}
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ cert_dir }}/{{ item }}.pem" # also admin.csr admin-key.pem
+  loop: "{{ groups['nodes'] }}"
+
 - name: Discover if encryption config has already been generated
   stat: 
     path: "{{ encryption_config_file }}"
@@ -89,3 +108,5 @@
     src: "{{ role_path }}/templates/encryption-config.yaml.j2"
     dest: "{{ encryption_config_file }}"
   when: ecf.stat.exists == False
+
+

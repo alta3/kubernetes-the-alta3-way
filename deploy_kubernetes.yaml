@@ -29,16 +29,15 @@
   roles:
    - name: master_install
      when: run_master
-#  
-#  
-#- hosts: nodes
-#  gather_facts: False
-#  vars_files:
-#  - vars/k8s_vars.yaml
-#
-#  roles:
-#    - node_install
-#
+  
+- hosts: nodes
+  gather_facts: False
+  vars_files:
+  - vars/k8s_vars.yaml
+  roles:
+   - name: node_install
+     when: run_nodes
+
 #- hosts: localhost
 ##  gather_facts: False
 #  vars_files:

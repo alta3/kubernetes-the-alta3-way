@@ -1,6 +1,6 @@
-#-----------------------------------------------------------------------------
-# Create Directories for nodes
-#-----------------------------------------------------------------------------
+  #-----------------------------------------------------------------------------
+  # Create Directories for nodes
+  #-----------------------------------------------------------------------------
 
   - name: create directories for the kubernetes nodes
     file:
@@ -8,21 +8,22 @@
       state: directory
       mode: "0755"
     with_items:
-    - "/etc/cni/net.d"
-    - "/opt/cni/bin"
-    - "/var/lib/kubelet"
-    - "/var/lib/kube-proxy"
-    - "/var/lib/kubernetes"
-    - "/var/run/kubernetes"
-    - "/etc/etcd"
+     - "/etc/cni/net.d"
+     - "/opt/cni/bin"
+     - "/var/lib/kubelet"
+     - "/var/lib/kube-proxy"
+     - "/var/lib/kubernetes"
+     - "/var/run/kubernetes"
+     - "/etc/etcd"
     become: yes
 
 
-#``````````````````````````````````````````````````````````
-# Setup nginx on the nodes
-#``````````````````````````````````````````````````````````
+  #``````````````````````````````````````````````````````````
+  # Setup nginx on the nodes
+  #``````````````````````````````````````````````````````````
+  # TODO make this a role? run it on localhost and nodes
 
-  - name: Install nginx for ??
+  - name: Install nginx for localhost loadbalancing access to the HA masters
     apt:
      name: nginx
      state: present
@@ -42,72 +43,6 @@
       enabled: yes
     become: yes
 
-
-#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-#-------------------------------------------------------------------------------------------------------------------------------
-# Check if files exist before clobbering a working system - certs - **** THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON****
-#-------------------------------------------------------------------------------------------------------------------------------
-  - name: Check if node-x.pem exists in the path
-    stat:
-      path: "/var/lib/kubelet/{{ inventory_hostname }}.pem"
-    register: pem_exists
-    become: yes
-
-#  - name: fix issues #TODO: remove when system is working???
-#    debug:
-#      var: pem_exists
-
-  - name: Check if node-x-key.pem exists in the path
-    stat:
-      path: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem"
-    register: pem_key_exists
-    become: yes
-
-#  - name: fix more issues #TODO: remove when system is working???
-#    debug: 
-#      var: pem_key_exists
-
-# Set reload to true by default to reload pem keys
-  - set_fact:
-      reload: true
-
-#  - set_fact:
-#      reload: "(pem_exists.stat.exists == false) or (pem_key_exists.stat.exists == false)"
-
-#TODO: get rid of next 3 lines once working system
-#If either pem or -key.pem does not exist then we will reload all keys. Note the override switch force_reload if set to true, will always cause the pem keys to be recalculated.
-  - set_fact:
-      reload: false
-    when: (pem_exists and pem_key_exists) and not force_reload
-   # when: ({{ inventory_hostname }}_pem.stat.exists == false) or ({{ inventory_hostname }}_key_pem.stat.exists == false)
-
-
-#--------------------------------------------------------------------------------------------------------------------
-# Create the Kubelet Client Certificates for each node -- ****THIS WILL BE MOVED TO MAKECERTS AT SOME POINT SOON*****
-#--------------------------------------------------------------------------------------------------------------------
-  - name: Generate the certificate config file for nodes (file same on all nodes)
-    local_action: 
-      module: template 
-      src: "{{ role_path }}/templates/node-csr.json.j2" 
-      dest: "/home/student/{{ inventory_hostname }}-csr.json"
-    when: reload
-    #become: yes 
-
-  - name: Generate the specific certificate and Private key for each node when it does not already exist
-    local_action:
-      module: shell cfssl gencert \
-              -ca=/var/lib/kubernetes/ca.pem \
-              -ca-key=/var/lib/kubernetes/ca-key.pem \
-              -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json \
-              -hostname={{ inventory_hostname }},{{ ansible_host }} \
-              -profile=kubernetes /home/student/{{ inventory_hostname }}-csr.json | cfssljson -bare {{ inventory_hostname }}
-    args: 
-      chdir: "/home/student/"
-    when: reload
-
-
-#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-
 #-----------------------------------------------------------------------------
 # Copy Certs to the Kubernetes nodes
 #-----------------------------------------------------------------------------
@@ -119,8 +54,6 @@
       owner: student
       group: student
     with_items:
-    #TODO delete if not necessary- { source: /var/lib/kubernetes/ca-key.pem,             dest: /home/student/ca-key.pem,             mode: "0600" } 
-    #TODO does this get moved? - { source: /var/lib/kubernetes/,                   dest: /home/student/encryption-config.yaml,        mode: "0664" }
     - { source: "/var/lib/kubernetes/ca.pem", dest: "/var/lib/kubernetes/ca.pem", mode: "0664" }
     - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/etc/etcd/kubernetes.pem", mode: "0664" }
     - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem", mode: "0600" }
