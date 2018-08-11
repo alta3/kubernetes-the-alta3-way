@@ -21,3 +21,7 @@ Mostly all I did was move stuff around into other roles where appropriate
 I also made extensive changes to variable files.  There is still more to do on
 this front, there are lots of hardcoded values in files and templates. Leaving
 that as a TODO for later.
+
+#### TODO:
+
+ * This playbook needs handlers.  If any file that is used in a service is modified, call the restart service handler to make sure that the services all get the freshness updates.

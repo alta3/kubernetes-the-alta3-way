@@ -1,6 +1,4 @@
 ---
-
-
 # control flow
 run_makecerts: True 
 run_nodeconfig: True 
@@ -90,7 +88,7 @@ deployed_cert_and_config_files:
 # master vars
 apiserver_cluster_ip: 172.16.3.1 
 service_cluster_ip_range: 172.16.3.0/24
-master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }},{% endfor %}"
+master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }}{% if not loop.last%},{% endif %}{% endfor %}"
 
 master_services: 
  - display_name: "Kubernetes API Server"
@@ -160,7 +158,6 @@ etcd_port:
   s2s: 2380 
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].ansible_host }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
-
 
 # nodes 
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"
