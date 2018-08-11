@@ -1,13 +1,15 @@
 ---
 # control flow
-run_makecerts: True 
-run_nodeconfig: True 
-run_localconfig: True 
-run_bootstrap: True 
-run_etcd: True
-run_master: True
-run_nginx_lb: True
-run_nodes: True
+run_all: True
+run_makecerts: "{{ run_all }}" 
+run_nodeconfig: "{{ run_all }}" 
+run_localconfig: "{{ run_all }}" 
+run_calico: "{{ run_all }}" 
+run_bootstrap: "{{ run_all }}" 
+run_etcd: "{{ run_all }}"
+run_master: "{{ run_all }}"
+run_nginx_lb: "{{ run_all }}"
+run_nodes: "{{ run_all }}"
 
 # versions
 k8s_version: "1.9.0"
@@ -158,6 +160,7 @@ etcd_port:
   s2s: 2380 
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].ansible_host }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
 
 # nodes 
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"

@@ -2,33 +2,42 @@
 # Install fping
 #``````````````````````````````````````````````````````````
 
- - name: install fping for checking if nodes are alive
-   apt:
-    name: fping
-    state: present
-   become: yes
+- name: install fping for checking if nodes are alive
+  apt:
+   name: fping
+   state: present
+  become: yes
+
+#- name: create directories for the kubernetes nodes
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    mode: "0755"
+#  with_items:
+#   - "/var/lib/kubernetes"
+#  become: yes
 
 
 #``````````````````````````````````````````````````````````
 # Locally configure kubernetes 
 #``````````````````````````````````````````````````````````
 
- - name: Verify the cluster is set on the beachhead control machine
-   shell: kubectl config set-cluster {{ cluster_name }} \
-          --certificate-authority={{ ca_pem_file }}  \
-          --embed-certs=true \
-          --server={{ localhost_lb_apiserver_address }}
+- name: Verify the cluster is set on the beachhead control machine
+  shell: kubectl config set-cluster {{ cluster_name }} \
+         --certificate-authority={{ ca_pem_file }}  \
+         --embed-certs=true \
+         --server={{ localhost_lb_apiserver_address }}
 
- - name: Verify the credentials are set on the beachhead control machine
-   shell: kubectl config set-credentials admin \ 
-          --client-certificate={{ admin_pem_file }} \
-          --client-key={{ admin_key_file }} \ 
+- name: Verify the credentials are set on the beachhead control machine
+  shell: kubectl config set-credentials admin \ 
+         --client-certificate={{ admin_pem_file }} \
+         --client-key={{ admin_key_file }} \ 
 
- - name: Verify the context is set for the admin user
-   shell: kubectl config set-context {{ cluster_name }} 
-          --cluster={{ cluster_name }} \
-          --user=admin
+- name: Verify the context is set for the admin user
+  shell: kubectl config set-context {{ cluster_name }} 
+         --cluster={{ cluster_name }} \
+         --user=admin
 
- - name: Use the context for the config file
-   shell: kubectl config use-context {{ cluster_name }}
+- name: Use the context for the config file
+  shell: kubectl config use-context {{ cluster_name }}
 

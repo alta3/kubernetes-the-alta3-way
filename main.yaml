@@ -12,6 +12,8 @@
      when: run_nodeconfig
    - name: localhost_config
      when: run_localconfig
+   - name: calico
+     when: run_calico
 
 - hosts: etcd
   gather_facts: True

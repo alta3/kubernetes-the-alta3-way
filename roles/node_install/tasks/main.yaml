@@ -14,8 +14,6 @@
    - "/var/lib/kubelet"
    - "/var/lib/kube-proxy"
    - "/var/lib/kubernetes"
-  # - "/var/run/kubernetes"
-  # - "/etc/etcd"
   become: yes
 
 
@@ -137,6 +135,15 @@
     src: "{{  role_path  }}/files/{{ inventory_hostname }}-pod-routes"
     dest: "/etc/network/if-up.d/pod-routes"
     mode: "0775"
+  become: yes
+
+- name: Enable packet forwarding on the node 
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: True
+    state: present
+    reload: yes
   become: yes
 
 #-----------------------------------------------------------------------------
