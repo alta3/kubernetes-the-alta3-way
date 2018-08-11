@@ -1,0 +1,92 @@
+---
+# Note, none of these commands should be idempotent so we just run them again if we run these tasks again
+# TODO these could probably just be a jinja2 template file for kubconfig (the resulting config file)
+# TODO the tough part is they are setup with embedded certs, maybe if we looked into not embedding them
+
+#-----------------------------------------------------------------------------
+# Node configuration files - Setting the cluster 
+#-----------------------------------------------------------------------------
+
+- name: Set the config file for each node
+  command: kubectl config set-cluster {{ cluster_name }} \
+           --certificate-authority={{ ca_pem_file }} \
+           --embed-certs=true \ 
+           --server={{ localhost_lb_apiserver_address }} \
+           --kubeconfig={{ item }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  loop: "{{ groups['nodes'] }}"
+
+#-----------------------------------------------------------------------------
+# Node configuration files - Setting the credentials
+#-----------------------------------------------------------------------------
+
+- name: Set the credentials for each node
+  command: kubectl config set-credentials system:node:{{ item }} \
+           --client-certificate={{ cert_dir }}/{{ item }}.pem \
+           --client-key={{ cert_dir }}/{{ item }}-key.pem \
+           --embed-certs=true \
+           --kubeconfig={{ item }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  loop: "{{ groups['nodes'] }}"
+
+#-----------------------------------------------------------------------------
+# Node configuration files - Set-context default
+#-----------------------------------------------------------------------------
+
+- name: Set the context default for each node
+  command: kubectl config set-context default \
+           --cluster={{ cluster_name }} \
+           --user=system:node:{{ item }} \
+           --kubeconfig={{ item }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  loop: "{{ groups['nodes'] }}"
+  
+#-----------------------------------------------------------------------------
+# Node configuration files - Use-context default
+#-----------------------------------------------------------------------------
+
+- name: Use the context default for each node
+  command: kubectl config use-context default \
+           --kubeconfig={{ item }}.kubeconfig
+  args: 
+    chdir: "{{ config_dir }}"
+  loop: "{{ groups['nodes'] }}"
+
+#-----------------------------------------------------------------------------
+# Node configuration - Generating client authentication config file 
+#-----------------------------------------------------------------------------
+
+- name: create the client auth config file using the ca cert
+  command: kubectl config set-cluster {{ cluster_name }} \
+           --certificate-authority={{ ca_pem_file }} \
+           --embed-certs=true \
+           --server={{ localhost_lb_apiserver_address }} \
+           --kubeconfig=kube-proxy.kubeconfig 
+  args:
+    chdir: "{{ config_dir }}"
+  
+- name: add the kube-proxy cert and key to the config
+  command: kubectl config set-credentials kube-proxy \
+           --client-certificate={{ kube_proxy_pem_file }} \
+           --client-key={{ kube_proxy_key_file }} \
+           --embed-certs=true \
+           --kubeconfig=kube-proxy.kubeconfig 
+  args:
+    chdir: "{{ config_dir }}"
+  
+- name: set the config user to be kube-proxy
+  command: kubectl config set-context default \
+           --cluster={{ cluster_name }} \
+           --user=kube-proxy \
+           --kubeconfig=kube-proxy.kubeconfig
+  args:
+    chdir: "{{ config_dir }}"
+
+- name: set the default kubeconfig to be kube-proxy.kubeconfig
+  command: kubectl config use-context default \
+           --kubeconfig=kube-proxy.kubeconfig
+  args:
+    chdir: "{{ config_dir }}"

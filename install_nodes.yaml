@@ -1,7 +1,0 @@
-- hosts: nodes
-  gather_facts: False
-  vars_files: 
-  - vars/k8s_vars.yaml
-
-  roles:
-    - node_install

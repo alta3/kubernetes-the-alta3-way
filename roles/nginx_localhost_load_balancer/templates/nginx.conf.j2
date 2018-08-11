@@ -11,9 +11,9 @@ events {
 stream {
 	upstream kube_apiserver {
 		least_conn;
-		server {{ ip.master1 }}:6443;
-		server {{ ip.master2 }}:6443;
-		server {{ ip.master3 }}:6443;
+		{% for m in groups['masters'] %}
+		server {{ hostvars[m].ansible_host }}:6443;
+		{% endfor %}
 	}
 
 	server {

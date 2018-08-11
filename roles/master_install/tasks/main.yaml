@@ -15,27 +15,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
-
-  with_items:
-   - src: "{{ ca_pem_file }}"
-     dest: "{{ master_ca_pem_file }}"
-     mode: "0664"
-     
-   - src: "{{ ca_key_file }}"
-     dest: "{{ master_ca_key_file }}"
-     mode: "0600" 
-     
-   - src: "{{ k8s_pem_file }}"
-     dest: "{{ master_k8s_pem_file }}"
-     mode: "0664" 
-     
-   - src: "{{ k8s_key_file }}"
-     dest: "{{ master_k8s_key_file }}"
-     mode: "0600" 
-     
-   - src: "{{ encryption_config_file }}"
-     dest: "{{ master_encryption_config_file }}"
-     mode: "0600" 
+  loop: "{{ deployed_cert_and_config_files }}"
   become: yes
 
 #----------------------------------------------------------------------------------------------------------

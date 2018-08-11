@@ -1,223 +1,59 @@
-  #-----------------------------------------------------------------------------
-  # Create Directories for nodes
-  #-----------------------------------------------------------------------------
+---
+#-----------------------------------------------------------------------------
+# Create Directories for nodes
+#-----------------------------------------------------------------------------
 
-  - name: create directories for the kubernetes nodes
-    file:
-      path: "{{ item }}"
-      state: directory
-      mode: "0755"
-    with_items:
-     - "/etc/cni/net.d"
-     - "/opt/cni/bin"
-     - "/var/lib/kubelet"
-     - "/var/lib/kube-proxy"
-     - "/var/lib/kubernetes"
-     - "/var/run/kubernetes"
-     - "/etc/etcd"
-    become: yes
+- name: create directories for the kubernetes nodes
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  with_items:
+   - "/etc/cni/net.d"
+   - "/opt/cni/bin"
+   - "/var/lib/kubelet"
+   - "/var/lib/kube-proxy"
+   - "/var/lib/kubernetes"
+  # - "/var/run/kubernetes"
+  # - "/etc/etcd"
+  become: yes
 
 
-  #``````````````````````````````````````````````````````````
-  # Setup nginx on the nodes
-  #``````````````````````````````````````````````````````````
-  # TODO make this a role? run it on localhost and nodes
-
-  - name: Install nginx for localhost loadbalancing access to the HA masters
-    apt:
-     name: nginx
-     state: present
-    become: yes
-
-  - name: Create the config file for nginx
-    template:
-      src: "{{ role_path }}/templates/nginx.conf.j2"
-      dest: "/etc/nginx/nginx.conf"
-    become: yes
-
-  - name: Start the nginx service
-    systemd:
-      name: nginx
-      daemon_reload: yes
-      state: restarted
-      enabled: yes
-    become: yes
 
 #-----------------------------------------------------------------------------
 # Copy Certs to the Kubernetes nodes
 #-----------------------------------------------------------------------------
-  - name: Copy Certs to Nodes
-    copy:
-      src: '{{ item.source }}'
-      dest: '{{ item.dest }}'
-      mode: '{{ item.mode }}'
-      owner: student
-      group: student
-    with_items:
-    - { source: "/var/lib/kubernetes/ca.pem", dest: "/var/lib/kubernetes/ca.pem", mode: "0664" }
-    - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/etc/etcd/kubernetes.pem", mode: "0664" }
-    - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/etc/etcd/kubernetes-key.pem", mode: "0600" }
-    - { source: "/var/lib/kubernetes/kubernetes.pem", dest: "/var/lib/kubernetes.pem", mode: "0664" }
-    - { source: "/var/lib/kubernetes/kubernetes-key.pem", dest: "/var/lib/kubernetes-key.pem", mode: "0600" }
-    - { source: "/home/student/{{ inventory_hostname }}.pem", dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem", mode: "0664" }
-    - { source: "/home/student/{{ inventory_hostname }}-key.pem",  dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem", mode: "0600" }
-    become: yes
-#/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+- name: Copy Certs to Nodes
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    mode: '{{ item.mode }}'
+  loop: "{{ deployed_cert_and_config_files }}"
+  loop_control:
+     label: "File = {{ item.dest }}"
+  become: yes
 
-
-
-#-----------------------------------------------------------------------------
-# Node configuration files - Setting the cluster (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: Set the config file for each node
-    local_action:
-      module: shell kubectl config set-cluster kubernetes-the-alta3-way \
-              --certificate-authority=/var/lib/kubernetes/ca.pem \
-              --embed-certs=true --server=https://127.0.0.1:6443 \
-              --kubeconfig={{ inventory_hostname }}.kubeconfig
-      args: 
-        chdir: "{{ k8sconfigdir }}"
-    become: yes
-    when: reload
-
-
-#-----------------------------------------------------------------------------
-# Node configuration files - Setting the credentials (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: Set the credentials for each node
-    local_action:
-      module: shell kubectl config set-credentials system:node:{{ inventory_hostname }} \
-              --client-certificate=/home/student/{{ inventory_hostname }}.pem \
-              --client-key=/home/student/{{ inventory_hostname }}-key.pem \
-              --embed-certs=true --kubeconfig={{ inventory_hostname }}.kubeconfig
-      args:
-        chdir: "{{ k8sconfigdir }}"
-    become: yes
-    when: reload
-    
-
-#-----------------------------------------------------------------------------
-# Node configuration files - Set-context default (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: Set the context default for each node
-    local_action:
-      module: shell kubectl config set-context default \
-              --cluster=kubernetes-the-alta3-way \
-              --user=system:node:{{ inventory_hostname }} \
-              --kubeconfig={{ inventory_hostname }}.kubeconfig
-      args:
-        chdir: "{{ k8sconfigdir }}"
-    become: yes
-    when: reload
-
-    
-#-----------------------------------------------------------------------------
-# Node configuration files - Use-context default (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: Use the context default for each node
-    local_action:
-      module: shell kubectl config use-context default \
-              --kubeconfig={{ inventory_hostname }}.kubeconfig
-      args:
-        chdir: "{{ k8sconfigdir }}" 
-    become: yes
-    when: reload
-    
-
-#-----------------------------------------------------------------------------
-# Node configuration files - Generating cert and key (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-  - name: Generate kube-proxy client cert and private key (kube-proxy-key.pem & kube-proxy.pem)
-    local_action: 
-      module: shell cfssl gencert -ca=/var/lib/kubernetes/ca.pem \
-              -ca-key=/var/lib/kubernetes/ca-key.pem \
-              -config=/home/student/git/kubernetes-the-alta3-way/roles/makecerts/files/ca-config.json \
-              -profile=kubernetes /home/student/git/kubernetes-the-alta3-way/roles/node_install/files/kube-proxy-csr.json | cfssljson -bare kube-proxy
-      args:
-        chdir: "{{ k8scertsdir }}"
-    become: yes
-    when: reload #TODO change this to be creates (shell) so its part of the module parameters and reduces the need for when: reloads
-
-
-#-----------------------------------------------------------------------------
-# Node configuration - Generating client authentication config file (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: create the client auth config file using the ca cert
-    local_action: 
-      module: shell kubectl config set-cluster kubernetes-the-alta3-way \
-              --certificate-authority=/var/lib/kubernetes/ca.pem \
-              --embed-certs=true \
-              --server=https://127.0.0.1:6443 \
-              --kubeconfig=kube-proxy.kubeconfig 
-      args:
-        chdir: "{{ k8sconfigdir }}" 
-    become: yes
-    when: reload
-    
-  - name: add the kube-proxy cert and key to the config
-    local_action:
-      module: shell kubectl config set-credentials kube-proxy \
-              --client-certificate=/home/student/k8s-certs/kube-proxy.pem \
-              --client-key=/home/student/k8s-certs/kube-proxy-key.pem \
-              --embed-certs=true \
-              --kubeconfig=kube-proxy.kubeconfig 
-      args:
-        chdir: "{{ k8sconfigdir }}" 
-    become: yes
-    when: reload
-    
-  - name: set the config user to be kube-proxy
-    local_action:
-      module: shell kubectl config set-context default \
-              --cluster=kubernetes-the-alta3-way \
-              --user=kube-proxy \
-              --kubeconfig=kube-proxy.kubeconfig
-      args:
-        chdir: "{{ k8sconfigdir }}" 
-    become: yes
-    when: reload
-
-  - name: set the default kubeconfig to be kube-proxy.kubeconfig
-    local_action: 
-      module: shell kubectl config use-context default \
-              --kubeconfig=kube-proxy.kubeconfig
-      args:
-        chdir: "{{ k8sconfigdir }}" 
-    become: yes
-    when: reload
-
-
-#-----------------------------------------------------------------------------
-# Node configuration - Generating client authentication config file (convert to k8s_raw and or command vs shell)
-#-----------------------------------------------------------------------------
-
-  - name: Chmod files to make them transferrable #TODO get these files in one place
-    local_action:
-      module:  file 
-      path: "{{ item }}"
-      mode: "0777"	
-      #state: file
-    with_items: 
-    - "{{ k8sconfigdir }}/kube-proxy.kubeconfig"
-    - "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig"
-    become: yes
-
-  - name: Copy configuration files out to kubernetes nodes
-    copy:
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-      mode: "0600"
-      group: student
-      owner: student
-    with_items: 
-    - { source: "{{ k8sconfigdir }}/kube-proxy.kubeconfig", dest: "/var/lib/kube-proxy/kubeconfig" }
-    - { source: "{{ k8sconfigdir }}/{{ inventory_hostname }}.kubeconfig", dest: "/var/lib/kubelet/kubeconfig" }
-    become: yes
+- name: Copy certs/keys/configs to Nodes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop: 
+   - src: "{{ cert_dir }}/{{ inventory_hostname }}.pem"
+     dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem"
+     mode: "0664"
+   - src: "{{ cert_dir }}/{{ inventory_hostname }}-key.pem"
+     dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem"
+     mode: "0600"
+   - src: "{{ config_dir }}/kube-proxy.kubeconfig"
+     dest: "{{ kube_proxy_kubeconfig_path }}"
+     mode: "0600"
+   - src: "{{ config_dir }}/{{ inventory_hostname }}.kubeconfig"
+     dest: "{{ kubelet_kubeconfig_path }}" 
+     mode: "0600"
+  loop_control:
+     label: "File = {{ item.dest }}"
+  become: yes
 
 
 #/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
@@ -226,70 +62,52 @@
 #-----------------------------------------------------------------------------
 #/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
-
-
 #-----------------------------------------------------------------------------
 # Installing OS Dependencies 
 #-----------------------------------------------------------------------------
 
-  - name: Install socat on the kubernetes nodes
-    apt: 
-      name: socat
-      state: present
-    become: yes
+- name: Install socat on the kubernetes nodes
+  apt: 
+    name: socat
+    state: latest
+  become: yes
 
-#-----------------------------------------------------------------------------
-# Create Directories for Installation of Node Binaries 
-#-----------------------------------------------------------------------------
-#TODO: I think this section can be removed.. already done previously
-#  - name: Create the install directories
-#    file: 
-#      path: "{{ item }}"
-#      state: directory
-#      mode: "0750" 
-#    with_items: 
-#    - "/etc/cni/net.d/"
-#    - "/opt/cni/bin/"
-#    - "/var/lib/kubelet/"
-#    - "/var/lib/kube-proxy/"
-#    - "/var/lib/kubernetes/"
-#    - "/var/run/kubernetes/"
-#    become: yes
 
 #-----------------------------------------------------------------------------
 # Downloading and Installing Node Binaries 
 #-----------------------------------------------------------------------------
 
-  - name: Download the Node binaries
-    get_url:
-      url: "{{ item }}"
-      dest: "/usr/local/bin/"
-      mode: "0755"
-    become: yes 
-    with_items:
-    - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl
-    - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kube-proxy
-    - https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubelet
+- name: Download Kubernetes kubectl 
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+   - url: "{{ kubectl.url }}"
+     dest: "{{ kubectl.path }}"
+     mode: '0755'
+  become: yes    
 
-  - name: Download Node binaries that are tarred
-    get_url:
-      url: "{{ item.url }}"
-      dest: "{{ item.dest }}"
-      #mode: "0755"
-    with_items:
-    - { url: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
-    - { url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
-    become: yes 
+- name: Download the Node services binaries
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ node_services }}"
+  loop_control:
+     label: "k8s v{{ k8s_version }} - {{ item.path }}"
+  become: yes 
 
-  - name: unarchive the kubernetes binaries
-    unarchive:
-      remote_src: yes
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-    with_items:
-    - { source: "/opt/cni/bin/cni-plugins-amd64-v0.6.0.tgz", dest: "/opt/cni/bin/" }
-    - { source: "/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz", dest: "/" }
-    become: yes
+- name: Download and unarchive Node dependencies
+  unarchive:
+    remote_src: yes
+    src: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  loop: "{{ node_dependencies }}"
+  loop_control:
+     label: "{{ item.name }}"
+  become: yes 
+
 
 
 #/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
@@ -298,80 +116,77 @@
 #-----------------------------------------------------------------------------
 #/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
 
-  - name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
-    template:
-      src: "{{ role_path }}/templates/10-bridge.conf.j2"
-      dest: "/etc/cni/net.d/10-bridge.conf"
-      owner: student
-      group: student
-      mode: "0664"
-    become: yes
+- name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
+  template:
+    src: "{{ role_path }}/templates/10-bridge.conf.j2"
+    dest: "/etc/cni/net.d/10-bridge.conf"
+    mode: "0664"
+  become: yes
 
-  - name: Create the 99-loopback.conf file for each node. 
-    copy: 
-      src: "{{ role_path }}/files/99-loopback.conf"
-      dest: "/etc/cni/net.d"
-      owner: student
-      group: student
-      mode: "0664"
-    become: yes    
+- name: Create the 99-loopback.conf file for each node. 
+  copy: 
+    src: "{{ role_path }}/files/99-loopback.conf"
+    dest: "/etc/cni/net.d"
+    mode: "0664"
+  become: yes    
 
-  - name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
-    copy: 
-      src: "{{role_path}}/files/{{ inventory_hostname }}-pod-routes"
-      dest: "/etc/network/if-up.d/pod-routes"
-      owner: student
-      group: student
-      mode: "0775"
-    become: yes
 
+#TODO: these pod-routes are hard coded, need to be templatized and smartly created
+- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
+  copy: 
+    src: "{{  role_path  }}/files/{{ inventory_hostname }}-pod-routes"
+    dest: "/etc/network/if-up.d/pod-routes"
+    mode: "0775"
+  become: yes
 
 #-----------------------------------------------------------------------------
 # Configure the Kubelet
 #-----------------------------------------------------------------------------
 
 
-  - name: Create the kubelet.service config file for each node
-    template:
-      src: "{{ item.source }}"
-      dest: "{{ item.dest }}"
-      owner: student
-      group: student
-      mode: "0664"
-    with_items:    
-    - { source: "{{ role_path }}/templates/kubelet.service.j2", dest: "/etc/systemd/system/kubelet.service" }
-    - { source: "{{ role_path }}/templates/kube-proxy.service.j2", dest: "/etc/systemd/system/kube-proxy.service" }
-    become: yes
+- name: Create the kubelet.service config file for each node
+  template:
+    src: "{{ item.service_j2 }}"
+    dest: "{{ item.service_path }}"
+  loop: "{{ node_services }}"
+  loop_control:
+     label: "{{ item.service_path }}"
+  become: yes
 
 
 #-----------------------------------------------------------------------------
 # Start the Worker Services 
 #-----------------------------------------------------------------------------
 
-  - name: Do a reload of the daemons
-    systemd: 
-      daemon_reload: yes
-    become: yes  
+- name: Do a reload of the daemons
+  systemd: 
+    daemon_reload: yes
+  become: yes  
 
-  - name: Enable the new services
-    systemd:
-      enabled: yes
-      name: "{{ item }}"
-    with_items:
-    - "containerd"
-    - "cri-containerd"
-    - "kubelet"
-    - "kube-proxy"
-    become: yes
+- name: Enable the k8s services
+  systemd:
+    enabled: yes
+    name: "{{ item.name }}"
+  loop: "{{ node_services }}"
+  become: yes  
 
-  - name: Start the services
-    systemd: 
-      state: restarted #TODO check if not having this set to started causes any havoc
-      name: "{{ item }}"
-    with_items:
-    - "containerd"
-    - "cri-containerd"
-    - "kubelet"
-    - "kube-proxy"
-    become: yes
+- name: Enable the containerd services
+  systemd:
+    enabled: yes
+    name: "{{ item.name }}"
+  loop: "{{ node_dependencies }}"
+  become: yes
 
+- name: Restart the k8s services
+  systemd:
+    state: restarted
+    name: "{{ item.name }}"
+  loop: "{{ node_services }}"
+  become: yes  
+
+- name: Restart the containerd services
+  systemd:
+    state: restarted
+    name: "{{ item.name }}"
+  loop: "{{ node_dependencies }}"
+  become: yes

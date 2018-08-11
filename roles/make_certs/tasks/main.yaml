@@ -41,6 +41,8 @@
      dest: "{{ k8s_csr_config_file }}"
    - src: "{{ role_path }}/files/admin-csr.json"
      dest: "{{ admin_csr_config_file }}"
+   - src: "{{ role_path }}/files/kube-proxy-csr.json"
+     dest: "{{ kube_proxy_csr_config_file }}"
 
 # TODO make all csr generation be from a template
 - name: Generate the certificate config file for nodes (file same on all nodes)
@@ -49,14 +51,12 @@
     dest: "{{ csr_dir }}/{{ item }}-csr.json"
   loop: "{{ groups['nodes'] }}"
        
-# Generates ca.pem and ca-key.pem when do not already exist
 - name: Generate a self-signed CA cert and private key for the k8s cloud
   shell: "cfssl gencert -initca {{ ca_csr_config_file }} | cfssljson -bare ca"
   args:
     chdir: "{{ cert_dir }}"
     creates: "{{ ca_pem_file }}" # also ca-key.pem, ca.csr
 
-# Generates kubernetes.pem and kubernetes-key.pem when do not already exist
 - name: Generate Certificate and private key for k8s API server
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
@@ -68,7 +68,6 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ k8s_pem_file }}" # also kubernetes.csr kubernetes-key.pem
 
-#Generate the admin certificates to setup for 
 - name: Generate admin certificates 
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
@@ -79,6 +78,16 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ admin_pem_file }}" # also admin.csr admin-key.pem
 
+- name: Generate kube-proxy client cert and private key 
+  shell: cfssl gencert -ca=/var/lib/kubernetes/ca.pem \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes {{ kube_proxy_csr_config_file }} | cfssljson -bare kube-proxy
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_proxy_pem_file }}" # also kube-proxy.csr kube-proxy-key.pem
+
 - name: Generate the specific certificate and Private key for each node when it does not already exist
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
@@ -88,7 +97,7 @@
          -profile=kubernetes {{ csr_dir }}/{{ hostvars[item].inventory_hostname }}-csr.json | cfssljson -bare {{ hostvars[item].inventory_hostname }}
   args:
     chdir: "{{ cert_dir }}"
-    creates: "{{ cert_dir }}/{{ item }}.pem" # also admin.csr admin-key.pem
+    creates: "{{ cert_dir }}/{{ item }}.pem"
   loop: "{{ groups['nodes'] }}"
 
 - name: Discover if encryption config has already been generated

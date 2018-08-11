@@ -1,3 +1,4 @@
+
 [masters]
 master-1 ansible_host="172.16.1.5"
 master-2 ansible_host="172.16.1.6"
