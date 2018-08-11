@@ -101,7 +101,8 @@ etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
 etcd_port:
   client: 2379
   s2s: 2380 
-etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }},{% endfor %}"
+etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].ansible_host }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
 
 # master
 master_k8s_config_dir: "/var/lib/kubernetes"
