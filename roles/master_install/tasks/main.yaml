@@ -78,6 +78,7 @@
 
 #-------------------------------------------------------------------------------------------
 # RBAC setup
+# TODO: I think rbac belongs on the beachhead role localhost, not run 3 times on each master --brfry
 #-------------------------------------------------------------------------------------------
 
 - name: Copy rbac cluster-role to masters
@@ -99,5 +100,3 @@
 - name: Bind the clusterrole to the kubernetes user.
   shell: "kubectl apply -f {{ master_rbac_rolebind.path }}"
   become: yes
-
-- meta: end_play

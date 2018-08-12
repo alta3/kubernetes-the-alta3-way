@@ -56,37 +56,49 @@
   loop: "{{ groups['nodes'] }}"
 
 #-----------------------------------------------------------------------------
-# Node configuration - Generating client authentication config file 
+# Node configuration - Generating client authentication config files
 #-----------------------------------------------------------------------------
 
-- name: create the client auth config file using the ca cert
+- name: auth kubeconfig files - create
   command: kubectl config set-cluster {{ cluster_name }} \
            --certificate-authority={{ ca_pem_file }} \
            --embed-certs=true \
-           --server={{ localhost_lb_apiserver_address }} \
-           --kubeconfig=kube-proxy.kubeconfig 
+           --server={{ item.server }} \
+           --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
   
-- name: add the kube-proxy cert and key to the config
-  command: kubectl config set-credentials kube-proxy \
-           --client-certificate={{ kube_proxy_pem_file }} \
-           --client-key={{ kube_proxy_key_file }} \
+- name: auth kubeconfig - set credentials 
+  command: kubectl config set-credentials {{ item.name }} \
+           --client-certificate={{ item.pem }} \
+           --client-key={{ item.key }} \
            --embed-certs=true \
-           --kubeconfig=kube-proxy.kubeconfig 
+           --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
   
-- name: set the config user to be kube-proxy
+- name: auth kubeconfig - set context
   command: kubectl config set-context default \
            --cluster={{ cluster_name }} \
-           --user=kube-proxy \
-           --kubeconfig=kube-proxy.kubeconfig
+           --user={{ item.user }} \
+           --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
 
-- name: set the default kubeconfig to be kube-proxy.kubeconfig
+- name: auth kubeconfig - use context
   command: kubectl config use-context default \
-           --kubeconfig=kube-proxy.kubeconfig
+           --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
+  loop: "{{ auth_kubeconfigs }}"
+  loop_control:
+    label: "config={{ item.config }}"
