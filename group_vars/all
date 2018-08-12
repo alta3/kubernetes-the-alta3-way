@@ -4,7 +4,7 @@ run_all: True
 run_makecerts: "{{ run_all }}" 
 run_nodeconfig: "{{ run_all }}" 
 run_localconfig: "{{ run_all }}" 
-run_calico: "{{ run_all }}" 
+run_services: "{{ run_all }}" 
 run_bootstrap: "{{ run_all }}" 
 run_etcd: "{{ run_all }}"
 run_master: "{{ run_all }}"
@@ -18,7 +18,7 @@ etcd_version: "3.3.9"
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 cluster_dns: "172.16.3.10"
-pod_cidr: 192.168.1.0/24 # not currently used but lots of this string is out there in configs
+pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
 
 
 # dependencies and their destinations

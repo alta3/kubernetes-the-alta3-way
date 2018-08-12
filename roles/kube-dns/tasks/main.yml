@@ -1,0 +1,8 @@
+
+- name: Generate a kube-dns installation yaml file
+  template:
+    src: "{{ role_path }}/templates/kube-dns.yaml.j2" 
+    dest: "{{ config_dir }}/kube-dns.yaml"
+
+- name: Apply kube-dns service 
+  command: kubectl apply -f {{ config_dir }}/kube-dns.yaml 
