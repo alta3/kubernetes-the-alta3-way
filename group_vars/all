@@ -14,7 +14,7 @@ run_nginx_lb: "{{ run_all }}"
 run_nodes: "{{ run_all }}"
 
 # versions
-k8s_version: "1.10.2"
+k8s_version: "1.9.10"
 etcd_version: "3.3.9"
 
 cluster_name: "kubernetes-the-alta3-way"
