@@ -1,4 +1,6 @@
 ---
+ansible_python_interpreter: "/usr/bin/python3"
+
 # control flow
 run_all: True
 run_makecerts: "{{ run_all }}" 
