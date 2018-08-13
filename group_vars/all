@@ -112,7 +112,7 @@ auth_kubeconfigs:
      config: "kube-proxy.kubeconfig"
      pem: "{{ kube_proxy_pem_file }}"
      key: "{{ kube_proxy_key_file }}"
-     user: "system:kube-proxy"
+     user: "kube-proxy"
 
    - name: "kube-controller-manager"
      server: "{{ master_api_localhost_url }}"
