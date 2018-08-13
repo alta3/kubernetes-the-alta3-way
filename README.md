@@ -25,3 +25,5 @@ that as a TODO for later.
 #### TODO:
 
  * This playbook needs handlers.  If any file that is used in a service is modified, call the restart service handler to make sure that the services all get the freshness updates.
+ * move the rbac yaml runners out of master_install, put it on beachhead-only playbook
+ * add beachhead routes to pod cidrs --> beachhead only playbook
