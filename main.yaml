@@ -51,3 +51,9 @@
      when: run_services
    - name: kube-dns
      when: run_services
+  tasks:
+   - name: configure beachhead's routes to nodes (pod routes)
+     # TODO put these in an interface bash script somewhere so they get added when ens3 comes up
+     command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].ansible_host }}"
+     loop: "{{ groups['nodes'] }}"
+     become: yes
