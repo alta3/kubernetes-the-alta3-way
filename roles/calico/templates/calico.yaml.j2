@@ -194,6 +194,8 @@ spec:
               value: "autodetect"
             - name: FELIX_HEALTHENABLED
               value: "true"
+            - name: IP_AUTODETECTION_METHOD
+              value: "can-reach=8.8.8.8"
           securityContext:
             privileged: true
           resources:
