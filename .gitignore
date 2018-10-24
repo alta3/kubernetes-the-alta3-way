@@ -1,5 +1,5 @@
 # vim swap #
 ######################
-
+ansible.log
 *.swp
 *.retry
