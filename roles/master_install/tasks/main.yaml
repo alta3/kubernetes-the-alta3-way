@@ -75,6 +75,23 @@
 - name: Allow Kubernetes API Server to fully initialize
   pause:
     seconds: 15
+    
+# ----------------------------------------------------------------------------
+#   _____ _____ ___ _____ _____ _____   ______ _____ _   _ _____ _____ _____ 
+#  /  ___|_   _/ _ \_   _|_   _/  __ \  | ___ \  _  | | | |_   _|  ___/  ___|
+#  \ `--.  | |/ /_\ \| |   | | | /  \/  | |_/ / | | | | | | | | | |__ \ `--. 
+#   `--. \ | ||  _  || |   | | | |      |    /| | | | | | | | | |  __| `--. \
+#  /\__/ / | || | | || |  _| |_| \__/\  | |\ \\ \_/ / |_| | | | | |___/\__/ /
+#  \____/  \_/\_| |_/\_/  \___/ \____/  \_| \_|\___/ \___/  \_/ \____/\____/ 
+# ----------------------------------------------------------------------------
+
+#TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
+- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
+  copy: 
+    src: "{{  role_path  }}/files/node-routes"
+    dest: "/etc/network/if-up.d/node-routes"
+    mode: "0775"
+  become: yes
 
 #-------------------------------------------------------------------------------------------
 # RBAC setup
