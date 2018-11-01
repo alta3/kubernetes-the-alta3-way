@@ -6,7 +6,6 @@ Documentation=https://github.com/kubernetes/kubernetes
 ExecStart=/usr/local/bin/kube-proxy \
   --cluster-cidr={{ cluster_cidr }} \
   --kubeconfig={{ kube_proxy_kubeconfig_path }} \
-  --masquerade-all=true \ 
   --proxy-mode=iptables \
   --v=2
 Restart=on-failure
