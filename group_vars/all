@@ -12,6 +12,7 @@ run_etcd: "{{ run_all }}"
 run_master: "{{ run_all }}"
 run_nginx_lb: "{{ run_all }}"
 run_nodes: "{{ run_all }}"
+run_rbac: "{{ run_all }}"
 
 # versions
 k8s_version: "1.9.10"
@@ -192,11 +193,11 @@ node_dependencies:
 # rbac configs
 master_rbac_role:
   file: "{{ role_path }}/files/rbac-clusterrole.yaml"
-  path: "{{ deployed_k8s_config_dir }}/rbac-clusterrole.yaml"
+  path: "{{ config_dir }}/rbac-clusterrole.yaml"
 
 master_rbac_rolebind:
   file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
-  path: "{{ deployed_k8s_config_dir }}/rbac-clusterrolebind.yaml"
+  path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
  
 # etcd
 etcd_arch: "amd64"

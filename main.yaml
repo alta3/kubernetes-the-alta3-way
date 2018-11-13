@@ -36,6 +36,12 @@
    - name: nginx_localhost_load_balancer
      when: run_nginx_lb
 
+- name: configure rbac
+  hosts: localhost
+  roles:
+   - name: rbac
+     when: run_rbac
+     
 - name: deploy k8s nodes
   hosts: nodes
   gather_facts: False

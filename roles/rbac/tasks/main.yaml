@@ -1,0 +1,19 @@
+#-------------------------------------------------------------------------------------------
+# RBAC setup
+#-------------------------------------------------------------------------------------------
+#
+- name: Copy rbac cluster-role to masters
+  copy:
+    src: "{{ master_rbac_role.file }}"
+    dest: "{{ master_rbac_role.path }}"
+
+- name: Apply the RBAC rules
+  shell: "kubectl apply -f {{ master_rbac_role.path }}"
+
+- name: Copy the cluster role bind file to the masters
+  copy:
+    src: "{{ master_rbac_rolebind.file }}"
+    dest: "{{ master_rbac_rolebind.path }}"
+
+- name: Bind the clusterrole to the kubernetes user.
+  shell: "kubectl apply -f {{ master_rbac_rolebind.path }}"
