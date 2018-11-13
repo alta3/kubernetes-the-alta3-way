@@ -17,6 +17,20 @@
 #   - "/var/lib/kubernetes"
 #  become: yes
 
+#TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
+- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
+  copy: 
+    src: "{{  role_path  }}/files/node-routes"
+    dest: "/etc/network/if-up.d/node-routes"
+    mode: "0775"
+  become: yes
+
+- name: configure routes to nodes (pod routes)
+  command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].ansible_host }}"
+  loop: "{{ groups['nodes'] }}"
+  become: yes
+  ignore_errors: True
+
 
 #``````````````````````````````````````````````````````````
 # Locally configure kubernetes 

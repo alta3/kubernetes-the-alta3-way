@@ -93,6 +93,12 @@
     mode: "0775"
   become: yes
 
+- name: configure routes to nodes (pod routes)
+  command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].ansible_host }}"
+  loop: "{{ groups['nodes'] }}"
+  become: yes
+  ignore_errors: True
+
 #-------------------------------------------------------------------------------------------
 # RBAC setup
 # TODO: I think rbac belongs on the beachhead role localhost, not run 3 times on each master --brfry

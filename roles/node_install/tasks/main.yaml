@@ -128,15 +128,6 @@
     mode: "0664"
   become: yes    
 
-
-#TODO: these pod-routes are hard coded, need to be templatized and smartly created
-#- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
-#  copy: 
-#    src: "{{  role_path  }}/files/{{ inventory_hostname }}-pod-routes"
-#    dest: "/etc/network/if-up.d/pod-routes"
-#    mode: "0775"
-#  become: yes
-
 - name: Enable packet forwarding on the node 
   sysctl:
     name: net.ipv4.ip_forward
@@ -144,6 +135,18 @@
     sysctl_set: True
     state: present
     reload: yes
+  become: yes
+
+- name: Enable br_netfilter kernel module
+  modprobe:
+    name: br_netfilter
+    state: present
+  become: yes
+
+- name: Persist br_netfilter kernell module loading (on reboot)
+  copy: 
+    dest: /etc/modules-load.d/br_netfilter.conf
+    contents: br_netfilter
   become: yes
 
 #-----------------------------------------------------------------------------
