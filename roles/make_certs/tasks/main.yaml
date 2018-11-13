@@ -49,6 +49,8 @@
      dest: "{{ kube_scheduler_csr_config_file }}"
    - src: "{{ role_path }}/files/kube-service-account-csr.json"
      dest: "{{ kube_service_account_csr_config_file }}"
+   - src: "{{ role_path }}/files/kube-registry-web-csr.json"
+     dest: "{{ kube_registry_web_csr_config_file }}"
 
 # TODO make all csr generation be from a template
 - name: Generate the certificate config file for nodes (file same on all nodes)
@@ -129,6 +131,17 @@
   args:
     chdir: "{{ cert_dir }}"
     creates: "{{ kube_service_account_pem_file }}" # also kube-service-account.csr kube-service-account-key.pem
+
+- name: Generate registry web cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ kube_registry_web_csr_config_file }} | cfssljson -bare registry-web
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_registry_web_pem_file }}" # also .csr .pem
 
 - name: Generate the specific certificate and Private key for each node when it does not already exist
   shell: cfssl gencert \

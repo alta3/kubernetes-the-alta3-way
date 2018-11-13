@@ -56,6 +56,7 @@ kube_proxy_csr_config_file: "{{ csr_dir }}/kube-proxy-csr.json"
 kube_controller_manager_csr_config_file: "{{ csr_dir }}/kube-controller-manager-csr.json"
 kube_scheduler_csr_config_file: "{{ csr_dir }}/kube-scheduler-csr.json"
 kube_service_account_csr_config_file: "{{ csr_dir }}/kube-service-account-csr.json"
+kube_registry_web_csr_config_file: "{{ csr_dir }}/kube-registry-web-csr.json"
 
 # generated cert and key files
 ca_pem_file: "{{ cert_dir }}/ca.pem"
@@ -72,6 +73,8 @@ kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
 kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
 kube_service_account_pem_file: "{{ cert_dir }}/service-account.pem"
 kube_service_account_key_file: "{{ cert_dir }}/service-account-key.pem"
+kube_registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
+kube_registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
 
 # master and node certificates
 deployed_k8s_config_dir: "/var/lib/kubernetes"
