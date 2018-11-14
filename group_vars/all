@@ -13,6 +13,7 @@ run_master: "{{ run_all }}"
 run_nginx_lb: "{{ run_all }}"
 run_nodes: "{{ run_all }}"
 run_rbac: "{{ run_all }}"
+run_trusted_ca: "{{ run_all }}"
 
 # versions
 k8s_version: "1.9.10"
@@ -60,6 +61,7 @@ kube_registry_web_csr_config_file: "{{ csr_dir }}/kube-registry-web-csr.json"
 
 # generated cert and key files
 ca_pem_file: "{{ cert_dir }}/ca.pem"
+ca_crt_file: "{{ cert_dir }}/ca.crt"
 ca_key_file: "{{ cert_dir }}/ca-key.pem"
 k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
 k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"

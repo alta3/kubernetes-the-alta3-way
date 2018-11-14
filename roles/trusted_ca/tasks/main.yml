@@ -1,0 +1,10 @@
+- name: Copy k8s CA
+  copy:
+    src: "{{ ca_crt_file }}"
+    dest: "/usr/local/share/ca-certificates/ca.crt" 
+    mode: "0600"
+  become: yes
+
+- name: Update Trusted Certificates
+  shell: /usr/sbin/update-ca-certificates
+  become: yes

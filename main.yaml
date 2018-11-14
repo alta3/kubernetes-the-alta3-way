@@ -35,6 +35,8 @@
   roles:
    - name: nginx_localhost_load_balancer
      when: run_nginx_lb
+   - name: trusted_ca
+     when: run_trusted_ca
 
 - name: configure rbac
   hosts: localhost

@@ -65,6 +65,12 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ ca_pem_file }}" # also ca-key.pem, ca.csr
 
+- name: Create crt version of the ca.pem cert file
+  shell: "openssl x509 -in {{ ca_pem_file }} -inform PEM -out {{ ca_crt_file }}"
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ ca_crt_file }}"
+
 - name: Generate Certificate and private key for k8s API server
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
