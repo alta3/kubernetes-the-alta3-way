@@ -29,6 +29,7 @@
   command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
   loop: "{{ groups['nodes'] }}"
   become: yes
+  register: cmd_result
   failed_when:
   - "'answers: File exists' not in cmd_result.stderr"
   - "cmd_result.rc != 0"
