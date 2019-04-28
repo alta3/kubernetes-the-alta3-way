@@ -1,14 +1,56 @@
+---
+all:
+  vars:
+    student_number:             "000"
+    ansible_user:               student
+    ansible_python_interpreter: /usr/bin/python3
+    class: "ceph"
+  children:  
+    clients:
+      hosts:
+        localhost
+    masters:
+      hosts:
+        master1:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-master-01.localdomain ')}}"
+        master2:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-master-02.localdomain ')}}"
+        master3:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-master-03.localdomain ')}}"  
+      vars: 
+        monitor_address_block: "10.0.0.0/12"
+    etcd:
+        children:
+            masters  
+    nodes:
+      hosts:
+        node1:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-node-01.localdomain ')}}" 
+        node2:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-node-02.localdomain ')}}" 
+        node3:
+          ansible_host: "{{ lookup('dig', '{{ class }}-{{ student_number }}-node-03.localdomain ')}}"
+      vars: 
+        public_network:        "10.0.0.0/12"
+        radosgw_address_block: "10.0.0.0/12"
+#    mdss:
+#      hosts:
+#        node1:
+#          ansible_host: ceph-{{ student_number }}-node-01.localdomain 
 
-[masters]
-master-1 ansible_host="172.16.1.5"
-master-2 ansible_host="172.16.1.6"
-master-3 ansible_host="172.16.1.7"
 
-[etcd:children]
-masters
-
-[nodes]
-node-1 ansible_host="172.16.1.8" cni_host_subnet="192.168.1.0/24"
-node-2 ansible_host="172.16.1.9" cni_host_subnet="192.168.2.0/24"
-node-3 ansible_host="172.16.1.10" cni_host_subnet="192.168.3.0/24"
-
+#
+#
+#[masters]
+#master-1 ansible_host="ceph-387-master-01"
+#master-2 ansible_host="ceph-387-master-02"
+#master-3 ansible_host="ceph-387-master-03"
+#
+#[etcd:children]
+#masters
+#
+#[nodes]
+#node-1 ansible_host="ceph-387-node-01" cni_host_subnet="192.168.1.0/24"
+#node-2 ansible_host="ceph-387-node-02" cni_host_subnet="192.168.2.0/24"
+#node-3 ansible_host="ceph-387-node-03" cni_host_subnet="192.168.3.0/24"
+#
