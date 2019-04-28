@@ -96,6 +96,8 @@
 - name: configure routes to nodes (pod routes)
   command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
   loop: "{{ groups['nodes'] }}"
+  register: cmd_result
   become: yes
-  ignore_errors: True
-
+  failed_when:
+  - "'answers: File exists' not in cmd_result.stderr"
+  - "cmd_result.rc != 0"
