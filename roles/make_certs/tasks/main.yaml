@@ -71,12 +71,12 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ ca_crt_file }}"
 
-- name: Generate Certificate and private key for k8s API server
+- name: Generate Certificate and private key for k8s API server and etcd
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ apiserver_cluster_ip }},{{ master_ips_csv }},127.0.0.1,kubernetes.default \
+         -hostname={{ apiserver_cluster_ip }},{{ master_ips_csv }},{{ master_fqdn_csv }},127.0.0.1,kubernetes.default \
          -profile=kubernetes \
          {{ k8s_csr_config_file }} | cfssljson -bare kubernetes
   args:
@@ -154,7 +154,7 @@
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ hostvars[item].inventory_hostname }},{{ hostvars[item].ansible_host }} \
+         -hostname={{ hostvars[item].inventory_hostname }},{{ hostvars[item].public_ip }},{{ hostvars[item].public_fqdn }} \
          -profile=kubernetes {{ csr_dir }}/{{ hostvars[item].inventory_hostname }}-csr.json | cfssljson -bare {{ hostvars[item].inventory_hostname }}
   args:
     chdir: "{{ cert_dir }}"

@@ -19,11 +19,6 @@
   raw: apt install -qy python aptitude
   become: true
 
-- name: Update hostname to match inventory 
-  hostname: 
-    name: "{{ inventory_hostname }}"
-  become: true
-
 - name: Update /etc/hosts on all systems
   template: 
     src: "{{ role_path }}/templates/hosts.j2"

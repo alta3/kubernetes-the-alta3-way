@@ -3,3 +3,4 @@
 ansible.log
 *.swp
 *.retry
+old_inventory

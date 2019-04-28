@@ -2,7 +2,7 @@
 127.0.0.1 {{ inventory_hostname }} localhost 
 
 {% for h in groups['all'] %}
-{{ hostvars[h].ansible_host }} {{ hostvars[h].inventory_hostname }}
+{{ hostvars[h]["public_ip"] }} {{ hostvars[h]["inventory_hostname"] }}
 {% endfor %}
 # end ansible managed
 

@@ -144,7 +144,8 @@ auth_kubeconfigs:
 # master vars
 apiserver_cluster_ip: 172.16.3.1 
 service_cluster_ip_range: 172.16.3.0/24
-master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].ansible_host }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_api_localhost_url: "https://127.0.0.1:6443" 
 
 master_services: 
@@ -213,8 +214,8 @@ etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
 etcd_port:
   client: 2379
   s2s: 2380 
-etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].ansible_host }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].ansible_host }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
 calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
 
 # nodes 

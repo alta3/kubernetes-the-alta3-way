@@ -5,7 +5,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 [Service]
 ExecStart=/usr/local/bin/kube-apiserver \
   --admission-control=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
-  --advertise-address={{ ansible_host }} \
+  --advertise-address={{ public_ip }} \
   --allow-privileged=true \
   --apiserver-count=3 \
   --audit-log-maxage=30 \

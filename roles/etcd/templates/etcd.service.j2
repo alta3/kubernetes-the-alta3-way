@@ -13,10 +13,10 @@ ExecStart=/usr/local/bin/etcd \
   --peer-trusted-ca-file=/etc/etcd/ca.pem \
   --peer-client-cert-auth \
   --client-cert-auth \
-  --initial-advertise-peer-urls https://{{ ansible_host }}:{{ etcd_port.s2s }} \
-  --listen-peer-urls https://{{ ansible_host }}:{{ etcd_port.s2s }} \
-  --listen-client-urls https://{{ ansible_host }}:{{ etcd_port.client }},http://127.0.0.1:{{ etcd_port.client }} \
-  --advertise-client-urls https://{{ ansible_host }}:{{ etcd_port.client }} \
+  --initial-advertise-peer-urls https://{{ public_ip }}:{{ etcd_port.s2s }} \
+  --listen-peer-urls https://{{ public_ip }}:{{ etcd_port.s2s }} \
+  --listen-client-urls https://{{ public_ip }}:{{ etcd_port.client }},http://127.0.0.1:{{ etcd_port.client }} \
+  --advertise-client-urls https://{{ public_ip }}:{{ etcd_port.client }} \
   --initial-cluster-token etcd-cluster-0 \
   --initial-cluster {{ etcd_cluster_urls }} \
   --initial-cluster-state new \

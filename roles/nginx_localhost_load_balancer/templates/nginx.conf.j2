@@ -1,3 +1,4 @@
+load_module /usr/lib/nginx/modules/ngx_stream_module.so;
 user www-data;
 pid /run/nginx.pid;
 error_log stderr notice;
@@ -12,7 +13,7 @@ stream {
 	upstream kube_apiserver {
 		least_conn;
 		{% for m in groups['masters'] %}
-		server {{ hostvars[m].ansible_host }}:6443;
+		server {{ hostvars[m].public_ip }}:6443;
 		{% endfor %}
 	}
 
