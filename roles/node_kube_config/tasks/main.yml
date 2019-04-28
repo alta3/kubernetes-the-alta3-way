@@ -12,9 +12,11 @@
            --certificate-authority={{ ca_pem_file }} \
            --embed-certs=true \ 
            --server={{ localhost_lb_apiserver_address }} \
-           --kubeconfig={{ item }}.kubeconfig
+           --kubeconfig={{ public_fqdn }}.kubeconfig
   args: 
     chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
 #-----------------------------------------------------------------------------
@@ -22,13 +24,15 @@
 #-----------------------------------------------------------------------------
 
 - name: Set the credentials for each node
-  command: kubectl config set-credentials system:node:{{ item }} \
-           --client-certificate={{ cert_dir }}/{{ item }}.pem \
-           --client-key={{ cert_dir }}/{{ item }}-key.pem \
+  command: kubectl config set-credentials system:node:{{ public_fqdn }} \
+           --client-certificate={{ cert_dir }}/{{ public_fqdn }}.pem \
+           --client-key={{ cert_dir }}/{{ public_fqdn }}-key.pem \
            --embed-certs=true \
-           --kubeconfig={{ item }}.kubeconfig
+           --kubeconfig={{ public_fqdn }}.kubeconfig
   args: 
     chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
 #-----------------------------------------------------------------------------
@@ -38,10 +42,12 @@
 - name: Set the context default for each node
   command: kubectl config set-context default \
            --cluster={{ cluster_name }} \
-           --user=system:node:{{ item }} \
-           --kubeconfig={{ item }}.kubeconfig
+           --user=system:node:{{ public_fqdn }} \
+           --kubeconfig={{ public_fqdn }}.kubeconfig
   args: 
     chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
   
 #-----------------------------------------------------------------------------
@@ -50,9 +56,11 @@
 
 - name: Use the context default for each node
   command: kubectl config use-context default \
-           --kubeconfig={{ item }}.kubeconfig
+           --kubeconfig={{ public_fqdn }}.kubeconfig
   args: 
     chdir: "{{ config_dir }}"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
 #-----------------------------------------------------------------------------

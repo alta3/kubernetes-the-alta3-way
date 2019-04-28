@@ -56,7 +56,9 @@
 - name: Generate the certificate config file for nodes (file same on all nodes)
   template:
     src: "{{ role_path }}/templates/node-csr.json.j2" 
-    dest: "{{ csr_dir }}/{{ item }}-csr.json"
+    dest: "{{ csr_dir }}/{{ public_fqdn }}-csr.json"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
        
 - name: Generate a self-signed CA cert and private key for the k8s cloud
@@ -154,11 +156,15 @@
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ hostvars[item].inventory_hostname }},{{ hostvars[item].public_ip }},{{ hostvars[item].public_fqdn }} \
-         -profile=kubernetes {{ csr_dir }}/{{ hostvars[item].inventory_hostname }}-csr.json | cfssljson -bare {{ hostvars[item].inventory_hostname }}
+         -hostname={{ hostname }},{{ public_ip }},{{ public_fqdn }} \
+         -profile=kubernetes {{ csr_dir }}/{{ public_fqdn }}-csr.json | cfssljson -bare {{ public_fqdn }}
   args:
     chdir: "{{ cert_dir }}"
-    creates: "{{ cert_dir }}/{{ item }}.pem"
+    creates: "{{ cert_dir }}/{{ hostvars[item]['public_fqdn'] }}.pem"
+  vars:
+    public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
+    public_ip: "{{ hostvars[item]['public_ip'] }}"
+    hostname: "{{ hostvars[item].inventory_hostname }}"
   loop: "{{ groups['nodes'] }}"
 
 

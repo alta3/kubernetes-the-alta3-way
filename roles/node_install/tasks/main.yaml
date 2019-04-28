@@ -37,18 +37,20 @@
     dest: "{{ item.dest }}"
     mode: "{{ item.mode }}"
   loop: 
-   - src: "{{ cert_dir }}/{{ inventory_hostname }}.pem"
-     dest: "/var/lib/kubelet/{{ inventory_hostname }}.pem"
+   - src: "{{ cert_dir }}/{{ public_fqdn }}.pem"
+     dest: "/var/lib/kubelet/{{ public_fqdn }}.pem"
      mode: "0664"
-   - src: "{{ cert_dir }}/{{ inventory_hostname }}-key.pem"
-     dest: "/var/lib/kubelet/{{ inventory_hostname }}-key.pem"
+   - src: "{{ cert_dir }}/{{ public_fqdn }}-key.pem"
+     dest: "/var/lib/kubelet/{{ public_fqdn }}-key.pem"
      mode: "0600"
    - src: "{{ config_dir }}/kube-proxy.kubeconfig"
      dest: "{{ kube_proxy_kubeconfig_path }}"
      mode: "0600"
-   - src: "{{ config_dir }}/{{ inventory_hostname }}.kubeconfig"
+   - src: "{{ config_dir }}/{{ public_fqdn }}.kubeconfig"
      dest: "{{ kubelet_kubeconfig_path }}" 
      mode: "0600"
+  vars:
+    public_fqdn: "{{ hostvars[inventory_hostname]['public_fqdn'] }}"
   loop_control:
      label: "File = {{ item.dest }}"
   become: yes
