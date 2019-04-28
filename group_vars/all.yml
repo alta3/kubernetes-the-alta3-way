@@ -16,7 +16,7 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.9.10"
+k8s_version: "1.9.11"
 etcd_version: "3.3.9"
 
 cluster_name: "kubernetes-the-alta3-way"
