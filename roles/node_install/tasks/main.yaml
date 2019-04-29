@@ -93,12 +93,12 @@
      mode: '0755'
   become: yes    
 
-- name: Download the Node services binaries
+- name: Download the Node binaries
   get_url:
     url: "{{ item.url }}"
     dest: "{{ item.path }}"
     mode: "{{ item.mode }}"
-  loop: "{{ node_services }}"
+  loop: "{{ node_binaries }}"
   loop_control:
      label: "k8s v{{ k8s_version }} - {{ item.path }}"
   become: yes 
@@ -162,14 +162,14 @@
 #
 - name: Create containerd configuration file
   copy:
-    src: "{{ role_path }}/files/continerd-config.toml"
+    src: "{{ role_path }}/files/containerd-config.toml"
     dest: "/etc/containerd/config.toml"
     mode: "0664"
   become: yes
 
 - name: Create the containerd service (systemd) file
   copy:
-    src: "{{ role_path }}/files/containerd.service"
+    src: "{{ role_path }}/templates/containerd.service.j2"
     dest: "/etc/systemd/system/containerd.service"
     mode: "0664"
   become: yes
