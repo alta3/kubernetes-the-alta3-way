@@ -10,10 +10,12 @@
     mode: "0755"
   with_items:
    - "/etc/cni/net.d"
+   - "/etc/containerd/"
    - "/opt/cni/bin"
    - "/var/lib/kubelet"
    - "/var/lib/kube-proxy"
    - "/var/lib/kubernetes"
+   - "/var/run/kubernetes"
   become: yes
 
 
@@ -68,7 +70,10 @@
 
 - name: Install socat on the kubernetes nodes
   apt: 
-    name: socat
+    name: 
+    - socat
+    - conntrack
+    - ipset
     state: latest
   become: yes
 
@@ -103,7 +108,7 @@
     remote_src: yes
     src: "{{ item.url }}"
     dest: "{{ item.dest }}"
-  loop: "{{ node_dependencies }}"
+  loop: "{{ node_archive_dependencies }}"
   loop_control:
      label: "{{ item.name }}"
   become: yes 
@@ -152,11 +157,29 @@
   become: yes
 
 #-----------------------------------------------------------------------------
+# Configure Containerd
+#-----------------------------------------------------------------------------
+#
+- name: Create containerd configuration file
+  copy:
+    src: "{{ role_path }}/files/continerd-config.toml"
+    dest: "/etc/containerd/config.toml"
+    mode: "0664"
+  become: yes
+
+- name: Create the containerd service (systemd) file
+  copy:
+    src: "{{ role_path }}/files/containerd.service"
+    dest: "/etc/systemd/system/containerd.service"
+    mode: "0664"
+  become: yes
+
+#-----------------------------------------------------------------------------
 # Configure the Kubelet
 #-----------------------------------------------------------------------------
 
 
-- name: Create the kubelet.service config file for each node
+- name: Create the node services config files for each node
   template:
     src: "{{ item.service_j2 }}"
     dest: "{{ item.service_path }}"
@@ -182,12 +205,12 @@
   loop: "{{ node_services }}"
   become: yes  
 
-- name: Enable the containerd services
-  systemd:
-    enabled: yes
-    name: "{{ item.name }}"
-  loop: "{{ node_dependencies }}"
-  become: yes
+#- name: Enable the containerd services
+#  systemd:
+#    enabled: yes
+#    name: "{{ item.name }}"
+#  loop: "{{ node_dependencies }}"
+#  become: yes
 
 - name: Restart the k8s services
   systemd:
@@ -196,9 +219,9 @@
   loop: "{{ node_services }}"
   become: yes  
 
-- name: Restart the containerd services
-  systemd:
-    state: restarted
-    name: "{{ item.name }}"
-  loop: "{{ node_dependencies }}"
-  become: yes
+#- name: Restart the containerd services
+#  systemd:
+#    state: restarted
+#    name: "{{ item.name }}"
+#  loop: "{{ node_dependencies }}"
+#  become: yes

@@ -16,8 +16,10 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.9.11"
+k8s_version: "1.12.8"
 etcd_version: "3.3.9"
+cni_version: "0.6.0"
+cri_version: "1.2.0-rc.0"
 
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
@@ -173,28 +175,56 @@ master_services:
    service_j2: "{{ role_path }}/files/kube-scheduler.service"
    service_path: "/etc/systemd/system/kube-scheduler.service"
 
-node_services: 
+node_binaries: 
  - name: "kubelet"
    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version}}/bin/linux/amd64/kube-proxy"
    path: "/usr/local/bin/kube-proxy"
    mode: "0775"
-   service_j2: "{{ role_path }}/templates/kube-proxy.service.j2"
-   service_path: "/etc/systemd/system/kube-proxy.service" 
 
  - name: "kube-proxy"
    url: "https://storage.googleapis.com/kubernetes-release/release/v{{k8s_version}}/bin/linux/amd64/kubelet"
    path: "/usr/local/bin/kubelet"
    mode: "0775"
+
+ - name: "runsc"
+   url: "https://storage.googleapis.com/kubernetes-the-hard-way/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17"
+   dest: "/urs/local/bin/runsc"
+   mode: "0775"
+
+ - name: "runc"
+   url: "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc5/runc.amd64"
+   dest: "/urs/local/bin/runc"
+   mode: "0775"
+
+ - name: "kubectl"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+   path: "/usr/local/bin/kubectl"
+   mode: "0775"
+
+node_services: 
+ - name: "kube-proxy"
+   service_j2: "{{ role_path }}/templates/kube-proxy.service.j2"
+   service_path: "/etc/systemd/system/kube-proxy.service" 
+ - name: "kubelet"
    service_j2: "{{ role_path }}/templates/kubelet.service.j2"
    service_path: "/etc/systemd/system/kubelet.service" 
-
-node_dependencies:
  - name: "containerd"
-   url: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz"
+   service_j2: "{{ role_path }}/templates/containerd.service.j2"
+   service_path: "/etc/systemd/system/containerd.service" 
+
+node_archive_dependencies:
+ - name: "containerd" # (cni-plugins)
+   url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-amd64-v{{ cni_version }}.tgz"
    dest: "/opt/cni/bin/"
  - name: "cri-containerd"
-   url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz"
+   url: "https://github.com/containerd/cri-containerd/releases/download/v{{ cri_version }}/cri-containerd-{{ cri_version }}.linux-amd64.tar.gz"
    dest: "/" 
+ - name: "crictl"
+   url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ k8s_version }}/crictl-v{{ k8s_version }}-linux-amd64.tar.gz"
+   dest: "/usr/local/bin/"
+
+
+
 
 # rbac configs
 master_rbac_role:
