@@ -156,7 +156,7 @@
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ hostname }},{{ public_ip }},{{ public_fqdn }} \
+         -hostname={{ hostname }},{{ public_ip }},{{ public_fqdn }},{{ public_hostname }} \
          -profile=kubernetes {{ csr_dir }}/{{ public_fqdn }}-csr.json | cfssljson -bare {{ public_fqdn }}
   args:
     chdir: "{{ cert_dir }}"
@@ -164,6 +164,7 @@
   vars:
     public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
     public_ip: "{{ hostvars[item]['public_ip'] }}"
+    public_hostname: "{{ hostvars[item]['public_hostname'] }}"
     hostname: "{{ hostvars[item].inventory_hostname }}"
   loop: "{{ groups['nodes'] }}"
 
