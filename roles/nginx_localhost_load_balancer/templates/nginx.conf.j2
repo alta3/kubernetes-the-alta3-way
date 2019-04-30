@@ -1,4 +1,4 @@
-{% if not xenial %}
+{% if ansible_distribution_release == bionic %}
 load_module /usr/lib/nginx/modules/ngx_stream_module.so;
 {% endif %}
 
