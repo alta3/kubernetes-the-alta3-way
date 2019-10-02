@@ -16,8 +16,8 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.9.11"
-etcd_version: "3.3.9"
+k8s_version: "1.15.3"
+etcd_version: "3.4.0"
 
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
@@ -190,7 +190,7 @@ node_services:
 
 node_dependencies:
  - name: "containerd"
-   url: "https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz"
+   url: "https://github.com/containernetworking/plugins/releases/download/v0.7.1/cni-plugins-amd64-v0.6.0.tgz"
    dest: "/opt/cni/bin/"
  - name: "cri-containerd"
    url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz"
