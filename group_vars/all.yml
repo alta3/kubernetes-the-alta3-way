@@ -193,7 +193,7 @@ node_dependencies:
    url: "https://github.com/containernetworking/plugins/releases/download/v0.7.1/cni-plugins-amd64-v0.6.0.tgz"
    dest: "/opt/cni/bin/"
  - name: "cri-containerd"
-   url: "https://github.com/containerd/cri-containerd/releases/download/v1.0.0-beta.1/cri-containerd-1.0.0-beta.1.linux-amd64.tar.gz"
+   url: "https://github.com/containerd/containerd/releases/download/v1.2.9/containerd-1.2.9.linux-amd64.tar.gz"
    dest: "/" 
 
 # rbac configs
@@ -209,7 +209,7 @@ master_rbac_rolebind:
 etcd_arch: "amd64"
 etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
 etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
-etcd_url: "https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
+etcd_url: "https://github.com/etcd/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
 etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
 etcd_port:
   client: 2379
