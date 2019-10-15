@@ -1,4 +1,7 @@
+{% if ansible_distribution_release == "bionic" %}
 load_module /usr/lib/nginx/modules/ngx_stream_module.so;
+{% endif %}
+
 user www-data;
 pid /run/nginx.pid;
 error_log stderr notice;
