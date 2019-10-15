@@ -1,7 +1,4 @@
-# vim swap #
-######################
 ansible.log
 *.swp
 *.retry
 old_inventory
-hosts.yml

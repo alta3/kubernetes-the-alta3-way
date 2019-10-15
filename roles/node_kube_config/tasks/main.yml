@@ -57,7 +57,7 @@
     label: "config={{ item.config }}"
   
 - name: auth kubeconfig - multiple services - set credentials 
-  command: kubectl config set-credentials {{ item.name }} \
+  command: kubectl config set-credentials {{ item.user }} \
            --client-certificate={{ item.pem }} \
            --client-key={{ item.key }} \
            --embed-certs=true \
