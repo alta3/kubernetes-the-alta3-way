@@ -16,21 +16,25 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.12.8"
-etcd_version: "3.3.9"
+k8s_version: "1.15.3"
+etcd_version: "3.4.0"
 cni_version: "0.6.0"
 containerd_version: "1.2.0-rc.0"
 cri_tools_version: "1.12.0"
+cfssl_version: "1.3.4"
 
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 cluster_dns: "172.16.3.10"
 pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
 
-
 # dependencies and their destinations
-cfssl_url: "https://pkg.cfssl.org/R1.2/cfssl_linux-amd64"
-cfssljson_url: "https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64"
+# TODO eventually revert this back to the official releases, until then
+# see https://github.com/cloudflare/cfssl/issues/995
+#cfssl_url: "https://pkg.cfssl.org/{{ cfssl_version }}/cfssl_linux-amd64"
+#cfssljson_url: "https://pkg.cfssl.org/{{ cfssl_version }}/cfssljson_linux-amd64"
+cfssl_url: "https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/linux/cfssl"
+cfssljson_url: "https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/linux/cfssljson"
 
 # masters, nodes and localhost all need kubectl
 kubectl:
@@ -49,9 +53,13 @@ city_csr: Harrisburg
 state_csr: Pennsylvania
 ou_csr: Kubernetes The Alta3 Way
 
-# cert config files
+# cert and misc config files
 ca_config_file: "{{ config_dir }}/ca-config.json"
 encryption_config_file: "{{ config_dir }}/encryption-config.yaml"
+kube_scheduler_config_file: "{{ config_dir }}/kube-scheduler.yaml"
+
+kube_scheduler_kubeconfig_file: "{{ config_dir }}/kube-scheduler.kubeconfig"
+kube_controller_manager_kubeconfig_file: "{{ config_dir }}/kube-controller-manager.kubeconfig"
 
 ca_csr_config_file: "{{ csr_dir }}/ca-csr.json"
 k8s_csr_config_file: "{{ csr_dir }}/kubernetes-csr.json"
@@ -90,6 +98,10 @@ deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/kubernetes-key.pem"
 deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/encryption-config.yaml"
 deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.pem"
 deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/kube-scheduler-key.pem"
+deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.yaml"
+deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.kubeconfig"
+deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
+deployed_kube_service_account_key_file: "{{ deployed_k8s_config_dir }}/service-account-key.pem"
 
 # deployed to both masters and nodes
 deployed_cert_and_config_files:
@@ -114,6 +126,18 @@ deployed_cert_and_config_files:
  - src: "{{ kube_service_account_key_file }}"
    dest: "{{ deployed_kube_scheduler_key_file }}"
    mode: "0600" 
+ - src: "{{ kube_scheduler_config_file }}"
+   dest: "{{ deployed_kube_scheduler_config_file }}"
+   mode: "0664"
+ - src: "{{ kube_scheduler_kubeconfig_file }}"
+   dest: "{{ deployed_kube_scheduler_kubeconfig_file }}"
+   mode: "0664"
+ - src: "{{ kube_controller_manager_kubeconfig_file }}"
+   dest: "{{ deployed_kube_controller_manager_kubeconfig_file }}"
+   mode: "0664"
+ - src: "{{ kube_service_account_key_file }}"
+   dest: "{{ deployed_kube_service_account_key_file }}"
+   mode: "0664"
 
 auth_kubeconfigs:
    - name: "kube-proxy"
@@ -147,9 +171,10 @@ auth_kubeconfigs:
 # master vars
 apiserver_cluster_ip: 172.16.3.1 
 service_cluster_ip_range: 172.16.3.0/24
+service_cluster_port_range: "30000-32767"
 master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_api_localhost_url: "https://127.0.0.1:6443" 
+master_api_localhost_url: "http://127.0.0.1:8080" 
 
 master_services: 
  - display_name: "Kubernetes API Server"
@@ -173,7 +198,7 @@ master_services:
    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
    path: "/usr/local/bin/kube-scheduler"
    mode: "0775"
-   service_j2: "{{ role_path }}/files/kube-scheduler.service"
+   service_j2: "{{ role_path }}/templates/kube-scheduler.service.j2"
    service_path: "/etc/systemd/system/kube-scheduler.service"
 
 node_binaries: 

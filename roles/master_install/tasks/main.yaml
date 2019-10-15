@@ -1,103 +1,84 @@
-#-------------------------------------------------------------------------
-# Finish moving the certs we created on beachhead into the masters.
-
-- name: Create k8s directories on masters
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-  - "/var/lib/etcd"
-  - "/var/lib/kubernetes"
-  become: yes
-
-- name: Copy Certs and Config to Masters
-  copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  loop: "{{ deployed_cert_and_config_files }}"
-  become: yes
-
-#----------------------------------------------------------------------------------------------------------
-# BOOTSTRAPPING KUBERNETES 
-# ---------------------------------------------------------------------------------------------------------   
-
-# API Server Install
-- name: Download the master service binaries
-  get_url:
-    url: "{{ item.url }}"
-    dest: "{{ item.path }}"
-    mode: "{{ item.mode }}"
-  loop: "{{ master_services }}"
-  loop_control: 
-    label: "{{ item.display_name }} -> {{ item.path }}"
-  become: yes
-
-- name: Push the config files for the master services
-  template:
-    src: "{{ item.service_j2 }}"
-    dest: "{{ item.service_path }}"
-  loop: "{{ master_services }}"
-  loop_control: 
-    label: "{{ item.display_name }} -> {{ item.service_path }}"
-  become: yes 
-
-- name: Download Kubernetes kubectl 
-  get_url:
-    url: "{{ item.url }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  loop:
-   - url: "{{ kubectl.url }}"
-     dest: "{{ kubectl.path }}"
-     mode: '0755'
-  become: yes    
-
-
-# Bounce and enable kube services
-
-- name: Reload systemd manager
-  systemd: 
-    daemon_reload: True
-  become: yes
-  
-# TODO make this a handler
-- name: Reload the daemon for the services
-  service: 
-    name: "{{ item.name }}"
-    enabled: yes
-    state: restarted
-  loop: "{{ master_services }}"
-  loop_control: 
-    label: "{{ item.display_name }} Service -> {{ item.name }}"
-  become: yes
-
-- name: Allow Kubernetes API Server to fully initialize
-  pause:
-    seconds: 90
-    
-# ----------------------------------------------------------------------------
-#   _____ _____ ___ _____ _____ _____   ______ _____ _   _ _____ _____ _____ 
-#  /  ___|_   _/ _ \_   _|_   _/  __ \  | ___ \  _  | | | |_   _|  ___/  ___|
-#  \ `--.  | |/ /_\ \| |   | | | /  \/  | |_/ / | | | | | | | | | |__ \ `--. 
-#   `--. \ | ||  _  || |   | | | |      |    /| | | | | | | | | |  __| `--. \
-#  /\__/ / | || | | || |  _| |_| \__/\  | |\ \\ \_/ / |_| | | | | |___/\__/ /
-#  \____/  \_/\_| |_/\_/  \___/ \____/  \_| \_|\___/ \___/  \_/ \____/\____/ 
-# ----------------------------------------------------------------------------
-
-#TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
-- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
-  copy: 
-    src: "{{  role_path  }}/files/node-routes"
-    dest: "/etc/network/if-up.d/node-routes"
-    mode: "0775"
-  become: yes
-
-- name: configure routes to nodes (pod routes)
-  command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
-  loop: "{{ groups['nodes'] }}"
-  register: cmd_result
-  become: yes
-  failed_when:
-  - "'answers: File exists' not in cmd_result.stderr"
-  - "cmd_result.rc != 0"
+---
+ - name: Create k8s directories on masters
+   file:
+     path: "{{ item }}"
+     state: directory
+   with_items:
+   - "/var/lib/etcd"
+   - "/var/lib/kubernetes"
+   become: yes
+ 
+ - name: Copy Certs and Config to Masters
+   copy:
+     src: "{{ item.src }}"
+     dest: "{{ item.dest }}"
+     mode: "{{ item.mode }}"
+   loop: "{{ deployed_cert_and_config_files }}"
+   become: yes
+ 
+ - name: Download the master service binaries
+   get_url:
+     url: "{{ item.url }}"
+     dest: "{{ item.path }}"
+     mode: "{{ item.mode }}"
+   loop: "{{ master_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} -> {{ item.path }}"
+   become: yes
+ 
+ - name: Push the config files for the master services
+   template:
+     src: "{{ item.service_j2 }}"
+     dest: "{{ item.service_path }}"
+   loop: "{{ master_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} -> {{ item.service_path }}"
+   become: yes 
+ 
+ - name: Download Kubernetes kubectl 
+   get_url:
+     url: "{{ item.url }}"
+     dest: "{{ item.dest }}"
+     mode: "{{ item.mode }}"
+   loop:
+    - url: "{{ kubectl.url }}"
+      dest: "{{ kubectl.path }}"
+      mode: '0755'
+   become: yes    
+ 
+ - name: Reload systemd manager
+   systemd: 
+     daemon_reload: True
+   become: yes
+   
+ # TODO make this a handler
+ - name: Reload the daemon for the services
+   service: 
+     name: "{{ item.name }}"
+     enabled: yes
+     state: restarted
+   loop: "{{ master_services }}"
+   loop_control: 
+     label: "{{ item.display_name }} Service -> {{ item.name }}"
+   become: yes
+ 
+ - name: Allow Kubernetes API Server to fully initialize
+   pause:
+     seconds: 90
+     
+ #TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
+ #- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
+ #  copy: 
+ #    src: "{{  role_path  }}/files/node-routes"
+ #    dest: "/etc/network/if-up.d/node-routes"
+ #    mode: "0775"
+ #  become: yes
+ 
+ - name: configure routes to nodes (pod routes)
+   command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
+   loop: "{{ groups['nodes'] }}"
+   register: cmd_result
+   become: yes
+   failed_when:
+   - "'answers: File exists' not in cmd_result.stderr"
+   - "cmd_result.rc != 0"

@@ -23,36 +23,41 @@
   - { url: "{{ kubectl.url }}",
       dest: "{{ kubectl.path }}",
       mode: '0755' }
-  become: yes    
+  become: True
 
 # Deploy certificate configuration data 
-- name: Deply certificate generation configuration files
-  copy: 
+- name: Deploy certificate generation configuration files
+  template: 
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
   with_items:
-   - { src: "{{ role_path }}/files/ca-config.json",
-       dest: "{{ ca_config_file }}"}
-   # CSR files
-   # TODO replace csr files with j2 templates
-   - src: "{{ role_path }}/files/ca-csr.json"
+   - src: "{{ role_path }}/templates/ca-config.json.j2"
+     dest: "{{ ca_config_file }}"
+   - src: "{{ role_path }}/templates/ca-csr.json.j2"
      dest: "{{ ca_csr_config_file }}"
-   - src: "{{ role_path }}/files/kubernetes-csr.json"
-     dest: "{{ k8s_csr_config_file }}"
-   - src: "{{ role_path }}/files/admin-csr.json"
+   - src: "{{ role_path }}/templates/admin-csr.json.j2"
      dest: "{{ admin_csr_config_file }}"
-   - src: "{{ role_path }}/files/kube-proxy-csr.json"
-     dest: "{{ kube_proxy_csr_config_file }}"
-   - src: "{{ role_path }}/files/kube-controller-manager-csr.json"
+   - src: "{{ role_path }}/templates/kube-controller-manager-csr.json.j2"
      dest: "{{ kube_controller_manager_csr_config_file }}"
-   - src: "{{ role_path }}/files/kube-scheduler-csr.json"
+   - src: "{{ role_path }}/templates/kube-proxy-csr.json.j2"
+     dest: "{{ kube_proxy_csr_config_file }}"
+   - src: "{{ role_path }}/templates/kube-scheduler-csr.json.j2"
      dest: "{{ kube_scheduler_csr_config_file }}"
-   - src: "{{ role_path }}/files/kube-service-account-csr.json"
+   - src: "{{ role_path }}/templates/kubernetes-csr.json.j2"
+     dest: "{{ k8s_csr_config_file }}"
+   - src: "{{ role_path }}/templates/kube-service-account-csr.json.j2"
      dest: "{{ kube_service_account_csr_config_file }}"
-   - src: "{{ role_path }}/files/kube-registry-web-csr.json"
+   - src: "{{ role_path }}/templates/kube-registry-web-csr.json.j2"
      dest: "{{ kube_registry_web_csr_config_file }}"
 
-# TODO make all csr generation be from a template
+- name: Generate misc service configuration templates
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+  - src: "{{ role_path }}/templates/kube-scheduler.yaml.j2"
+    dest: "{{ kube_scheduler_config_file }}"
+
 - name: Generate the certificate config file for nodes (file same on all nodes)
   template:
     src: "{{ role_path }}/templates/node-csr.json.j2" 
@@ -96,17 +101,6 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ admin_pem_file }}" # also admin.csr admin-key.pem
 
-- name: Generate kube-proxy client cert and private key 
-  shell: cfssl gencert \
-         -ca={{ ca_pem_file }} \
-         -ca-key={{ ca_key_file }} \
-         -config={{ ca_config_file }} \
-         -profile=kubernetes \
-         {{ kube_proxy_csr_config_file }} | cfssljson -bare kube-proxy
-  args:
-    chdir: "{{ cert_dir }}"
-    creates: "{{ kube_proxy_pem_file }}" # also kube-proxy.csr kube-proxy-key.pem
-
 - name: Generate kube-controller-manager client cert and private key 
   shell: cfssl gencert \
          -ca={{ ca_pem_file }} \
@@ -117,6 +111,17 @@
   args:
     chdir: "{{ cert_dir }}"
     creates: "{{ kube_controller_manager_pem_file }}" # also kube-controller-manager.csr kube-controller-manager-key.pem
+
+- name: Generate kube-proxy client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ kube_proxy_csr_config_file }} | cfssljson -bare kube-proxy
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ kube_proxy_pem_file }}" # also kube-proxy.csr kube-proxy-key.pem
 
 - name: Generate kube-scheduler client cert and private key 
   shell: cfssl gencert \
@@ -168,7 +173,6 @@
     hostname: "{{ hostvars[item].inventory_hostname }}"
   loop: "{{ groups['nodes'] }}"
 
-
 - name: Discover if encryption config has already been generated
   stat: 
     path: "{{ encryption_config_file }}"
@@ -186,5 +190,4 @@
     src: "{{ role_path }}/templates/encryption-config.yaml.j2"
     dest: "{{ encryption_config_file }}"
   when: ecf.stat.exists == False
-
 
