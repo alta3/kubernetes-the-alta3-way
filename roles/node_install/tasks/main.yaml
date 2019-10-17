@@ -1,7 +1,4 @@
 ---
-#-----------------------------------------------------------------------------
-# Create Directories for nodes
-#-----------------------------------------------------------------------------
 
 - name: create directories for the kubernetes nodes
   file:
@@ -10,19 +7,14 @@
     mode: "0755"
   with_items:
    - "/etc/cni/net.d"
-   - "/etc/containerd/"
    - "/opt/cni/bin"
    - "/var/lib/kubelet"
    - "/var/lib/kube-proxy"
    - "/var/lib/kubernetes"
    - "/var/run/kubernetes"
+   - "/etc/containerd/"
   become: yes
 
-
-
-#-----------------------------------------------------------------------------
-# Copy Certs to the Kubernetes nodes
-#-----------------------------------------------------------------------------
 - name: Copy Certs to Nodes
   copy:
     src: '{{ item.src }}'
@@ -57,18 +49,7 @@
      label: "File = {{ item.dest }}"
   become: yes
 
-
-#/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-#-----------------------------------------------------------------------------
-# Bootstrap Kubernetes Nodes
-#-----------------------------------------------------------------------------
-#/\/\/\/\/\/\/\/\/\//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-
-#-----------------------------------------------------------------------------
-# Installing OS Dependencies 
-#-----------------------------------------------------------------------------
-
-- name: Install socat on the kubernetes nodes
+- name: Install kubernetes apt dependencies on nodes
   apt: 
     name: 
     - socat
@@ -76,11 +57,6 @@
     - ipset
     state: latest
   become: yes
-
-
-#-----------------------------------------------------------------------------
-# Downloading and Installing Node Binaries 
-#-----------------------------------------------------------------------------
 
 - name: Download Kubernetes kubectl 
   get_url:
@@ -112,14 +88,6 @@
   loop_control:
      label: "{{ item.name }}"
   become: yes 
-
-
-
-#/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
-#-----------------------------------------------------------------------------
-# Configure CNI Networking 
-#-----------------------------------------------------------------------------
-#/\/\/\/\/\/\/\/\/\\/\/\/\/\//\/\/\/\/\/\//\/\/\/\/\/\/\/\\/\/\/\/\/\/\/\/\/\/\
 
 - name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
   template:
@@ -156,10 +124,6 @@
     content: br_netfilter
   become: yes
 
-#-----------------------------------------------------------------------------
-# Configure Containerd
-#-----------------------------------------------------------------------------
-#
 - name: Create containerd configuration file
   copy:
     src: "{{ role_path }}/files/containerd-config.toml"
@@ -174,11 +138,6 @@
     mode: "0664"
   become: yes
 
-#-----------------------------------------------------------------------------
-# Configure the Kubelet
-#-----------------------------------------------------------------------------
-
-
 - name: Create the node services config files for each node
   template:
     src: "{{ item.service_j2 }}"
@@ -188,17 +147,12 @@
      label: "{{ item.service_path }}"
   become: yes
 
-
-#-----------------------------------------------------------------------------
-# Start the Worker Services 
-#-----------------------------------------------------------------------------
-
-- name: Do a reload of the daemons
+- name: Reload systemctl daemons
   systemd: 
     daemon_reload: yes
   become: yes  
 
-- name: Enable the k8s services
+- name: Enable k8s services
   systemd:
     enabled: yes
     name: "{{ item.name }}"

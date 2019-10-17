@@ -18,10 +18,11 @@ run_trusted_ca: "{{ run_all }}"
 # versions
 k8s_version: "1.15.3"
 etcd_version: "3.4.0"
-cni_version: "0.6.0"
-containerd_version: "1.2.0-rc.0"
-cri_tools_version: "1.12.0"
+cni_version: "0.8.2"
+containerd_version: "1.2.9"
+cri_tools_version: "1.15.0"
 cfssl_version: "1.3.4"
+runc_version: "1.0.0-rc8"
 
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
@@ -218,7 +219,7 @@ node_binaries:
    mode: "0775"
 
  - name: "runc"
-   url: "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc5/runc.amd64"
+   url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.amd64"
    path: "/usr/local/bin/runc"
    mode: "0775"
 
@@ -243,7 +244,7 @@ node_archive_dependencies:
    url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ cri_tools_version }}/crictl-v{{ cri_tools_version }}-linux-amd64.tar.gz"
    dest: "/usr/local/bin/"
  - name: "cni-plugins"
-   url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-amd64-v{{ cni_version }}.tgz"
+   url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-linux-amd64-v{{ cni_version }}.tgz"
    dest: "/opt/cni/bin/"
  - name: "containerd"
    url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
