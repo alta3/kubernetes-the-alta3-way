@@ -69,7 +69,7 @@
     label: "config={{ item.config }}"
   
 - name: auth kubeconfig - multiple services - set context
-  command: kubectl config set-context default \
+  command: kubectl config set-context default-system \
            --cluster={{ cluster_name }} \
            --user={{ item.user }} \
            --kubeconfig={{ item.config }} 
@@ -80,7 +80,7 @@
     label: "config={{ item.config }}"
 
 - name: auth kubeconfig - muiltiple services - use context
-  command: kubectl config use-context default \
+  command: kubectl config use-context default-system \
            --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
