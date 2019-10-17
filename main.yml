@@ -1,0 +1,61 @@
+---
+- name: bootstrap 
+  hosts: all
+  roles:
+   - name: bootstrap
+     when: run_bootstrap
+
+- name: make certs & gen configs
+  hosts: localhost
+  roles:
+   - name: make_certs
+     when: run_makecerts
+   - name: kube_config
+     when: run_nodeconfig
+   - name: localhost_config
+     when: run_localconfig
+
+- name: deploy etcd
+  hosts: etcd
+  gather_facts: True
+  roles:
+   - name: etcd
+     when: run_etcd
+
+- name: deploy k8s masters
+  hosts: masters
+  gather_facts: True
+  roles:
+   - name: master_install
+     when: run_master
+
+- name: deploy load balancers
+  hosts: localhost,nodes
+  gather_facts: False
+  roles:
+   - name: nginx_localhost_load_balancer
+     when: run_nginx_lb
+   - name: trusted_ca
+     when: run_trusted_ca
+
+- name: configure rbac
+  hosts: localhost
+  roles:
+   - name: rbac
+     when: run_rbac
+     
+- name: deploy k8s nodes
+  hosts: nodes
+  gather_facts: False
+  roles:
+   - name: node_install
+     when: run_nodes
+
+- name: deploy k8s services
+  hosts: localhost
+  gather_facts: False
+  roles:
+   - name: calico
+     when: run_services
+   - name: kube-dns
+     when: run_services
