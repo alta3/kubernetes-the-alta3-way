@@ -45,8 +45,8 @@
      dest: "{{ kube_scheduler_csr_config_file }}"
    - src: "{{ role_path }}/templates/kubernetes-csr.json.j2"
      dest: "{{ k8s_csr_config_file }}"
-   - src: "{{ role_path }}/templates/kube-service-account-csr.json.j2"
-     dest: "{{ kube_service_account_csr_config_file }}"
+     #   - src: "{{ role_path }}/templates/kube-service-account-csr.json.j2"
+     #     dest: "{{ kube_service_account_csr_config_file }}"
    - src: "{{ role_path }}/templates/kube-registry-web-csr.json.j2"
      dest: "{{ kube_registry_web_csr_config_file }}"
 
@@ -134,16 +134,16 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ kube_scheduler_pem_file }}" # also kube-scheduler.csr kube-scheduler-key.pem
 
-- name: Generate service-account client cert and private key 
-  shell: cfssl gencert \
-         -ca={{ ca_pem_file }} \
-         -ca-key={{ ca_key_file }} \
-         -config={{ ca_config_file }} \
-         -profile=kubernetes \
-         {{ kube_service_account_csr_config_file }} | cfssljson -bare service-account
-  args:
-    chdir: "{{ cert_dir }}"
-    creates: "{{ kube_service_account_pem_file }}" # also kube-service-account.csr kube-service-account-key.pem
+    #- name: Generate service-account client cert and private key 
+    #  shell: cfssl gencert \
+    #         -ca={{ ca_pem_file }} \
+    #         -ca-key={{ ca_key_file }} \
+    #         -config={{ ca_config_file }} \
+    #         -profile=kubernetes \
+    #         {{ kube_service_account_csr_config_file }} | cfssljson -bare service-account
+    #  args:
+    #    chdir: "{{ cert_dir }}"
+    #    creates: "{{ kube_service_account_pem_file }}" # also kube-service-account.csr kube-service-account-key.pem
 
 - name: Generate registry web cert and private key 
   shell: cfssl gencert \

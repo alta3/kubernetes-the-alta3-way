@@ -6,23 +6,13 @@ Requires=containerd.service
 
 [Service]
 ExecStart=/usr/local/bin/kubelet \
-  --allow-privileged=true \
-  --anonymous-auth=false \
-  --authorization-mode=Webhook \
-  --client-ca-file={{ deployed_ca_pem_file }} \
-  --cloud-provider= \
-  --cluster-dns={{ cluster_dns }} \
-  --cluster-domain=cluster.local \
+  --config={{ kubelet_config_file }} \
   --container-runtime=remote \
   --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
   --image-pull-progress-deadline=2m \
-  --kubeconfig={{ kubelet_kubeconfig_path }} \
+  --kubeconfig={{ kubelet_kubeconfig_file }} \
   --network-plugin=cni \
-  --pod-cidr={{ cni_host_subnet }} \
   --register-node=true \
-  --runtime-request-timeout=15m \
-  --tls-cert-file=/var/lib/kubelet/{{ hostvars[inventory_hostname]['public_fqdn'] }}.pem \
-  --tls-private-key-file=/var/lib/kubelet/{{ hostvars[inventory_hostname]['public_fqdn'] }}-key.pem \
   --v=2
 Restart=on-failure
 RestartSec=5
