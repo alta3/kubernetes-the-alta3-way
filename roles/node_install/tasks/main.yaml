@@ -25,7 +25,7 @@
      label: "File = {{ item.dest }}"
   become: yes
 
-- name: Copy certs/keys/configs to Nodes
+- name: Copy certs/keys/kubeconfigs to Nodes
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -38,11 +38,12 @@
      dest: "/var/lib/kubelet/{{ public_fqdn }}-key.pem"
      mode: "0600"
    - src: "{{ config_dir }}/kube-proxy.kubeconfig"
-     dest: "{{ kube_proxy_kubeconfig_path }}"
+     dest: "{{ kube_proxy_kubeconfig_file }}"
      mode: "0600"
    - src: "{{ config_dir }}/{{ public_fqdn }}.kubeconfig"
-     dest: "{{ kubelet_kubeconfig_path }}" 
+     dest: "{{ kubelet_kubeconfig_file }}" 
      mode: "0600"
+
   vars:
     public_fqdn: "{{ hostvars[inventory_hostname]['public_fqdn'] }}"
   loop_control:
@@ -124,12 +125,15 @@
     content: br_netfilter
   become: yes
 
-- name: Create containerd configuration file
-  copy:
-    src: "{{ role_path }}/files/containerd-config.toml"
-    dest: "/etc/containerd/config.toml"
+- name: Create node configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: "0664"
   become: yes
+  loop: "{{ node_configs }}"
+  loop_control:
+     label: "{{ item.name }}"
 
 - name: Create the containerd service (systemd) file
   copy:

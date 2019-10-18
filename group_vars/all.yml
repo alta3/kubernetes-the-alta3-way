@@ -27,6 +27,7 @@ runc_version: "1.0.0-rc8"
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 cluster_dns: "172.16.3.10"
+upstream_dns: "10.0.0.1"
 pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
 
 # dependencies and their destinations
@@ -46,6 +47,7 @@ kubectl:
 localhost_home_dir: "{{ lookup('env', 'HOME') }}"
 cert_dir: "{{ localhost_home_dir }}/k8s-certs"
 config_dir: "{{ localhost_home_dir }}/k8s-config"
+systemd_dir: "/etc/systemd/system"
 
 # csr config
 csr_dir: "{{ config_dir }}/csr/"
@@ -68,7 +70,7 @@ admin_csr_config_file: "{{ csr_dir }}/admin-csr.json"
 kube_proxy_csr_config_file: "{{ csr_dir }}/kube-proxy-csr.json"
 kube_controller_manager_csr_config_file: "{{ csr_dir }}/kube-controller-manager-csr.json"
 kube_scheduler_csr_config_file: "{{ csr_dir }}/kube-scheduler-csr.json"
-kube_service_account_csr_config_file: "{{ csr_dir }}/kube-service-account-csr.json"
+#kube_service_account_csr_config_file: "{{ csr_dir }}/kube-service-account-csr.json"
 kube_registry_web_csr_config_file: "{{ csr_dir }}/kube-registry-web-csr.json"
 
 # generated cert and key files
@@ -85,8 +87,8 @@ kube_controller_manager_pem_file: "{{ cert_dir }}/kube-controller-manager.pem"
 kube_controller_manager_key_file: "{{ cert_dir }}/kube-controller-manager-key.pem"
 kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
 kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
-kube_service_account_pem_file: "{{ cert_dir }}/service-account.pem"
-kube_service_account_key_file: "{{ cert_dir }}/service-account-key.pem"
+#kube_service_account_pem_file: "{{ cert_dir }}/service-account.pem"
+#kube_service_account_key_file: "{{ cert_dir }}/service-account-key.pem"
 kube_registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
 kube_registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
 
@@ -102,7 +104,10 @@ deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/kube-scheduler-
 deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.yaml"
 deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.kubeconfig"
 deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
-deployed_kube_service_account_key_file: "{{ deployed_k8s_config_dir }}/service-account-key.pem"
+#deployed_kube_service_account_pem_file: "{{ deployed_k8s_config_dir }}/service-account.pem"
+#deployed_kube_service_account_key_file: "{{ deployed_k8s_config_dir }}/service-account-key.pem"
+deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.pem"
+deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager-key.pem"
 
 # deployed to both masters and nodes
 deployed_cert_and_config_files:
@@ -121,12 +126,12 @@ deployed_cert_and_config_files:
  - src: "{{ encryption_config_file }}"
    dest: "{{ deployed_encryption_config_file }}"
    mode: "0600" 
- - src: "{{ kube_service_account_pem_file }}"
-   dest: "{{ deployed_kube_scheduler_pem_file }}"
-   mode: "0664"
- - src: "{{ kube_service_account_key_file }}"
-   dest: "{{ deployed_kube_scheduler_key_file }}"
-   mode: "0600" 
+   # - src: "{{ kube_service_account_pem_file }}"
+   #   dest: "{{ deployed_kube_scheduler_pem_file }}"
+   #   mode: "0664"
+   # - src: "{{ kube_service_account_key_file }}"
+   #   dest: "{{ deployed_kube_scheduler_key_file }}"
+   #   mode: "0600" 
  - src: "{{ kube_scheduler_config_file }}"
    dest: "{{ deployed_kube_scheduler_config_file }}"
    mode: "0664"
@@ -136,8 +141,11 @@ deployed_cert_and_config_files:
  - src: "{{ kube_controller_manager_kubeconfig_file }}"
    dest: "{{ deployed_kube_controller_manager_kubeconfig_file }}"
    mode: "0664"
- - src: "{{ kube_service_account_key_file }}"
-   dest: "{{ deployed_kube_service_account_key_file }}"
+ - src: "{{ kube_controller_manager_key_file }}"
+   dest: "{{ deployed_kube_controller_manager_key_file }}"
+   mode: "0664"
+ - src: "{{ kube_controller_manager_pem_file }}"
+   dest: "{{ deployed_kube_controller_manager_pem_file }}"
    mode: "0664"
 
 auth_kubeconfigs:
@@ -184,7 +192,7 @@ master_services:
    path: "/usr/local/bin/kube-apiserver"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-apiserver.service.j2"
-   service_path: "/etc/systemd/system/kube-apiserver.service"
+   service_path: "{{ systemd_dir }}/kube-apiserver.service"
    
  - display_name: "Kubernetes Manager"
    name: "kube-controller-manager"
@@ -192,7 +200,7 @@ master_services:
    path: "/usr/local/bin/kube-controller-manager"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-controller-manager.service.j2"
-   service_path: "/etc/systemd/system/kube-controller-manager.service"
+   service_path: "{{ systemd_dir }}/kube-controller-manager.service"
    
  - display_name: "Kubernetes Scheduler"
    name: "kube-scheduler"
@@ -200,7 +208,42 @@ master_services:
    path: "/usr/local/bin/kube-scheduler"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-scheduler.service.j2"
-   service_path: "/etc/systemd/system/kube-scheduler.service"
+   service_path: "{{ systemd_dir }}/kube-scheduler.service"
+
+
+# rbac configs
+master_rbac_role:
+  file: "{{ role_path }}/files/rbac-clusterrole.yaml"
+  path: "{{ config_dir }}/rbac-clusterrole.yaml"
+
+master_rbac_rolebind:
+  file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
+  path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
+ 
+# etcd
+etcd_arch: "amd64"
+etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
+etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
+etcd_url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
+etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
+etcd_port:
+  client: 2379
+  s2s: 2380 
+etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
+
+# nodes 
+localhost_lb_apiserver_address: "https://127.0.0.1:6443"
+
+kubelet_config_dir: "/var/lib/kubelet"
+kubelet_kubeconfig_file: "{{ kubelet_config_dir }}/kubeconfig"
+kubelet_config_file: "{{ kubelet_config_dir }}/kubelet-config.yaml"
+
+kube_proxy_config_dir: "/var/lib/kube-proxy"
+kube_proxy_kubeconfig_file: "{{ kube_proxy_config_dir }}/kubeconfig"
+kube_proxy_config_file: "{{ kube_proxy_config_dir }}/kube-proxy-config.yaml"
+kube_proxy_mode: "iptables"
 
 node_binaries: 
  - name: "kubelet"
@@ -231,13 +274,24 @@ node_binaries:
 node_services: 
  - name: "kube-proxy"
    service_j2: "{{ role_path }}/templates/kube-proxy.service.j2"
-   service_path: "/etc/systemd/system/kube-proxy.service" 
+   service_path: "{{ systemd_dir }}/kube-proxy.service" 
  - name: "kubelet"
    service_j2: "{{ role_path }}/templates/kubelet.service.j2"
-   service_path: "/etc/systemd/system/kubelet.service" 
+   service_path: "{{ systemd_dir }}/kubelet.service" 
  - name: "containerd"
    service_j2: "{{ role_path }}/templates/containerd.service.j2"
-   service_path: "/etc/systemd/system/containerd.service" 
+   service_path: "{{ systemd_dir }}/containerd.service" 
+
+node_configs:
+ - name: "containerd"
+   src: "{{ role_path }}/files/containerd-config.toml"
+   dest: "/etc/containerd/config.toml"
+ - name: "kubelet-config"
+   src: "{{ role_path }}/templates/kubelet-config.yaml.j2"
+   dest: "{{ kubelet_config_file }}"
+ - name: "kube-proxy"
+   src: "{{ role_path }}/templates/kube-proxy.yaml.j2"
+   dest: "{{ kube_proxy_config_file }}"
 
 node_archive_dependencies:
  - name: "crictl"
@@ -249,33 +303,3 @@ node_archive_dependencies:
  - name: "containerd"
    url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
    dest: "/" 
-
-
-
-
-# rbac configs
-master_rbac_role:
-  file: "{{ role_path }}/files/rbac-clusterrole.yaml"
-  path: "{{ config_dir }}/rbac-clusterrole.yaml"
-
-master_rbac_rolebind:
-  file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
-  path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
- 
-# etcd
-etcd_arch: "amd64"
-etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
-etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
-etcd_url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
-etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
-etcd_port:
-  client: 2379
-  s2s: 2380 
-etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
-calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
-
-# nodes 
-localhost_lb_apiserver_address: "https://127.0.0.1:6443"
-kubelet_kubeconfig_path: "/var/lib/kubelet/kubeconfig"
-kube_proxy_kubeconfig_path: "/var/lib/kube-proxy/kubeconfig"

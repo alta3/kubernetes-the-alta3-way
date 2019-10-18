@@ -1,0 +1,34 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  Corefile: |
+    .:53 {
+        errors
+        health
+        ready
+        kubernetes cluster.local in-addr.arpa ip6.arpa {
+          upstream 10.0.0.1
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+        }
+        prometheus :9153
+        cache 30
+        loop
+        reload
+        loadbalance
+        log
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","data":{"Corefile":".:53 {\n    errors\n    health\n    ready\n    kubernetes cluster.local in-addr.arpa ip6.arpa {\n      pods insecure\n      fallthrough in-addr.arpa ip6.arpa\n    }\n    prometheus :9153\n    cache 30\n    loop\n    reload\n    loadbalance\n}\n"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"coredns","namespace":"kube-system"}}
+  creationTimestamp: "2019-10-18T18:25:16Z"
+  name: coredns
+  namespace: kube-system
+  resourceVersion: "92670"
+  selfLink: /api/v1/namespaces/kube-system/configmaps/coredns
+  uid: e2ede496-cc80-4be3-8265-4e25ee9559e0
