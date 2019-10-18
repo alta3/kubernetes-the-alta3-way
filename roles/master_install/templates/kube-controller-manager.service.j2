@@ -17,7 +17,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --service-account-private-key-file={{ deployed_kube_controller_manager_key_file }} \
   --service-cluster-ip-range={{ service_cluster_ip_range }} \
   --use-service-account-credentials=true \
-  --v=2
+  --v=4
 Restart=on-failure
 RestartSec=5
 
