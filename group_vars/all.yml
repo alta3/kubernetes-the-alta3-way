@@ -132,9 +132,10 @@ deployed_cert_and_config_files:
    mode: "0664"
  - src: "{{ kube_controller_manager_key_file }}"
    dest: "{{ deployed_kube_controller_manager_key_file }}"
-   mode: "0664"
+   mode: "0600" 
  - src: "{{ kube_controller_manager_pem_file }}"
    dest: "{{ deployed_kube_controller_manager_pem_file }}"
+   mode: "0664"
 
 auth_kubeconfigs:
    - name: "kube-proxy"
@@ -219,7 +220,12 @@ etcd_port:
   s2s: 2380 
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+
+# calico
 calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
+calico_veth_mtu: "1440" # hmmm
+calico_manifest_config: "{{ config_dir }}/calico-etcd.yaml"
+calico_rbac_config: "{{ config_dir }}/calico-v3.1-rbac.yaml"
 
 # nodes 
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"

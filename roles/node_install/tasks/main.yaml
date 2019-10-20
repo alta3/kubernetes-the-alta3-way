@@ -90,12 +90,12 @@
      label: "{{ item.name }}"
   become: yes 
 
-- name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
-  template:
-    src: "{{ role_path }}/templates/10-bridge.conf.j2"
-    dest: "/etc/cni/net.d/10-bridge.conf"
-    mode: "0664"
-  become: yes
+  #- name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
+  #  template:
+  #    src: "{{ role_path }}/templates/10-bridge.conf.j2"
+  #    dest: "/etc/cni/net.d/10-bridge.conf"
+  #    mode: "0664"
+  #  become: yes
 
 - name: Create the 99-loopback.conf file for each node. 
   copy: 

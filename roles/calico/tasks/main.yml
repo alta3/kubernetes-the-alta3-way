@@ -1,16 +1,11 @@
 
-- name: Generate a calico installation yaml file
+- name: Generate a calico installation yaml files
   template:
-    src: "{{ role_path }}/templates/calico.yaml.j2" 
-    dest: "{{ config_dir }}/calico.yaml"
-
-- name: Deploy the calico rbac file
-  copy:
-    src: "{{ role_path }}/files/calico-v3.1-rbac.yaml" 
-    dest: "{{ config_dir }}/calico-v3.1-rbac.yaml"
-
-- name: Apply calico rbac
-  command: kubectl apply -f {{ config_dir }}/calico-v3.1-rbac.yaml 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+  - src: "{{ role_path }}/templates/calico-etcd-v3.10.yaml.j2" 
+    dest: "{{ calico_manifest_config}}"
 
 - name: Apply calico service 
-  command: kubectl apply -f {{ config_dir }}/calico.yaml 
+  command: "kubectl apply -f {{ calico_manifest_config}}"
