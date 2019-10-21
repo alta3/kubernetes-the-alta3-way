@@ -135,6 +135,7 @@ deployed_cert_and_config_files:
    mode: "0664"
  - src: "{{ kube_controller_manager_pem_file }}"
    dest: "{{ deployed_kube_controller_manager_pem_file }}"
+   mode: "0664"
 
 auth_kubeconfigs:
    - name: "kube-proxy"
