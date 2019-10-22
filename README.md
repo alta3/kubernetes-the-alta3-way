@@ -15,14 +15,15 @@ The target audience for this tutorial is someone planning to support a productio
 ## Cluster Details
 
 Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kubernetes cluster with:
+* A highly available cntrol plane backed by etcd
 * End-to-end encryption between components
-* RBAC authentication
-* Isolated networking
+* RBAC authenticated services and users
+* Isolated and default-deny networking
 
 Components and versions:
 * [kubernetes](https://github.com/kubernetes/kubernetes) 1.15.3
 * [containerd](https://github.com/containerd/containerd) 1.2.9
 * [coredns](https://github.com/coredns/coredns) v1.6.3
 * [cni](https://github.com/containernetworking/cni) v0.7.1
-* [calico](https://www.projectcalico.org/) v3.9
+* [calico](https://www.projectcalico.org/) v3.10
 * [etcd](https://github.com/coreos/etcd) v3.4.0
