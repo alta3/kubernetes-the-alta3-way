@@ -11,9 +11,9 @@
      dest: '{{ item.dest }}'
      mode: '{{ item.mode }}'
    with_items:
-   - { source: "{{ ca_pem_file }}",   dest: /etc/etcd/ca.pem,               mode: "0664" }
-   - { source: "{{ k8s_pem_file }}",  dest: /etc/etcd/kubernetes.pem,       mode: "0664" }
-   - { source: "{{ k8s_key_file }}",  dest: /etc/etcd/kubernetes-key.pem,   mode: "0600" }
+   - { source: "{{ ca_pem_file }}",   dest: "{{ etcd_config_dir }}/ca.pem",               mode: "0664" }
+   - { source: "{{ k8s_pem_file }}",  dest: "{{ etcd_config_dir }}/kubernetes.pem",       mode: "0664" }
+   - { source: "{{ k8s_key_file }}",  dest: "{{ etcd_config_dir }}/kubernetes-key.pem",   mode: "0600" }
    become: yes
 
  - name: Unpack the etcd binaries on each master

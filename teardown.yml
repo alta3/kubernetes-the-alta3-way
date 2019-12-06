@@ -1,0 +1,174 @@
+- name: uninstall services
+  hosts: localhost
+  tasks:
+
+  - name: Remove all resources
+    command: "kubectl delete all --all"
+    ignore_errors: True # TODO only run when kubectl binary is present
+
+  - name: Apply calico service 
+    command: "kubectl delete -f {{ calico_manifest_config}}"
+    ignore_errors: True # TODO only run when kubectl binary is present
+
+  - name: Apply kube-dns service 
+    command: "kubectl delete -f {{ config_dir }}/coredns.yaml"
+    ignore_errors: True # TODO only run when kubectl binary is present
+
+  - name: Remove all service resources
+    command: "kubectl delete all --all -n kube-system"
+    ignore_errors: True # TODO only run when kubectl binary is present
+
+- name: uninstall nodes
+  hosts: nodes
+  vars:
+    role_path: "" # short circuit some var lists that will complain if this isn't set
+  tasks:
+
+  - name: remove the node services config files for each node
+    file:
+      path: "{{ item.service_path }}"
+      state: absent
+    loop: "{{ node_services }}"
+    loop_control:
+       label: "{{ item.service_path }}"
+    become: True
+  
+  - name: disable k8s services
+    systemd:
+      enabled: False
+      name: "{{ item.name }}"
+      state: stopped
+    loop: "{{ node_services }}"
+    ignore_errors: True # TODO only run when item.service_path exists
+    become: True
+  
+  - name: remove Kubernetes kubectl
+    file:
+      path: "{{ item.dest }}"
+      state: absent
+    loop:
+     - url: "{{ kubectl.url }}"
+       dest: "{{ kubectl.path }}"
+       mode: '0755'
+    become: True
+  
+  - name: remove the Node binaries
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    loop: "{{ node_binaries }}"
+    loop_control:
+       label: "k8s v{{ k8s_version }} - {{ item.path }}"
+    become: True
+
+  # TODO not easy to undo, enumerate and remove files 
+  # - name: Download and unarchive Node dependencies
+  #   unarchive:
+  #     remote_src: yes
+  #     src: "{{ item.url }}"
+  #     dest: "{{ item.dest }}"
+  #   loop: "{{ node_archive_dependencies }}"
+  #   loop_control:
+  #      label: "{{ item.name }}"
+  #   become: yes
+
+
+  - name: remove directories for the kubernetes nodes
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+     - "/etc/cni/net.d"
+     - "/opt/cni/bin"
+     - "/var/lib/kubelet"
+     - "/var/lib/kube-proxy"
+     - "/var/lib/kubernetes"
+     - "/var/run/kubernetes"
+     - "/etc/containerd/"
+    become: True
+
+- name: remove nginx load balancers
+  hosts: localhost,nodes
+  tasks:
+  
+   - name: Stop the nginx service
+     systemd:
+       name: nginx
+       daemon_reload: yes
+       state: stopped
+       enabled: False
+     become: True
+
+   - name: Delete the config file for nginx
+     file:
+       path: "/etc/nginx/nginx.conf"
+       state: absent
+     become: True
+
+- name: uninstall masters
+  hosts: masters
+  vars:
+    role_path: "" # short circuit some var lists that will complain if this isn't set
+  tasks: 
+
+  - name: remove daemon for the master services
+    service:
+      name: "{{ item.name }}"
+      enabled: False
+      state: stopped
+    loop: "{{ master_services }}"
+    loop_control:
+      label: "{{ item.display_name }} Service -> {{ item.name }}"
+    ignore_errors: True # TODO only run when item.service_path exists
+    become: True
+
+  - name: remove config files for the master services
+    file:
+      path: "{{ item.service_path }}"
+      state: absent
+    loop: "{{ master_services }}"
+    loop_control:
+      label: "{{ item.display_name }} -> {{ item.service_path }}"
+    become: True
+
+  - name: remove the master service binaries
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    loop: "{{ master_services }}"
+    loop_control:
+      label: "{{ item.display_name }} -> {{ item.path }}"
+    become: True
+
+  - name: Remove k8s directories on masters
+    file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+    - "/var/lib/etcd"
+    - "/var/lib/kubernetes"
+    become: True
+
+- name: remove etcd
+  hosts: etcd
+  tasks:
+
+  - name: Reload the daemon for the services
+    systemd:
+      name: etcd.service
+      enabled: False
+      state: stopped
+    become: True
+ 
+  - name: remove etcd files
+    file: 
+      path: "{{ item }}"
+      state: absent
+    become: True
+    loop:
+    - "{{ etcd_config_dir }}"
+    - /usr/local/bin/etcd 
+    - /usr/local/bin/etcdctl 
+    - /etc/systemd/system/etcd.service
+
+

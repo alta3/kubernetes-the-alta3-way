@@ -210,6 +210,7 @@ master_rbac_rolebind:
   path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
  
 # etcd
+etcd_config_dir: "/etc/etcd/"
 etcd_arch: "amd64"
 etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
 etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
