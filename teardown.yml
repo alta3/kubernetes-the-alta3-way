@@ -1,4 +1,4 @@
-- name: uninstall services
+- name: uninstall cluster services
   hosts: localhost
   tasks:
 
@@ -153,11 +153,12 @@
   hosts: etcd
   tasks:
 
-  - name: Reload the daemon for the services
+  - name: stop the etcd daemon for the services
     systemd:
       name: etcd.service
       enabled: False
       state: stopped
+    ignore_errors: True # TODO only run when etcd.service exists
     become: True
  
   - name: remove etcd files
@@ -171,4 +172,15 @@
     - /usr/local/bin/etcdctl 
     - /etc/systemd/system/etcd.service
 
+- name: uninstall cluster configs
+  hosts: localhost
+  tasks:
 
+  - name: remove the k8s config dirs
+    file:
+      path: "{{ item }}"
+      state: absent
+    loop:
+    - "{{ cert_dir }}"
+    - "{{ config_dir }}"
+    become: True
