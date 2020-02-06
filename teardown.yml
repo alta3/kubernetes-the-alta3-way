@@ -6,11 +6,15 @@
     command: "kubectl delete all --all"
     ignore_errors: True # TODO only run when kubectl binary is present
 
-  - name: Apply calico service 
+  - name: Remove calico daemonset
+    command: "kubectl delete daemonset calico-node --namespace kube-system"
+    ignore_errors: True
+
+  - name: Remove calico service
     command: "kubectl delete -f {{ calico_manifest_config}}"
     ignore_errors: True # TODO only run when kubectl binary is present
 
-  - name: Apply kube-dns service 
+  - name: Remove kube-dns service
     command: "kubectl delete -f {{ config_dir }}/coredns.yaml"
     ignore_errors: True # TODO only run when kubectl binary is present
 
@@ -18,6 +22,19 @@
     command: "kubectl delete all --all -n kube-system"
     ignore_errors: True # TODO only run when kubectl binary is present
 
+  - name: Drain all nodes
+    command: "kubectl drain {{ item }}"
+    ignore_errors: True
+    with_items:
+    - "{{ nodes }}"
+
+  - name: Remove kubelet from bchd
+    systemd:
+      enabled: False
+      name: "kubelet"
+      state: stopped
+    ignore_errors: True # TODO only run when item.service_path exists
+    become: True
 - name: uninstall nodes
   hosts: nodes
   vars:
