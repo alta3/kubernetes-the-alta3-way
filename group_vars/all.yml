@@ -1,4 +1,11 @@
 ---
+student_number: "000"
+nodes:
+- "k8s-{{ student_number }}-node-01"
+- "k8s-{{ student_number }}-node-02"
+- "k8s-{{ student_number }}-node-03"
+
+# python
 ansible_python_interpreter: "/usr/bin/python3"
 
 # control flow
