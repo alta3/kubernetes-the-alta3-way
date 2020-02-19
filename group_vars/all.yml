@@ -1,0 +1,313 @@
+---
+student_number: 848
+nodes:
+- "k8s-{{ student_number }}-node-01"
+- "k8s-{{ student_number }}-node-02"
+- "k8s-{{ student_number }}-node-03"
+
+# python
+ansible_python_interpreter: "/usr/bin/python3"
+
+# control flow
+run_all: True
+run_makecerts: "{{ run_all }}" 
+run_nodeconfig: "{{ run_all }}" 
+run_localconfig: "{{ run_all }}" 
+run_services: "{{ run_all }}" 
+run_bootstrap: "{{ run_all }}" 
+run_etcd: "{{ run_all }}"
+run_master: "{{ run_all }}"
+run_nginx_lb: "{{ run_all }}"
+run_nodes: "{{ run_all }}"
+run_rbac: "{{ run_all }}"
+run_trusted_ca: "{{ run_all }}"
+
+# versions
+k8s_version: "1.17.3"
+etcd_version: "3.2.17"
+<<<<<<< HEAD
+cni_version: "0.8.2"
+containerd_version: "1.2.6"
+cri_tools_version: "1.17.0"
+=======
+cni_version: "0.7.5"
+containerd_version: "1.2.6"
+cri_tools_version: "1.13.0"
+>>>>>>> 3a7bcbb9c03ada8ed33886fb89af6d2ce7fbf449
+cfssl_version: "1.3.4"
+runc_version: "1.0.0-rc8"
+
+cluster_name: "kubernetes-the-alta3-way"
+cluster_cidr: "192.168.0.0/16"
+cluster_dns: "172.16.3.10"
+upstream_dns: "10.0.0.1"
+pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
+
+# dependencies and their destinations
+# TODO eventually revert this back to the official releases, until then
+# see https://github.com/cloudflare/cfssl/issues/995
+#cfssl_url: "https://pkg.cfssl.org/{{ cfssl_version }}/cfssl_linux-amd64"
+#cfssljson_url: "https://pkg.cfssl.org/{{ cfssl_version }}/cfssljson_linux-amd64"
+cfssl_url: "https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/linux/cfssl"
+cfssljson_url: "https://storage.googleapis.com/kubernetes-the-hard-way/cfssl/linux/cfssljson"
+
+# masters, nodes and localhost all need kubectl
+kubectl:
+  url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+  path: "/usr/local/bin/kubectl"
+
+# config and cert dirs
+localhost_home_dir: "{{ lookup('env', 'HOME') }}"
+cert_dir: "{{ localhost_home_dir }}/k8s-certs"
+config_dir: "{{ localhost_home_dir }}/k8s-config"
+systemd_dir: "/etc/systemd/system"
+
+# csr config
+csr_dir: "{{ config_dir }}/csr/"
+country_csr: US
+city_csr: Harrisburg
+state_csr: Pennsylvania
+ou_csr: Kubernetes The Alta3 Way
+
+# cert and misc config files
+ca_config_file: "{{ config_dir }}/ca-config.json"
+encryption_config_file: "{{ config_dir }}/encryption-config.yaml"
+kube_scheduler_config_file: "{{ config_dir }}/kube-scheduler.yaml"
+
+kube_scheduler_kubeconfig_file: "{{ config_dir }}/kube-scheduler.kubeconfig"
+kube_controller_manager_kubeconfig_file: "{{ config_dir }}/kube-controller-manager.kubeconfig"
+
+ca_csr_config_file: "{{ csr_dir }}/ca-csr.json"
+k8s_csr_config_file: "{{ csr_dir }}/kubernetes-csr.json"
+admin_csr_config_file: "{{ csr_dir }}/admin-csr.json" 
+kube_proxy_csr_config_file: "{{ csr_dir }}/kube-proxy-csr.json"
+kube_controller_manager_csr_config_file: "{{ csr_dir }}/kube-controller-manager-csr.json"
+kube_scheduler_csr_config_file: "{{ csr_dir }}/kube-scheduler-csr.json"
+kube_registry_web_csr_config_file: "{{ csr_dir }}/kube-registry-web-csr.json"
+
+# generated cert and key files
+ca_pem_file: "{{ cert_dir }}/ca.pem"
+ca_crt_file: "{{ cert_dir }}/ca.crt"
+ca_key_file: "{{ cert_dir }}/ca-key.pem"
+k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
+k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
+admin_pem_file: "{{ cert_dir }}/admin.pem"
+admin_key_file: "{{ cert_dir }}/admin-key.pem"
+kube_proxy_pem_file: "{{ cert_dir }}/kube-proxy.pem"
+kube_proxy_key_file: "{{ cert_dir }}/kube-proxy-key.pem"
+kube_controller_manager_pem_file: "{{ cert_dir }}/kube-controller-manager.pem"
+kube_controller_manager_key_file: "{{ cert_dir }}/kube-controller-manager-key.pem"
+kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
+kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
+kube_registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
+kube_registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
+
+# master and node certificates
+deployed_k8s_config_dir: "/var/lib/kubernetes"
+deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/ca.pem"
+deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/ca-key.pem"
+deployed_k8s_pem_file: "{{ deployed_k8s_config_dir }}/kubernetes.pem"
+deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/kubernetes-key.pem"
+deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/encryption-config.yaml"
+deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.pem"
+deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/kube-scheduler-key.pem"
+deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.yaml"
+deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.kubeconfig"
+deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
+deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.pem"
+deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager-key.pem"
+
+# deployed to both masters and nodes
+deployed_cert_and_config_files:
+ - src: "{{ ca_pem_file }}"
+   dest: "{{ deployed_ca_pem_file }}"
+   mode: "0664"
+ - src: "{{ ca_key_file }}"
+   dest: "{{ deployed_ca_key_file }}"
+   mode: "0600" 
+ - src: "{{ k8s_pem_file }}"
+   dest: "{{ deployed_k8s_pem_file }}"
+   mode: "0664" 
+ - src: "{{ k8s_key_file }}"
+   dest: "{{ deployed_k8s_key_file }}"
+   mode: "0600" 
+ - src: "{{ encryption_config_file }}"
+   dest: "{{ deployed_encryption_config_file }}"
+   mode: "0600" 
+ - src: "{{ kube_scheduler_config_file }}"
+   dest: "{{ deployed_kube_scheduler_config_file }}"
+   mode: "0664"
+ - src: "{{ kube_scheduler_kubeconfig_file }}"
+   dest: "{{ deployed_kube_scheduler_kubeconfig_file }}"
+   mode: "0664"
+ - src: "{{ kube_controller_manager_kubeconfig_file }}"
+   dest: "{{ deployed_kube_controller_manager_kubeconfig_file }}"
+   mode: "0664"
+ - src: "{{ kube_controller_manager_key_file }}"
+   dest: "{{ deployed_kube_controller_manager_key_file }}"
+   mode: "0600" 
+ - src: "{{ kube_controller_manager_pem_file }}"
+   dest: "{{ deployed_kube_controller_manager_pem_file }}"
+   mode: "0664"
+
+auth_kubeconfigs:
+   - name: "kube-proxy"
+     server: "{{ localhost_lb_apiserver_address }}"
+     config: "kube-proxy.kubeconfig"
+     pem: "{{ kube_proxy_pem_file }}"
+     key: "{{ kube_proxy_key_file }}"
+     user: "kube-proxy"
+
+   - name: "kube-controller-manager"
+     server: "{{ master_api_localhost_url }}"
+     config: "kube-controller-manager.kubeconfig"
+     pem: "{{ kube_controller_manager_pem_file }}"
+     key: "{{ kube_controller_manager_key_file }}"
+     user: "system:kube-controller-manager"
+
+   - name: "kube-scheduler"
+     server: "{{ master_api_localhost_url }}"
+     config: "kube-scheduler.kubeconfig"
+     pem: "{{ kube_scheduler_pem_file }}"
+     key: "{{ kube_scheduler_key_file }}"
+     user: "system:kube-scheduler"
+
+   - name: "admin"
+     server: "{{ localhost_lb_apiserver_address }}"
+     config: "admin.kubeconfig"
+     pem: "{{ admin_pem_file }}"
+     key: "{{ admin_key_file }}"
+     user: "admin"
+
+# master vars
+apiserver_cluster_ip: 172.16.3.1 
+service_cluster_ip_range: 172.16.3.0/24
+service_cluster_port_range: "30000-32767"
+master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_api_localhost_url: "https://127.0.0.1:6443" 
+
+master_services: 
+ - display_name: "Kubernetes API Server"
+   name: "kube-apiserver"
+   url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
+   path: "/usr/local/bin/kube-apiserver"
+   mode: "0775"
+   service_j2: "{{ role_path }}/templates/kube-apiserver.service.j2"
+   service_path: "{{ systemd_dir }}/kube-apiserver.service"
+   
+ - display_name: "Kubernetes Manager"
+   name: "kube-controller-manager"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager" 
+   path: "/usr/local/bin/kube-controller-manager"
+   mode: "0775"
+   service_j2: "{{ role_path }}/templates/kube-controller-manager.service.j2"
+   service_path: "{{ systemd_dir }}/kube-controller-manager.service"
+   
+ - display_name: "Kubernetes Scheduler"
+   name: "kube-scheduler"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
+   path: "/usr/local/bin/kube-scheduler"
+   mode: "0775"
+   service_j2: "{{ role_path }}/templates/kube-scheduler.service.j2"
+   service_path: "{{ systemd_dir }}/kube-scheduler.service"
+
+
+# rbac configs
+master_rbac_role:
+  file: "{{ role_path }}/files/rbac-clusterrole.yaml"
+  path: "{{ config_dir }}/rbac-clusterrole.yaml"
+
+master_rbac_rolebind:
+  file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
+  path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
+ 
+# etcd
+etcd_config_dir: "/etc/etcd/"
+etcd_arch: "amd64"
+etcd_file_name: "etcd-v{{ etcd_version }}-linux-{{ etcd_arch }}"
+etcd_tar_name: "{{ etcd_file_name }}.tar.gz"
+etcd_url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}/{{ etcd_tar_name }}"
+etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
+etcd_port:
+  client: 2379
+  s2s: 2380 
+etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
+master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+
+# calico
+calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
+calico_veth_mtu: "1440" # hmmm
+calico_manifest_config: "{{ config_dir }}/calico-etcd.yaml"
+calico_rbac_config: "{{ config_dir }}/calico-v3.1-rbac.yaml"
+
+# nodes 
+localhost_lb_apiserver_address: "https://127.0.0.1:6443"
+
+kubelet_config_dir: "/var/lib/kubelet"
+kubelet_kubeconfig_file: "{{ kubelet_config_dir }}/kubeconfig"
+kubelet_config_file: "{{ kubelet_config_dir }}/kubelet-config.yaml"
+
+kube_proxy_config_dir: "/var/lib/kube-proxy"
+kube_proxy_kubeconfig_file: "{{ kube_proxy_config_dir }}/kubeconfig"
+kube_proxy_config_file: "{{ kube_proxy_config_dir }}/kube-proxy-config.yaml"
+kube_proxy_mode: "iptables"
+
+node_binaries: 
+ - name: "kubelet"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version}}/bin/linux/amd64/kube-proxy"
+   path: "/usr/local/bin/kube-proxy"
+   mode: "0775"
+
+ - name: "kube-proxy"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{k8s_version}}/bin/linux/amd64/kubelet"
+   path: "/usr/local/bin/kubelet"
+   mode: "0775"
+
+ - name: "runsc"
+   url: "https://storage.googleapis.com/kubernetes-the-hard-way/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17"
+   path: "/usr/local/bin/runsc"
+   mode: "0775"
+
+ - name: "runc"
+   url: "https://github.com/opencontainers/runc/releases/download/v{{ runc_version }}/runc.amd64"
+   path: "/usr/local/bin/runc"
+   mode: "0775"
+
+ - name: "kubectl"
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+   path: "/usr/local/bin/kubectl"
+   mode: "0775"
+
+node_services: 
+ - name: "kube-proxy"
+   service_j2: "{{ role_path }}/templates/kube-proxy.service.j2"
+   service_path: "{{ systemd_dir }}/kube-proxy.service" 
+ - name: "kubelet"
+   service_j2: "{{ role_path }}/templates/kubelet.service.j2"
+   service_path: "{{ systemd_dir }}/kubelet.service" 
+ - name: "containerd"
+   service_j2: "{{ role_path }}/templates/containerd.service.j2"
+   service_path: "{{ systemd_dir }}/containerd.service" 
+
+node_configs:
+ - name: "containerd"
+   src: "{{ role_path }}/files/containerd-config.toml"
+   dest: "/etc/containerd/config.toml"
+ - name: "kubelet-config"
+   src: "{{ role_path }}/templates/kubelet-config.yaml.j2"
+   dest: "{{ kubelet_config_file }}"
+ - name: "kube-proxy"
+   src: "{{ role_path }}/templates/kube-proxy.yaml.j2"
+   dest: "{{ kube_proxy_config_file }}"
+
+node_archive_dependencies:
+ - name: "crictl"
+   url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ cri_tools_version }}/crictl-v{{ cri_tools_version }}-linux-amd64.tar.gz"
+   dest: "/usr/local/bin/"
+ - name: "cni-plugins"
+   url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-linux-amd64-v{{ cni_version }}.tgz"
+   dest: "/opt/cni/bin/"
+ - name: "containerd"
+   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
+   dest: "/" 
