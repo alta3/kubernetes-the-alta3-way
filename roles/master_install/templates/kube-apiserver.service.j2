@@ -27,7 +27,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --kubelet-client-certificate=/var/lib/kubernetes/kubernetes.pem \
   --kubelet-client-key=/var/lib/kubernetes/kubernetes-key.pem \
   --kubelet-https=true \
-  --runtime-config=api/all \
+  --runtime-config=api/all=true \
   --service-account-key-file={{ deployed_kube_controller_manager_pem_file }} \
   --service-cluster-ip-range={{ service_cluster_ip_range }} \
   --service-node-port-range={{ service_cluster_port_range }} \
