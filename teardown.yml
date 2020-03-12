@@ -89,7 +89,20 @@
   #      label: "{{ item.name }}"
   #   become: yes
 
+  - name: get all the possible pesky pods
+    command: ls /var/lib/kubelet/pods
+    become: yes
+    register: mount_points
 
+  - name: debug mount_points
+    debug: var=mount_points
+
+  - name: unmount all mount_points
+    command: "umount {{ item }}"
+    become: yes
+    with_items:
+    - "{{ mount_points.stdout_lines }}"
+    
   - name: remove directories for the kubernetes nodes
     file:
       path: "{{ item }}"
