@@ -13,7 +13,7 @@ data:
   # not using TLS for etcd.
   # The keys below should be uncommented and the values populated with the base64
   # encoded contents of each file that would be associated with the TLS data.
-  # Example command for encoding a file contents: cat <file> | base64 - 
+  # Example command for encoding a file contents: cat <file> | base64 -w 0
   # alta3-the-hard-way managed item 
   etcd-ca:   "{{ lookup('file', ca_pem_file  ) | b64encode }}"   
   etcd-cert: "{{ lookup('file', k8s_pem_file ) | b64encode }}"
@@ -27,7 +27,7 @@ metadata:
   name: calico-config
   namespace: kube-system
 data:
-  # Configure this with the location of your etcd cluster. 
+  # Configure this with the location of your etcd cluster.
   # alta3-the-hard-way managed item 
   etcd_endpoints: "{{ calico_etcd_endpoints }}"
   # If you're using TLS enabled etcd uncomment the following.
@@ -74,6 +74,10 @@ data:
           "type": "portmap",
           "snat": true,
           "capabilities": {"portMappings": true}
+        },
+        {
+          "type": "bandwidth",
+          "capabilities": {"bandwidth": true}
         }
       ]
     }
@@ -100,6 +104,7 @@ rules:
     verbs:
       - watch
       - list
+      - get
   # Watch for changes to Kubernetes NetworkPolicies.
   - apiGroups: ["networking.k8s.io"]
     resources:
@@ -144,12 +149,19 @@ rules:
       # Used to discover service IPs for advertisement.
       - watch
       - list
+  # Pod CIDR auto-detection on kubeadm needs access to config maps.
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    verbs:
+      - get
   - apiGroups: [""]
     resources:
       - nodes/status
     verbs:
       # Needed for clearing NodeNetworkUnavailable flag.
       - patch
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -196,7 +208,7 @@ spec:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
       hostNetwork: true
       tolerations:
         # Make sure calico-node gets scheduled on all nodes.
@@ -216,7 +228,7 @@ spec:
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: calico/cni:v3.10.0
+          image: calico/cni:v{{ calico_version }}
           command: ["/install-cni.sh"]
           env:
             # Name of the CNI config file to create.
@@ -250,19 +262,23 @@ spec:
               name: cni-net-dir
             - mountPath: /calico-secrets
               name: etcd-certs
+          securityContext:
+            privileged: true
         # Adds a Flex Volume Driver that creates a per-pod Unix Domain Socket to allow Dikastes
         # to communicate with Felix over the Policy Sync API.
         - name: flexvol-driver
-          image: calico/pod2daemon-flexvol:v3.10.0
+          image: calico/pod2daemon-flexvol:v{{ calico_version }}
           volumeMounts:
           - name: flexvol-driver-host
             mountPath: /host/driver
+          securityContext:
+            privileged: true
       containers:
         # Runs calico-node container on each Kubernetes node.  This
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: calico/node:v3.10.0
+          image: calico/node:v{{ calico_version }}
           env:
             # The location of the etcd cluster.
             - name: ETCD_ENDPOINTS
@@ -347,6 +363,7 @@ spec:
               command:
               - /bin/calico-node
               - -felix-live
+              - -bird-live
             periodSeconds: 10
             initialDelaySeconds: 10
             failureThreshold: 6
@@ -449,7 +466,7 @@ spec:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
       tolerations:
         # Mark the pod as a critical add-on for rescheduling.
         - key: CriticalAddonsOnly
@@ -463,7 +480,7 @@ spec:
       hostNetwork: true
       containers:
         - name: calico-kube-controllers
-          image: calico/kube-controllers:v3.10.0
+          image: calico/kube-controllers:v{{ calico_version }}
           env:
             # The location of the etcd cluster.
             - name: ETCD_ENDPOINTS
