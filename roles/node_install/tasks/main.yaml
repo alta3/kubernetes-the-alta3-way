@@ -13,7 +13,7 @@
    - "/var/lib/kubernetes"
    - "/var/run/kubernetes"
    - "/etc/containerd/"
-  become: yes
+  become: True
 
 - name: Copy Certs to Nodes
   copy:
@@ -23,7 +23,7 @@
   loop: "{{ deployed_cert_and_config_files }}"
   loop_control:
      label: "File = {{ item.dest }}"
-  become: yes
+  become: True
 
 - name: Copy certs/keys/kubeconfigs to Nodes
   copy:
@@ -48,7 +48,7 @@
     public_fqdn: "{{ hostvars[inventory_hostname]['public_fqdn'] }}"
   loop_control:
      label: "File = {{ item.dest }}"
-  become: yes
+  become: True
 
 - name: Install kubernetes apt dependencies on nodes
   apt: 
@@ -57,7 +57,7 @@
     - conntrack
     - ipset
     state: latest
-  become: yes
+  become: True
 
 - name: Download Kubernetes kubectl 
   get_url:
@@ -68,7 +68,7 @@
    - url: "{{ kubectl.url }}"
      dest: "{{ kubectl.path }}"
      mode: '0755'
-  become: yes    
+  become: True    
 
 - name: Download the Node binaries
   get_url:
@@ -78,7 +78,7 @@
   loop: "{{ node_binaries }}"
   loop_control:
      label: "k8s v{{ k8s_version }} - {{ item.path }}"
-  become: yes 
+  become: True 
 
 - name: Download and unarchive Node dependencies
   unarchive:
@@ -88,49 +88,59 @@
   loop: "{{ node_archive_dependencies }}"
   loop_control:
      label: "{{ item.name }}"
-  become: yes 
+  become: True 
 
   #- name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
   #  template:
   #    src: "{{ role_path }}/templates/10-bridge.conf.j2"
   #    dest: "/etc/cni/net.d/10-bridge.conf"
   #    mode: "0664"
-  #  become: yes
+  #  become: True
 
 - name: Create the 99-loopback.conf file for each node. 
   copy: 
     src: "{{ role_path }}/files/99-loopback.conf"
     dest: "/etc/cni/net.d"
     mode: "0664"
-  become: yes    
+  become: True    
 
 - name: Enable packet forwarding on the node 
   sysctl:
-    name: net.ipv4.ip_forward
+    name: 
     value: 1
     sysctl_set: True
     state: present
     reload: yes
-  become: yes
+  become: True
+  loop:
+   - "net.ipv4.ip_forward"
+   - "net.bridge.bridge-nf-call-iptables"
+   - "net.bridge.bridge-nf-call-ip6tables"
 
 - name: Enable br_netfilter kernel module
   modprobe:
-    name: br_netfilter
+    name: "{{ item }}" 
     state: present
-  become: yes
+  become: True
+  loop:
+   - br_netfilter
+   - overlay
 
 - name: Persist br_netfilter kernell module loading (on reboot)
   copy: 
-    dest: /etc/modules-load.d/br_netfilter.conf
-    content: br_netfilter
-  become: yes
+    dest: "/etc/modules-load.d/{{ item }}.conf"
+    content: "{{ item }}"
+  become: True
+  loop:
+   - br_netfilter
+   - overlay
 
 - name: Create node configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: "0664"
-  become: yes
+  become: True
   loop: "{{ node_configs }}"
   loop_control:
      label: "{{ item.name }}"
@@ -140,7 +150,7 @@
     src: "{{ role_path }}/templates/containerd.service.j2"
     dest: "/etc/systemd/system/containerd.service"
     mode: "0664"
-  become: yes
+  become: True
 
 - name: Create the node services config files for each node
   template:
@@ -149,37 +159,37 @@
   loop: "{{ node_services }}"
   loop_control:
      label: "{{ item.service_path }}"
-  become: yes
+  become: True
 
 - name: Reload systemctl daemons
   systemd: 
     daemon_reload: yes
-  become: yes  
+  become: True  
 
 - name: Enable k8s services
   systemd:
     enabled: yes
     name: "{{ item.name }}"
   loop: "{{ node_services }}"
-  become: yes  
+  become: True  
 
 #- name: Enable the containerd services
 #  systemd:
 #    enabled: yes
 #    name: "{{ item.name }}"
 #  loop: "{{ node_dependencies }}"
-#  become: yes
+#  become: True
 
 - name: Restart the k8s services
   systemd:
     state: restarted
     name: "{{ item.name }}"
   loop: "{{ node_services }}"
-  become: yes  
+  become: True  
 
 #- name: Restart the containerd services
 #  systemd:
 #    state: restarted
 #    name: "{{ item.name }}"
 #  loop: "{{ node_dependencies }}"
-#  become: yes
+#  become: True
