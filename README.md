@@ -1,29 +1,30 @@
-# kubernetes-the-alta3-way
-Kubernetes Installation
+# Kubernetes The Alta3 Way
 
+This playbook walks you through setting up Kubernetes the Alta3 way. This guide is a fully automated command to bring up a Kubernetes cluster using Ansible.
 
-### bryfry audit
+Kubernetes The Alta3 Way is optimized for learning, which means taking the long route to ensure you understand each task required to bootstrap a Kubernetes cluster.
 
-hname.nodename -- this variable is already available in gathered facts -- deleted
-ip.nodename    -- this variable is already available in gathered facts -- deleted
+## Copyright
 
-#### makecerts role
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
 
-main changes were to make all the commands work no matter where they run,
-previously this role expected to be run on localhost.  This may not be the 
-end goal and all the commands/shells may need to run on a remote host.
-This mostly impacted the src and dest of many of the config files used
-to generate the certs.
+## Target Audience
 
-#### other roles
-Mostly all I did was move stuff around into other roles where appropriate 
-(e.g. move all the local\_action tasks into a localhost role.
-I also made extensive changes to variable files.  There is still more to do on
-this front, there are lots of hardcoded values in files and templates. Leaving
-that as a TODO for later.
+The target audience for this tutorial is someone planning to support a production Kubernetes cluster and wants to understand how everything fits together.
 
-#### TODO:
+## Cluster Details
 
- * This playbook needs handlers.  If any file that is used in a service is modified, call the restart service handler to make sure that the services all get the freshness updates.
- * move the rbac yaml runners out of master_install, put it on beachhead-only playbook
- * add beachhead routes to pod cidrs --> beachhead only playbook
+Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kubernetes cluster with:
+* A highly available cntrol plane backed by etcd
+* End-to-end encryption between components
+* RBAC authenticated services and users
+* Isolated and default-deny networking
+
+Components and versions:
+* [kubernetes](https://github.com/kubernetes/kubernetes) 1.15.3
+* [containerd](https://github.com/containerd/containerd) 1.2.9
+* [coredns](https://github.com/coredns/coredns) v1.6.3
+* [cni](https://github.com/containernetworking/cni) v0.7.1
+* [calico](https://www.projectcalico.org/) v3.10
+* [etcd](https://github.com/coreos/etcd) v3.4.0
+* [cfssl](https://github.com/cloudflare/cfssl) v1.4.1
