@@ -14,6 +14,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --authorization-mode=Node,RBAC \
   --bind-address=0.0.0.0 \
   --client-ca-file=/var/lib/kubernetes/ca.pem \
+  --requestheader-client-ca-file=/var/lib/kubernetes/ca.pem \
   --enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --enable-swagger-ui=true \
   --etcd-cafile=/var/lib/kubernetes/ca.pem \
