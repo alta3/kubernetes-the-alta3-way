@@ -106,7 +106,7 @@
 
 - name: Enable packet forwarding on the node 
   sysctl:
-    name: 
+    name: "{{ item }}"
     value: 1
     sysctl_set: True
     state: present
