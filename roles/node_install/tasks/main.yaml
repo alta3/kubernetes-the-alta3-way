@@ -104,6 +104,15 @@
     mode: "0664"
   become: True    
 
+- name: Enable br_netfilter kernel module
+  modprobe:
+    name: "{{ item }}" 
+    state: present
+  become: True
+  loop:
+   - br_netfilter
+   - overlay
+   
 - name: Enable packet forwarding on the node 
   sysctl:
     name: "{{ item }}"
@@ -116,15 +125,6 @@
    - "net.ipv4.ip_forward"
    - "net.bridge.bridge-nf-call-iptables"
    - "net.bridge.bridge-nf-call-ip6tables"
-
-- name: Enable br_netfilter kernel module
-  modprobe:
-    name: "{{ item }}" 
-    state: present
-  become: True
-  loop:
-   - br_netfilter
-   - overlay
 
 - name: Persist br_netfilter kernell module loading (on reboot)
   copy: 
