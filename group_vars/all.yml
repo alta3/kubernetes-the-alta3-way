@@ -1,5 +1,5 @@
 ---
-student_number: "2018"
+student_number: "####"
 nodes:
 - "k8s-{{ student_number }}-node-01"
 - "k8s-{{ student_number }}-node-02"
