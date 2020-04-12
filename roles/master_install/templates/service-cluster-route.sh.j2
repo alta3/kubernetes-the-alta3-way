@@ -1,0 +1,5 @@
+#!/bin/bash
+sudo ip route replace {{ service_cluster_ip_range }} \
+{% for node_hostname in nodes %}
+    nexthop via {{ lookup('dig', node_hostname) }} weight 1 \
+{% endfor %}

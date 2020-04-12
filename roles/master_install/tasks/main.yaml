@@ -65,20 +65,14 @@
  - name: Allow Kubernetes API Server to fully initialize
    pause:
      seconds: 90
-     
- #TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
- #- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
- #  copy: 
- #    src: "{{  role_path  }}/files/node-routes"
- #    dest: "/etc/network/if-up.d/node-routes"
- #    mode: "0775"
- #  become: yes
- 
- - name: configure routes to nodes (pod routes)
-   command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
-   loop: "{{ groups['nodes'] }}"
-   register: cmd_result
-   become: yes
-   failed_when:
-   - "'answers: File exists' not in cmd_result.stderr"
-   - "cmd_result.rc != 0"
+
+ - name: Create a route from masters to the service ip cidr
+   template: 
+     src: "{{  role_path  }}/templates/service-cluster-route.sh.j2"
+     dest: "/etc/network/if-up.d/service-cluster-route.sh"
+     mode: "0775"
+   become: True
+
+ - name: execute ifup script to insert route from masters to service ip cidr
+   command: "/etc/network/if-up.d/service-cluster-route.sh"
+   become: True
