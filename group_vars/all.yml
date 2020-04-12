@@ -1,5 +1,5 @@
 ---
-student_number: "###"
+student_number: "2018"
 nodes:
 - "k8s-{{ student_number }}-node-01"
 - "k8s-{{ student_number }}-node-02"
@@ -9,14 +9,14 @@ nodes:
 ansible_python_interpreter: "/usr/bin/python3"
 
 # control flow
-run_all: True
-run_makecerts: "{{ run_all }}" 
+run_all: False
+run_makecerts: True
 run_nodeconfig: "{{ run_all }}" 
 run_localconfig: "{{ run_all }}" 
 run_services: "{{ run_all }}" 
 run_bootstrap: "{{ run_all }}" 
 run_etcd: "{{ run_all }}"
-run_master: "{{ run_all }}"
+run_master: True
 run_nginx_lb: "{{ run_all }}"
 run_nodes: "{{ run_all }}"
 run_rbac: "{{ run_all }}"
@@ -73,17 +73,33 @@ kube_scheduler_config_file: "{{ config_dir }}/kube-scheduler.yaml"
 kube_scheduler_kubeconfig_file: "{{ config_dir }}/kube-scheduler.kubeconfig"
 kube_controller_manager_kubeconfig_file: "{{ config_dir }}/kube-controller-manager.kubeconfig"
 
-ca_csr_config_file: "{{ csr_dir }}/ca-csr.json"
-k8s_csr_config_file: "{{ csr_dir }}/kubernetes-csr.json"
-admin_csr_config_file: "{{ csr_dir }}/admin-csr.json" 
-kube_proxy_csr_config_file: "{{ csr_dir }}/kube-proxy-csr.json"
-kube_controller_manager_csr_config_file: "{{ csr_dir }}/kube-controller-manager-csr.json"
-kube_scheduler_csr_config_file: "{{ csr_dir }}/kube-scheduler-csr.json"
-kube_registry_web_csr_config_file: "{{ csr_dir }}/kube-registry-web-csr.json"
+k8s_certs_list:
+ - "ca"
+ - "admin"
+ - "kube-controller-manager"
+ - "kube-proxy"
+ - "kube-scheduler"
+ - "kubernetes"
+ - "registry-web"
+ - "front-proxy-client"
+
+ca_crt: "ca.pem"
+ca_key: "ca-key.pem"
+k8s_crt: "kubernetes.pem"
+k8s_key: "kubernetes-key.pem"
+encryption_config: "encryption-config.yaml"
+kube_scheduler_crt: "kube-scheduler.pem"
+kube_scheduler_key: "kube-scheduler-key.pem"
+kube_scheduler_config: "kube-scheduler.yaml"
+kube_scheduler_kubeconfig: "kube-scheduler.kubeconfig"
+kube_controller_manager_kubeconfig: "kube-controller-manager.kubeconfig"
+kube_controller_manager_crt: "kube-controller-manager.pem"
+kube_controller_manager_key: "kube-controller-manager-key.pem"
+front_proxy_client_crt: "front-proxy-client.pem"
+front_proxy_client_key: "front-proxy-client-key.pem"
 
 # generated cert and key files
 ca_pem_file: "{{ cert_dir }}/ca.pem"
-ca_crt_file: "{{ cert_dir }}/ca.crt"
 ca_key_file: "{{ cert_dir }}/ca-key.pem"
 k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
 k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
@@ -95,8 +111,10 @@ kube_controller_manager_pem_file: "{{ cert_dir }}/kube-controller-manager.pem"
 kube_controller_manager_key_file: "{{ cert_dir }}/kube-controller-manager-key.pem"
 kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
 kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
-kube_registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
-kube_registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
+registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
+registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
+front_proxy_client_pem_file: "{{ cert_dir }}/front-proxy-client.pem"
+front_proxy_client_key_file: "{{ cert_dir }}/front-proxy-client-key.pem"
 
 # master and node certificates
 deployed_k8s_config_dir: "/var/lib/kubernetes"
@@ -112,6 +130,8 @@ deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-sch
 deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
 deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.pem"
 deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager-key.pem"
+deployed_front_proxy_client_pem_file: "{{ deployed_k8s_config_dir }}/front-proxy-client.pem"
+deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/front-proxy-client-key.pem"
 
 # deployed to both masters and nodes
 deployed_cert_and_config_files:
@@ -144,6 +164,12 @@ deployed_cert_and_config_files:
    mode: "0600" 
  - src: "{{ kube_controller_manager_pem_file }}"
    dest: "{{ deployed_kube_controller_manager_pem_file }}"
+   mode: "0664"
+ - src:  "{{ front_proxy_client_key_file }}"
+   dest: "{{ deployed_front_proxy_client_key_file }}"
+   mode: "0600" 
+ - src:  "{{ front_proxy_client_pem_file }}"
+   dest: "{{ deployed_front_proxy_client_pem_file }}"
    mode: "0664"
 
 auth_kubeconfigs:
