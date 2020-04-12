@@ -11,7 +11,7 @@ authorization:
   mode: Webhook
 clusterDomain: "cluster.local"
 clusterDNS:
-  - {{ cluster_dns }}
+  - {{ dns_cluster_ip }}
 #podCIDR: "{{ cni_host_subnet }}"
 resolvConf: "/run/systemd/resolve/resolv.conf"
 runtimeRequestTimeout: "15m"

@@ -35,9 +35,12 @@ calico_version: "3.13.1"
 
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
-cluster_dns: "172.16.3.10"
 upstream_dns: "10.0.0.1"
 pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
+service_cluster_ip_range: "172.16.3.0/24"
+service_cluster_port_range: "30000-32767"
+apiserver_cluster_ip: "172.16.3.1 "
+dns_cluster_ip: "172.16.3.10"
 
 # dependencies and their destinations
 cfssl_version_url: "https://github.com/cloudflare/cfssl/releases/download"
@@ -173,9 +176,6 @@ auth_kubeconfigs:
      user: "admin"
 
 # master vars
-apiserver_cluster_ip: 172.16.3.1 
-service_cluster_ip_range: 172.16.3.0/24
-service_cluster_port_range: "30000-32767"
 master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_api_localhost_url: "https://127.0.0.1:6443" 
