@@ -33,6 +33,7 @@ runc_version: "1.0.0-rc8"
 coredns_version: "1.6.9"
 calico_version: "3.13.1"
 
+# cluster specifics
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
@@ -42,9 +43,9 @@ apiserver_cluster_ip: "172.16.3.1 "
 dns_cluster_ip: "172.16.3.10"
 
 # dependencies and their destinations
-cfssl_version_url: "https://github.com/cloudflare/cfssl/releases/download"
-cfssl_url: "{{ cfssl_version_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
-cfssljson_url: "{{ cfssl_version_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
+cfssl_source_url: "https://github.com/cloudflare/cfssl/releases/download"
+cfssl_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
+cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
 
 # masters, nodes and localhost all need kubectl
 kubectl:
