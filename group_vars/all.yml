@@ -36,7 +36,6 @@ calico_version: "3.13.1"
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
-pod_cidr: "192.168.1.0/24" # not currently used but lots of this string is out there in configs
 service_cluster_ip_range: "172.16.3.0/24"
 service_cluster_port_range: "30000-32767"
 apiserver_cluster_ip: "172.16.3.1 "
