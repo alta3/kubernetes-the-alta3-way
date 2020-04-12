@@ -55,7 +55,7 @@
   loop: "{{ groups['nodes'] }}"
        
 - name: Generate a self-signed CA cert and private key for the k8s cloud
-  shell: "cfssl gencert -initca {{ csr_dir }} ca-csr.json | cfssljson -bare ca"
+  shell: "cfssl gencert -initca {{ csr_dir }}/ca-csr.json | cfssljson -bare ca"
   args:
     chdir: "{{ cert_dir }}"
     creates: "{{ ca_pem_file }}" # also ca-key.pem, ca.csr
@@ -107,7 +107,7 @@
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
          -profile=kubernetes \
-         {{ csr_dir }}/kube-proxy-csr.json cfssljson -bare kube-proxy
+         {{ csr_dir }}/kube-proxy-csr.json | cfssljson -bare kube-proxy
   args:
     chdir: "{{ cert_dir }}"
     creates: "{{ kube_proxy_pem_file }}" # also kube-proxy.csr kube-proxy-key.pem

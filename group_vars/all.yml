@@ -39,7 +39,7 @@ cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
 service_cluster_ip_range: "172.16.3.0/24"
 service_cluster_port_range: "30000-32767"
-apiserver_cluster_ip: "172.16.3.1 "
+apiserver_cluster_ip: "172.16.3.1"
 dns_cluster_ip: "172.16.3.10"
 
 # dependencies and their destinations
