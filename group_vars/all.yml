@@ -9,14 +9,14 @@ nodes:
 ansible_python_interpreter: "/usr/bin/python3"
 
 # control flow
-run_all: False
-run_makecerts: True
+run_all: True
+run_makecerts: "{{ run_all }}" 
 run_nodeconfig: "{{ run_all }}" 
 run_localconfig: "{{ run_all }}" 
 run_services: "{{ run_all }}" 
 run_bootstrap: "{{ run_all }}" 
 run_etcd: "{{ run_all }}"
-run_master: True
+run_master: "{{ run_all }}"
 run_nginx_lb: "{{ run_all }}"
 run_nodes: "{{ run_all }}"
 run_rbac: "{{ run_all }}"
