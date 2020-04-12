@@ -3,10 +3,10 @@
    file:
      path: "{{ item }}"
      state: directory
-   with_items:
+   loop:
    - "/var/lib/etcd"
    - "/var/lib/kubernetes"
-   become: yes
+   become: True
  
  - name: Copy Certs and Config to Masters
    copy:
@@ -14,7 +14,7 @@
      dest: "{{ item.dest }}"
      mode: "{{ item.mode }}"
    loop: "{{ deployed_cert_and_config_files }}"
-   become: yes
+   become: True
  
  - name: Download the master service binaries
    get_url:
@@ -24,7 +24,7 @@
    loop: "{{ master_services }}"
    loop_control: 
      label: "{{ item.display_name }} -> {{ item.path }}"
-   become: yes
+   become: True
  
  - name: Push the config files for the master services
    template:
@@ -33,7 +33,7 @@
    loop: "{{ master_services }}"
    loop_control: 
      label: "{{ item.display_name }} -> {{ item.service_path }}"
-   become: yes 
+   become: True 
  
  - name: Download Kubernetes kubectl 
    get_url:
@@ -44,12 +44,12 @@
     - url: "{{ kubectl.url }}"
       dest: "{{ kubectl.path }}"
       mode: '0755'
-   become: yes    
+   become: True    
  
  - name: Reload systemd manager
    systemd: 
      daemon_reload: True
-   become: yes
+   become: True
    
  # TODO make this a handler
  - name: Reload the daemon for the services
@@ -60,7 +60,7 @@
    loop: "{{ master_services }}"
    loop_control: 
      label: "{{ item.display_name }} Service -> {{ item.name }}"
-   become: yes
+   become: True
  
  - name: Allow Kubernetes API Server to fully initialize
    pause:
