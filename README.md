@@ -21,6 +21,7 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 * Isolated and default-deny networking
 
 Components and versions:
+
 * [kubernetes](https://github.com/kubernetes/kubernetes) 1.18.0
 * [containerd](https://github.com/containerd/containerd) 1.3.3
 * [coredns](https://github.com/coredns/coredns) v1.6.9
@@ -28,3 +29,4 @@ Components and versions:
 * [calico](https://www.projectcalico.org/) v3.13.1
 * [etcd](https://github.com/coreos/etcd) v3.4.6
 * [cfssl](https://github.com/cloudflare/cfssl) v1.4.1
+
