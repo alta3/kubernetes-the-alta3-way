@@ -4,17 +4,20 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/kube-controller-manager \
-  --address=0.0.0.0 \
+  --bind-address=0.0.0.0 \
   --cluster-cidr={{ cluster_cidr }} \
   --cluster-name=kubernetes \
-  --cluster-signing-cert-file=/var/lib/kubernetes/ca.pem \
-  --cluster-signing-key-file=/var/lib/kubernetes/ca-key.pem \
+  --cluster-signing-cert-file={{ deployed_ca_pem_file }} \
+  --cluster-signing-key-file={{ deployed_ca_key_file }} \
+  --kubeconfig={{ deployed_kube_controller_manager_kubeconfig_file }} \
+  --authorization-kubeconfig={{ deployed_kube_controller_manager_kubeconfig_file }} \
+  --authentication-kubeconfig={{ deployed_kube_controller_manager_kubeconfig_file }} \
   --leader-elect=true \
-  --master=http://127.0.0.1:8080 \
-  --root-ca-file=/var/lib/kubernetes/ca.pem \
-  --service-account-private-key-file=/var/lib/kubernetes/ca-key.pem \
+  --root-ca-file={{ deployed_ca_pem_file }} \
+  --service-account-private-key-file={{ deployed_kube_controller_manager_key_file }} \
   --service-cluster-ip-range={{ service_cluster_ip_range }} \
-  --v=2
+  --use-service-account-credentials=true \
+  --v=4
 Restart=on-failure
 RestartSec=5
 

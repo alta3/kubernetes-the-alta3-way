@@ -1,6 +1,6 @@
 - name: Copy k8s CA
   copy:
-    src: "{{ ca_crt_file }}"
+    src: "{{ cert_dir }}/{{ ca_crt }}"
     dest: "/usr/local/share/ca-certificates/ca.crt" 
     mode: "0600"
   become: yes

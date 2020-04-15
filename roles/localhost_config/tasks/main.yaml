@@ -1,61 +1,19 @@
-#``````````````````````````````````````````````````````````
-# Install fping
-#``````````````````````````````````````````````````````````
-
-- name: install fping for checking if nodes are alive
-  apt:
-   name: fping
-   state: present
-  become: yes
-
-#- name: create directories for the kubernetes nodes
-#  file:
-#    path: "{{ item }}"
-#    state: directory
-#    mode: "0755"
-#  with_items:
-#   - "/var/lib/kubernetes"
-#  become: yes
-
-#TODO: these node-routes are hard coded, on a day far far from now, MAYBE templatized and smartly created
-- name: Create the pod-routes file for each node. Sets routes to get outbound connections from the calico network
-  copy: 
-    src: "{{  role_path  }}/files/node-routes"
-    dest: "/etc/network/if-up.d/node-routes"
-    mode: "0775"
-  become: yes
-
-- name: configure routes to nodes (pod routes)
-  command: "ip route add {{ hostvars[item].cni_host_subnet }} via {{ hostvars[item].public_ip }}"
-  loop: "{{ groups['nodes'] }}"
-  become: yes
-  register: cmd_result
-  failed_when:
-  - "'answers: File exists' not in cmd_result.stderr"
-  - "cmd_result.rc != 0"
-
-
-
-#``````````````````````````````````````````````````````````
-# Locally configure kubernetes 
-#``````````````````````````````````````````````````````````
-
-- name: Verify the cluster is set on the beachhead control machine
+- name: bchd-k8s-config - setup localhost loadbalancer for kubectl (as admin)
   shell: kubectl config set-cluster {{ cluster_name }} \
          --certificate-authority={{ ca_pem_file }}  \
          --embed-certs=true \
          --server={{ localhost_lb_apiserver_address }}
 
-- name: Verify the credentials are set on the beachhead control machine
+- name: bchd-k8s-config - setup creds for admin user
   shell: kubectl config set-credentials admin \ 
          --client-certificate={{ admin_pem_file }} \
          --client-key={{ admin_key_file }} \ 
 
-- name: Verify the context is set for the admin user
+- name: bchd-k8s-config - setup context for the admin user
   shell: kubectl config set-context {{ cluster_name }} 
          --cluster={{ cluster_name }} \
          --user=admin
 
-- name: Use the context for the config file
+- name: bchd-k8s-config - setup use-context for the admin user
   shell: kubectl config use-context {{ cluster_name }}
 

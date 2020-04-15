@@ -1,13 +1,5 @@
 ---
-# Note, none of these commands should be idempotent so we just run them again if we run these tasks again
-# TODO these could probably just be a jinja2 template file for kubconfig (the resulting config file)
-# TODO the tough part is they are setup with embedded certs, maybe if we looked into not embedding them
-
-#-----------------------------------------------------------------------------
-# Node configuration files - Setting the cluster 
-#-----------------------------------------------------------------------------
-
-- name: Set the config file for each node
+- name: Setup the config file for each node
   command: kubectl config set-cluster {{ cluster_name }} \
            --certificate-authority={{ ca_pem_file }} \
            --embed-certs=true \ 
@@ -19,11 +11,7 @@
     public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
-#-----------------------------------------------------------------------------
-# Node configuration files - Setting the credentials
-#-----------------------------------------------------------------------------
-
-- name: Set the credentials for each node
+- name: Setup the credentials for each node
   command: kubectl config set-credentials system:node:{{ public_fqdn }} \
            --client-certificate={{ cert_dir }}/{{ public_fqdn }}.pem \
            --client-key={{ cert_dir }}/{{ public_fqdn }}-key.pem \
@@ -35,11 +23,7 @@
     public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
-#-----------------------------------------------------------------------------
-# Node configuration files - Set-context default
-#-----------------------------------------------------------------------------
-
-- name: Set the context default for each node
+- name: Setup the context default for each node
   command: kubectl config set-context default \
            --cluster={{ cluster_name }} \
            --user=system:node:{{ public_fqdn }} \
@@ -50,11 +34,7 @@
     public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
   
-#-----------------------------------------------------------------------------
-# Node configuration files - Use-context default
-#-----------------------------------------------------------------------------
-
-- name: Use the context default for each node
+- name: Setup the use-context default for each node
   command: kubectl config use-context default \
            --kubeconfig={{ public_fqdn }}.kubeconfig
   args: 
@@ -63,11 +43,8 @@
     public_fqdn: "{{ hostvars[item]['public_fqdn'] }}"
   loop: "{{ groups['nodes'] }}"
 
-#-----------------------------------------------------------------------------
-# Node configuration - Generating client authentication config files
-#-----------------------------------------------------------------------------
-
-- name: auth kubeconfig files - create
+# multiple services
+- name: auth kubeconfig files - multiple services - create
   command: kubectl config set-cluster {{ cluster_name }} \
            --certificate-authority={{ ca_pem_file }} \
            --embed-certs=true \
@@ -79,8 +56,8 @@
   loop_control:
     label: "config={{ item.config }}"
   
-- name: auth kubeconfig - set credentials 
-  command: kubectl config set-credentials {{ item.name }} \
+- name: auth kubeconfig - multiple services - set credentials 
+  command: kubectl config set-credentials {{ item.user }} \
            --client-certificate={{ item.pem }} \
            --client-key={{ item.key }} \
            --embed-certs=true \
@@ -91,8 +68,8 @@
   loop_control:
     label: "config={{ item.config }}"
   
-- name: auth kubeconfig - set context
-  command: kubectl config set-context default \
+- name: auth kubeconfig - multiple services - set context
+  command: kubectl config set-context default-system \
            --cluster={{ cluster_name }} \
            --user={{ item.user }} \
            --kubeconfig={{ item.config }} 
@@ -102,8 +79,8 @@
   loop_control:
     label: "config={{ item.config }}"
 
-- name: auth kubeconfig - use context
-  command: kubectl config use-context default \
+- name: auth kubeconfig - muiltiple services - use context
+  command: kubectl config use-context default-system \
            --kubeconfig={{ item.config }} 
   args:
     chdir: "{{ config_dir }}"
