@@ -23,7 +23,7 @@
     ignore_errors: True # TODO only run when kubectl binary is present
 
   - name: Drain all nodes
-    command: "kubectl drain {{ item }}"
+    command: "kubectl drain {{ item }} --force"
     ignore_errors: True
     with_items:
     - "{{ nodes }}"
