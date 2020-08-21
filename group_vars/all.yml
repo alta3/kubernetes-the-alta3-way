@@ -1,9 +1,8 @@
 ---
-student_number: "####"
 nodes:
-- "k8s-{{ student_number }}-node-01"
-- "k8s-{{ student_number }}-node-02"
-- "k8s-{{ student_number }}-node-03"
+- node-01
+- node-02
+- node-03
 
 # python
 ansible_python_interpreter: "/usr/bin/python3"
