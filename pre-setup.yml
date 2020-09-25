@@ -1,0 +1,5 @@
+- name: Pre-setup
+  hosts: all
+  tasks:
+  - command: "hostnamectl set-hostname {{ inventory_hostname }}"
+    become: True
