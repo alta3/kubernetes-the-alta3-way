@@ -9,11 +9,11 @@ ansible_python_interpreter: "/usr/bin/python3"
 
 # control flow
 run_all: True
-run_makecerts: "{{ run_all }}" 
-run_nodeconfig: "{{ run_all }}" 
-run_localconfig: "{{ run_all }}" 
-run_services: "{{ run_all }}" 
-run_bootstrap: "{{ run_all }}" 
+run_makecerts: "{{ run_all }}"
+run_nodeconfig: "{{ run_all }}"
+run_localconfig: "{{ run_all }}"
+run_services: "{{ run_all }}"
+run_bootstrap: "{{ run_all }}"
 run_etcd: "{{ run_all }}"
 run_master: "{{ run_all }}"
 run_nginx_lb: "{{ run_all }}"
@@ -139,16 +139,16 @@ deployed_cert_and_config_files:
    mode: "0664"
  - src: "{{ ca_key_file }}"
    dest: "{{ deployed_ca_key_file }}"
-   mode: "0600" 
+   mode: "0600"
  - src: "{{ k8s_pem_file }}"
    dest: "{{ deployed_k8s_pem_file }}"
-   mode: "0664" 
+   mode: "0664"
  - src: "{{ k8s_key_file }}"
    dest: "{{ deployed_k8s_key_file }}"
-   mode: "0600" 
+   mode: "0600"
  - src: "{{ encryption_config_file }}"
    dest: "{{ deployed_encryption_config_file }}"
-   mode: "0600" 
+   mode: "0600"
  - src: "{{ kube_scheduler_config_file }}"
    dest: "{{ deployed_kube_scheduler_config_file }}"
    mode: "0664"
@@ -160,13 +160,13 @@ deployed_cert_and_config_files:
    mode: "0664"
  - src: "{{ kube_controller_manager_key_file }}"
    dest: "{{ deployed_kube_controller_manager_key_file }}"
-   mode: "0600" 
+   mode: "0600"
  - src: "{{ kube_controller_manager_pem_file }}"
    dest: "{{ deployed_kube_controller_manager_pem_file }}"
    mode: "0664"
  - src:  "{{ front_proxy_client_key_file }}"
    dest: "{{ deployed_front_proxy_client_key_file }}"
-   mode: "0600" 
+   mode: "0600"
  - src:  "{{ front_proxy_client_pem_file }}"
    dest: "{{ deployed_front_proxy_client_pem_file }}"
    mode: "0664"
@@ -203,9 +203,9 @@ auth_kubeconfigs:
 # master vars
 master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_api_localhost_url: "https://127.0.0.1:6443" 
+master_api_localhost_url: "https://127.0.0.1:6443"
 
-master_services: 
+master_services:
  - display_name: "Kubernetes API Server"
    name: "kube-apiserver"
    url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
@@ -213,15 +213,15 @@ master_services:
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-apiserver.service.j2"
    service_path: "{{ systemd_dir }}/kube-apiserver.service"
-   
+
  - display_name: "Kubernetes Manager"
    name: "kube-controller-manager"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager" 
+   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager"
    path: "/usr/local/bin/kube-controller-manager"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-controller-manager.service.j2"
    service_path: "{{ systemd_dir }}/kube-controller-manager.service"
-   
+
  - display_name: "Kubernetes Scheduler"
    name: "kube-scheduler"
    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
@@ -239,7 +239,7 @@ master_rbac_role:
 master_rbac_rolebind:
   file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
   path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
- 
+
 # etcd
 etcd_config_dir: "/etc/etcd/"
 etcd_arch: "amd64"
@@ -249,7 +249,7 @@ etcd_url: "https://github.com/etcd-io/etcd/releases/download/v{{ etcd_version }}
 etcd_extracted_dir: "/tmp/{{ etcd_file_name }}"
 etcd_port:
   client: 2379
-  s2s: 2380 
+  s2s: 2380
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
 master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
 
@@ -259,7 +259,7 @@ calico_veth_mtu: "1440" # hmmm
 calico_manifest_config: "{{ config_dir }}/calico-etcd.yaml"
 calico_rbac_config: "{{ config_dir }}/calico-v3.1-rbac.yaml"
 
-# nodes 
+# nodes
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"
 
 kubelet_config_dir: "/var/lib/kubelet"
@@ -271,7 +271,7 @@ kube_proxy_kubeconfig_file: "{{ kube_proxy_config_dir }}/kubeconfig"
 kube_proxy_config_file: "{{ kube_proxy_config_dir }}/kube-proxy-config.yaml"
 kube_proxy_mode: "iptables"
 
-node_binaries: 
+node_binaries:
  - name: "kubelet"
    url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version}}/bin/linux/amd64/kube-proxy"
    path: "/usr/local/bin/kube-proxy"
@@ -297,16 +297,16 @@ node_binaries:
    path: "/usr/local/bin/kubectl"
    mode: "0775"
 
-node_services: 
+node_services:
  - name: "kube-proxy"
    service_j2: "{{ role_path }}/templates/kube-proxy.service.j2"
-   service_path: "{{ systemd_dir }}/kube-proxy.service" 
+   service_path: "{{ systemd_dir }}/kube-proxy.service"
  - name: "kubelet"
    service_j2: "{{ role_path }}/templates/kubelet.service.j2"
-   service_path: "{{ systemd_dir }}/kubelet.service" 
+   service_path: "{{ systemd_dir }}/kubelet.service"
  - name: "containerd"
    service_j2: "{{ role_path }}/templates/containerd.service.j2"
-   service_path: "{{ systemd_dir }}/containerd.service" 
+   service_path: "{{ systemd_dir }}/containerd.service"
 
 node_configs:
  - name: "containerd"
@@ -328,4 +328,7 @@ node_archive_dependencies:
    dest: "/opt/cni/bin/"
  - name: "containerd"
    url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
-   dest: "/" 
+   dest: "/"
+
+# registry
+docker_io_mirror_endpoint: "https://registry.alta3.com"
