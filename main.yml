@@ -1,9 +1,10 @@
 ---
-- name: bootstrap 
+# all of the run_* vars are mapped in group_vars folder (default is true)
+- name: bootstrap
   hosts: all
   roles:
-   - name: bootstrap
-     when: run_bootstrap
+   - name: bootstrap       # uses raw module for apt updates and template to update /etc/hosts
+     when: run_bootstrap   # defaults to true
 
 - name: make certs & gen configs
   hosts: localhost
