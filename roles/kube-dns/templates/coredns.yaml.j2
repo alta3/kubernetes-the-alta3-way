@@ -11,22 +11,23 @@ metadata:
     kubernetes.io/bootstrapping: rbac-defaults
   name: system:coredns
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  - services
-  - pods
-  - namespaces
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
+  - apiGroups:
+    - ""
+    resources:
+    - endpoints
+    - services
+    - pods
+    - namespaces
+    verbs:
+    - list
+    - watch
+  - apiGroups:
+    - discovery.k8s.io
+    resources:
+    - endpointslices
+    verbs:
+    - list
+    - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -54,14 +55,17 @@ data:
   Corefile: |
     .:53 {
         errors
-        health
+        health {
+          lameduck 5s
+        }
         ready
         kubernetes cluster.local in-addr.arpa ip6.arpa {
-          pods insecure
           fallthrough in-addr.arpa ip6.arpa
         }
         prometheus :9153
-        forward . {{ upstream_dns }}
+        forward . {{ upstream_dns }} {
+          max_concurrent 1000
+        }
         cache 30
         loop
         reload
@@ -97,7 +101,16 @@ spec:
         - key: "CriticalAddonsOnly"
           operator: "Exists"
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
+      affinity:
+         podAntiAffinity:
+           requiredDuringSchedulingIgnoredDuringExecution:
+           - labelSelector:
+               matchExpressions:
+               - key: k8s-app
+                 operator: In
+                 values: ["kube-dns"]
+             topologyKey: kubernetes.io/hostname
       containers:
       - name: coredns
         image: coredns/coredns:{{ coredns_version }}
