@@ -156,7 +156,42 @@ node-1 kubelet[]: E0130 plugins.go:752] "Error dynamically probing plugins" err=
 [FATAL][1] main.go 107: Failed to start error=failed to build Calico client: could not initialize etcdv3 client: open /calico-secrets/etcd-cert: permission denied
 ```
 
+### Avoid deleting all of `/bin` with unarchive
 
+New in python3.8 ansible version 2.12 the unarchive module will happily delete (overwrite by removal)
+existing directories.  This can be bad when we're extracting the containerd tar ball onto `/bin`
+
+Normal tar execution doesn't delete the source directory
+```
+cd /
+tar xvfz containerd-1.5.9-linux-amd64.tar.gz
+bin/
+bin/ctr
+bin/containerd-shim-runc-v2
+bin/containerd-shim-runc-v1
+bin/containerd-shim
+bin/containerd
+```
+
+Ansible says hold my beer
+
+```
+student@node-2:~$ ls -al /bin
+total 98372
+drwxr-xr-x  2 student admin     4096 Jan  5 17:35 .
+drwxr-xr-x 20 root    root      4096 Jan 30 19:45 ..
+-rwxr-xr-x  1 student admin 49259008 Jan  5 17:35 containerd
+-rwxr-xr-x  1 student admin  6438912 Jan  5 17:35 containerd-shim
+-rwxr-xr-x  1 student admin  8777728 Jan  5 17:35 containerd-shim-runc-v1
+-rwxr-xr-x  1 student admin  8794112 Jan  5 17:35 containerd-shim-runc-v2
+-rwxr-xr-x  1 student admin 27448416 Jan  5 17:35 ctr
+```
+
+Fix: 
+
+```
++   extra_opts: ["--strip-components=1"]
+```
 
 ### Network setup failure on pods
 
