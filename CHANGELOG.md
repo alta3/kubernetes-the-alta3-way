@@ -128,43 +128,66 @@ roles/rbac/files/rbac-clusterrole.yaml
 ```
 
 
+## unsolved errors
+
 ```
 [INFO] plugin/ready: Still waiting on: "kubernetes"
 
-W0130 06:34:04.721855       1 reflector.go:324] pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
-E0130 06:34:04.721936       1 reflector.go:138] pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: Failed to watch *v1.EndpointSlice: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
+W0130 reflector.go:324 pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
+E0130 reflector.go:138 pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: Failed to watch *v1.EndpointSlice: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
 ```
 
 ```
-Jan 30 01:38:41 master-1 kube-apiserver[4817]: E0130 01:38:41.469791    4817 authentication.go:63] "Unable to authenticate the request" err="invalid bearer token"
+master-1 kube-apiserver[]: E0130 authentication.go:63] "Unable to authenticate the request" err="invalid bearer token"
 ```
 
 ```
-2022-01-30 06:50:26.157 [WARNING][60] active_rules_calculator.go 326: Profile not known or invalid, generating dummy profile that drops all traffic. profileID="ksa.kube-system.coredns"
+[WARNING][60] active_rules_calculator.go 326: Profile not known or invalid, generating dummy profile that drops all traffic. profileID="ksa.kube-system.coredns"
 
 ```
+```
+node-1 kubelet[]: E0130 driver-call.go:262] Failed to unmarshal output for command: init, output: "", error: unexpected end of JSON input
+node-1 kubelet[]: W0130 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds, args: [init], error: fork/exec /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds: no such file or directory, output: ""
+node-1 kubelet[]: E0130 plugins.go:752] "Error dynamically probing plugins" err="error creating Flexvolume plugin from directory nodeagent~uds, skipping. Error: unexpected end of JSON input"
+```
 
 ```
-Jan 30 07:20:39 node-1 kubelet[8024]: E0130 07:20:39.301504    8024 driver-call.go:262] Failed to unmarshal output for command: init, output: "", error: unexpected end of JSON input
-Jan 30 07:20:39 node-1 kubelet[8024]: W0130 07:20:39.301682    8024 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds, args: [init], error: fork/exec /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds: no such file or directory, output: ""
-Jan 30 07:20:39 node-1 kubelet[8024]: E0130 07:20:39.301867    8024 plugins.go:752] "Error dynamically probing plugins" err="error creating Flexvolume plugin from directory nodeagent~uds, skipping. Error: unexpected end of JSON input"
+[INFO][1] main.go 94: Loaded configuration from environment config=&config.Config{LogLevel:"info", WorkloadEndpointWorkers:1, ProfileWorkers:1, PolicyWorkers:1, NodeWorkers:1, Kubeconfig:"", DatastoreType:"etcdv3"}
+[FATAL][1] main.go 107: Failed to start error=failed to build Calico client: could not initialize etcdv3 client: open /calico-secrets/etcd-cert: permission denied
 ```
 
+
+
+### Network setup failure on pods
+
+
+``` log
+  Warning  FailedCreatePodSandBox  3m34s                kubelet            Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "e647c56fc036f1926ccb665873b3653cde5cd6510bb17c649f05efd250cec12c": Unauthorized
+  Warning  FailedCreatePodSandBox  3m18s                kubelet            (combined from similar events): Failed to create pod sandbox: rpc error: code = Unknown desc = failed to setup network for sandbox "da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf": Unauthorized
 ```
-2022-01-30 07:21:31.514 [INFO][1] main.go 94: Loaded configuration from environment config=&config.Config{LogLevel:"info", WorkloadEndpointWorkers:1, ProfileWorkers:1, PolicyWorkers:1, NodeWorkers:1, Kubeconfig:"", DatastoreType:"etcdv3"}
-2022-01-30 07:21:31.514 [FATAL][1] main.go 107: Failed to start error=failed to build Calico client: could not initialize etcdv3 client: open /calico-secrets/etcd-cert: permission denied
+
+
+``` log
+2022-01-30 17:21:57.754 [ERROR][26729] plugin.go 121: Final result of CNI ADD was an error. error=Unauthorized
+2022-01-30 17:21:57.914 [WARNING][26747] k8s.go 521: WorkloadEndpoint does not exist in the datastore, moving forward with the clean up ContainerID="da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf" WorkloadEndpoint="node--3-k8s-coredns--66d5dc5c47--bl67p-eth0"
+2022-01-30 17:21:58.017 [WARNING][26775] ipam_plugin.go 432: Asked to release address but it doesn't exist. Ignoring ContainerID="da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf" HandleID="k8s-pod-network.da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf" Workload="node--3-k8s-coredns--66d5dc5c47--bl67p-eth0"
 ```
 
 
 ## verify
 
 ```
-curl --cacert k8s-certs/ca.pem https://127.0.0.1:6443/version
+curl --cacert ~/k8s-certs/ca.pem https://127.0.0.1:6443/version
+source <(kubectl completion bash)
 kubectl get nodes
 kubectl get pods --all-namespaces
-kubectl create deployment nginx --image=nginx
+
+# test dns
+
+kubectl create deployment nginx3 --image=nginx
 sleep 30
-kubectl get pods -l app=nginx
+kubectl get pods -l app=nginx2
 kubectl exec --stdin --tty nginx-85b98978db-mkkn -- /bin/bash
+
 
 ```

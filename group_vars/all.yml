@@ -268,9 +268,8 @@ master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].p
 
 # calico
 calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
-calico_veth_mtu: "1440" # hmmm
-calico_manifest_config: "{{ config_dir }}/calico-etcd.yaml"
-calico_rbac_config: "{{ config_dir }}/calico-v3.1-rbac.yaml"
+calico_manifest_config: "{{ config_dir }}/calico.yaml"
+calico_veth_mtu: "1440" 
 
 # nodes
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"
