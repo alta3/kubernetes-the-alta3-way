@@ -85,17 +85,11 @@
     remote_src: yes
     src: "{{ item.url }}"
     dest: "{{ item.dest }}"
+    extra_opts: "{{ item.extra_opts }}"
   loop: "{{ node_archive_dependencies }}"
   loop_control:
      label: "{{ item.name }}"
   become: True
-
-  #- name: Create the 10-bridge.conf file for each node. Provides networking info for pods deployed to this node
-  #  template:
-  #    src: "{{ role_path }}/templates/10-bridge.conf.j2"
-  #    dest: "/etc/cni/net.d/10-bridge.conf"
-  #    mode: "0664"
-  #  become: True
 
 - name: Create the 99-loopback.conf file for each node.
   copy:

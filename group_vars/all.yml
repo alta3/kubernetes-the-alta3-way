@@ -335,12 +335,15 @@ node_archive_dependencies:
  - name: "crictl"
    url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ cri_tools_version }}/crictl-v{{ cri_tools_version }}-linux-amd64.tar.gz"
    dest: "/usr/local/bin/"
+   extra_opts: []
  - name: "cni-plugins"
    url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-linux-amd64-v{{ cni_version }}.tgz"
    dest: "/opt/cni/bin/"
+   extra_opts: []
  - name: "containerd"
    url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz"
-   dest: "/"
+   dest: "/usr/local/bin/"
+   extra_opts: ["--strip-components=1"]
 
 # registry
 docker_io_mirror_endpoint: "https://registry.alta3.com"
