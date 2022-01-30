@@ -22,7 +22,7 @@ kube-apiserver[]: Error: unknown flag: --kubelet-https
 ```
 
 Fix:
-```
+``` diff
 # on master kub-apiserver failed with error:
 roles/master_install/templates/kube-apiserver.service.j2
 -  --kubelet-https=true \
@@ -38,7 +38,7 @@ master-1 kube-scheduler[]: E0129 20:41:42.583894   16355 run.go:74] "command fai
 
 Fix:
 
-```
+``` diff
 roles/make_certs/templates/kube-scheduler.yaml.j2
 -apiVersion: kubescheduler.config.k8s.io/v1alpha1
 +apiVersion: kubescheduler.config.k8s.io/v1beta1
@@ -63,7 +63,7 @@ master-1 kube-apiserver[]: E0129 20:48:36.178551   24811 run.go:74] "command fai
 
 Fix: 
 
-```
+``` diff
 roles/master_install/templates/kube-apiserver.service.j2
 -  --service-account-key-file={{ deployed_kube_controller_manager_pem_file }} \
 +  --service-account-key-file={{ deployed_service_account_pem_file }} \
@@ -85,7 +85,7 @@ Fix:
 
 With the latest k8s (1.23.2+) an update to the apiVersion for kubescheduler is required
 
-```
+``` diff
 roles/make_certs/templates/kube-scheduler.yaml.j2
 -apiVersion: kubescheduler.config.k8s.io/v1beta1
 +apiVersion: kubescheduler.config.k8s.io/v1beta2
@@ -103,7 +103,7 @@ Fix:
 Kubernetes version `v1.23.1`+ no longer accepts `v1beta` for `rbac.authrization.k8s.io` version.
 Update the rbac cluster role authorization configuration yaml to `v1`
 
-``` 
+``` diff
 roles/rbac/files/rbac-clusterrole.yaml
 -apiVersion: rbac.authorization.k8s.io/v1beta1
 +apiVersion: rbac.authorization.k8s.io/v1
@@ -121,7 +121,7 @@ Fix:
 Kubernetes version `v1.23.1`+ no longer accepts `v1beta` for `rbac.authrization.k8s.io` version.
 Update the rbac cluster role binding authorization configuration yaml to `v1`
 
-``` 
+``` diff
 roles/rbac/files/rbac-clusterrole.yaml
 -apiVersion: rbac.authorization.k8s.io/v1beta1
 +apiVersion: rbac.authorization.k8s.io/v1
