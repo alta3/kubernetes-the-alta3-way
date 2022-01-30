@@ -144,6 +144,16 @@ Jan 30 01:38:41 master-1 kube-apiserver[4817]: E0130 01:38:41.469791    4817 aut
 
 ```
 
+```
+Jan 30 07:20:39 node-1 kubelet[8024]: E0130 07:20:39.301504    8024 driver-call.go:262] Failed to unmarshal output for command: init, output: "", error: unexpected end of JSON input
+Jan 30 07:20:39 node-1 kubelet[8024]: W0130 07:20:39.301682    8024 driver-call.go:149] FlexVolume: driver call failed: executable: /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds, args: [init], error: fork/exec /usr/libexec/kubernetes/kubelet-plugins/volume/exec/nodeagent~uds/uds: no such file or directory, output: ""
+Jan 30 07:20:39 node-1 kubelet[8024]: E0130 07:20:39.301867    8024 plugins.go:752] "Error dynamically probing plugins" err="error creating Flexvolume plugin from directory nodeagent~uds, skipping. Error: unexpected end of JSON input"
+```
+
+```
+2022-01-30 07:21:31.514 [INFO][1] main.go 94: Loaded configuration from environment config=&config.Config{LogLevel:"info", WorkloadEndpointWorkers:1, ProfileWorkers:1, PolicyWorkers:1, NodeWorkers:1, Kubeconfig:"", DatastoreType:"etcdv3"}
+2022-01-30 07:21:31.514 [FATAL][1] main.go 107: Failed to start error=failed to build Calico client: could not initialize etcdv3 client: open /calico-secrets/etcd-cert: permission denied
+```
 
 
 ## verify
