@@ -173,6 +173,15 @@ node-1 kubelet[]: E0130 plugins.go:752] "Error dynamically probing plugins" err=
 2022-01-30 17:21:58.017 [WARNING][26775] ipam_plugin.go 432: Asked to release address but it doesn't exist. Ignoring ContainerID="da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf" HandleID="k8s-pod-network.da0bb6e5252f0d848ac32811ee027db0af9f71c27a5ac7e192a4d05cc4599edf" Workload="node--3-k8s-coredns--66d5dc5c47--bl67p-eth0"
 ```
 
+https://projectcalico.docs.tigera.io/reference/resources/workloadendpoint
+
+
+
+```
+sudo journalctl -n 2000 -f | egrep -v "sudo|pam|sshd|systemd-logind|ansible|systemd\[1\]"
+```
+
+
 
 ## verify
 
@@ -183,11 +192,24 @@ kubectl get nodes
 kubectl get pods --all-namespaces
 
 # test dns
+# https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
+kubectl exec -i -t dnsutils -- nslookup kubernetes.default
 
+
+kubectl create deployment nginx1 --image=nginx
+kubectl create deployment nginx2 --image=nginx
 kubectl create deployment nginx3 --image=nginx
+kubectl create deployment nginx4 --image=nginx
+kubectl create deployment nginx5 --image=nginx
 sleep 30
 kubectl get pods -l app=nginx2
-kubectl exec --stdin --tty nginx-85b98978db-mkkn -- /bin/bash
+kubectl exec --stdin --tty nginx- -- /bin/bash
+
+kubectl delete deployment nginx1 
+kubectl delete deployment nginx2 
+kubectl delete deployment nginx3 
+kubectl delete deployment nginx4 
+kubectl delete deployment nginx5 
 
 
 ```
