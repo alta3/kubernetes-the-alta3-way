@@ -22,15 +22,15 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.18.0"
-etcd_version: "3.4.6"
-cni_version: "0.8.5"
-containerd_version: "1.3.3"
-cri_tools_version: "1.17.0"
-cfssl_version: "1.4.1"
-runc_version: "1.0.0-rc8"
-coredns_version: "1.6.9"
-calico_version: "3.13.1"
+k8s_version: "1.23.3"       # https://kubernetes.io/releases/#release-v1-23
+etcd_version: "3.5.1"       # https://github.com/etcd-io/etcd/releases/tag/v3.5.1
+cni_version: "1.0.1"        # https://github.com/containernetworking/cni/releases/tag/v1.0.1
+containerd_version: "1.5.9" # https://github.com/containerd/containerd/releases/tag/v1.5.9
+cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.23.0
+cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases/tag/v1.6.1
+runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases/tag/v1.1.0
+coredns_version: "1.8.7"    # https://github.com/coredns/coredns/releases/tag/v1.8.7
+calico_version: "3.13.1"    # https://github.com/projectcalico/calico/releases/tag/v3.21.4
 
 # cluster specifics
 cluster_name: "kubernetes-the-alta3-way"
@@ -64,20 +64,13 @@ city_csr: Harrisburg
 state_csr: Pennsylvania
 ou_csr: Kubernetes The Alta3 Way
 
-# cert and misc config files
-ca_config_file: "{{ config_dir }}/ca-config.json"
-encryption_config_file: "{{ config_dir }}/encryption-config.yaml"
-kube_scheduler_config_file: "{{ config_dir }}/kube-scheduler.yaml"
-
-kube_scheduler_kubeconfig_file: "{{ config_dir }}/kube-scheduler.kubeconfig"
-kube_controller_manager_kubeconfig_file: "{{ config_dir }}/kube-controller-manager.kubeconfig"
-
 k8s_certs_list:
  - "ca"
  - "admin"
  - "kube-controller-manager"
  - "kube-proxy"
  - "kube-scheduler"
+ - "service-account"
  - "kubernetes"
  - "registry-web"
  - "front-proxy-client"
@@ -96,41 +89,55 @@ kube_controller_manager_crt: "kube-controller-manager.pem"
 kube_controller_manager_key: "kube-controller-manager-key.pem"
 front_proxy_client_crt: "front-proxy-client.pem"
 front_proxy_client_key: "front-proxy-client-key.pem"
+service_account_crt: "service-account.pem"
+service_account_key: "service-account-key.pem"
+
+# cert and misc config files
+ca_config_file: "{{ config_dir }}/ca-config.json"
+encryption_config_file: "{{ config_dir }}/{{ encryption_config }}"
+kube_scheduler_config_file: "{{ config_dir }}/{{ kube_scheduler_config }}"
+kube_scheduler_kubeconfig_file: "{{ config_dir }}/{{ kube_scheduler_kubeconfig }}"
+kube_controller_manager_kubeconfig_file: "{{ config_dir }}/{{ kube_controller_manager_kubeconfig }}"
 
 # generated cert and key files
-ca_pem_file: "{{ cert_dir }}/ca.pem"
-ca_key_file: "{{ cert_dir }}/ca-key.pem"
-k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
-k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
+ca_pem_file: "{{ cert_dir }}/{{ ca_crt }}"
+ca_key_file: "{{ cert_dir }}/{{ ca_key }}"
+k8s_pem_file: "{{ cert_dir }}/{{ k8s_crt }}"
+k8s_key_file: "{{ cert_dir }}/{{ k8s_key }}"
+kube_controller_manager_pem_file: "{{ cert_dir }}/{{ kube_controller_manager_crt }}"
+kube_controller_manager_key_file: "{{ cert_dir }}/{{ kube_controller_manager_key }}"
+kube_scheduler_pem_file: "{{ cert_dir }}/{{ kube_scheduler_crt }}"
+kube_scheduler_key_file: "{{ cert_dir }}/{{ kube_scheduler_key }}"
+front_proxy_client_pem_file: "{{ cert_dir }}/{{ front_proxy_client_crt }}"
+front_proxy_client_key_file: "{{ cert_dir }}/{{ front_proxy_client_key }}"
+service_account_pem_file: "{{ cert_dir }}/{{ service_account_crt }}"
+service_account_key_file: "{{ cert_dir }}/{{ service_account_key }}"
+
 admin_pem_file: "{{ cert_dir }}/admin.pem"
 admin_key_file: "{{ cert_dir }}/admin-key.pem"
 kube_proxy_pem_file: "{{ cert_dir }}/kube-proxy.pem"
 kube_proxy_key_file: "{{ cert_dir }}/kube-proxy-key.pem"
-kube_controller_manager_pem_file: "{{ cert_dir }}/kube-controller-manager.pem"
-kube_controller_manager_key_file: "{{ cert_dir }}/kube-controller-manager-key.pem"
-kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
-kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
 registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
 registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
-front_proxy_client_pem_file: "{{ cert_dir }}/front-proxy-client.pem"
-front_proxy_client_key_file: "{{ cert_dir }}/front-proxy-client-key.pem"
 
 # master and node certificates
 deployed_k8s_config_dir: "/var/lib/kubernetes"
-deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/ca.pem"
-deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/ca-key.pem"
-deployed_k8s_pem_file: "{{ deployed_k8s_config_dir }}/kubernetes.pem"
-deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/kubernetes-key.pem"
-deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/encryption-config.yaml"
-deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.pem"
-deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/kube-scheduler-key.pem"
-deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.yaml"
-deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.kubeconfig"
-deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
-deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.pem"
-deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager-key.pem"
-deployed_front_proxy_client_pem_file: "{{ deployed_k8s_config_dir }}/front-proxy-client.pem"
-deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/front-proxy-client-key.pem"
+deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/{{ ca_crt }}"
+deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/{{ ca_key }}"
+deployed_k8s_pem_file: "{{ deployed_k8s_config_dir }}/{{ k8s_crt }}"
+deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/{{ k8s_key }}"
+deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/{{ encryption_config }}"
+deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_crt }}"
+deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_key }}"
+deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_config }}"
+deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_kubeconfig }}"
+deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_kubeconfig }}"
+deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_crt }}"
+deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_key }}"
+deployed_front_proxy_client_pem_file: "{{ deployed_k8s_config_dir }}/{{ front_proxy_client_crt }}"
+deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/{{ front_proxy_client_key }}"
+deployed_service_account_pem_file: "{{ deployed_k8s_config_dir }}/{{ service_account_crt }}"
+deployed_service_account_key_file: "{{ deployed_k8s_config_dir }}/{{ service_account_key }}"
 
 # deployed to both masters and nodes
 deployed_cert_and_config_files:
@@ -169,6 +176,12 @@ deployed_cert_and_config_files:
    mode: "0600"
  - src:  "{{ front_proxy_client_pem_file }}"
    dest: "{{ deployed_front_proxy_client_pem_file }}"
+   mode: "0664"
+ - src:  "{{ service_account_key_file }}"
+   dest: "{{ deployed_service_account_key_file }}"
+   mode: "0600"
+ - src:  "{{ service_account_pem_file }}"
+   dest: "{{ deployed_service_account_pem_file }}"
    mode: "0664"
 
 auth_kubeconfigs:
@@ -327,7 +340,7 @@ node_archive_dependencies:
    url: "https://github.com/containernetworking/plugins/releases/download/v{{ cni_version }}/cni-plugins-linux-amd64-v{{ cni_version }}.tgz"
    dest: "/opt/cni/bin/"
  - name: "containerd"
-   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
+   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz"
    dest: "/"
 
 # registry
