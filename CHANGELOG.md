@@ -11,7 +11,7 @@ cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools/relea
 cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases/tag/v1.6.1
 runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases/tag/v1.1.0
 coredns_version: "1.8.7"    # https://github.com/coredns/coredns/releases/tag/v1.8.7
-calico_version: "3.13.1"    # https://github.com/projectcalico/calico/releases/tag/v3.21.4
+calico_version: "3.21.4"    # https://github.com/projectcalico/calico/releases/tag/v3.21.4
 ```
 
 ### Removed depricated kube-apiserver flag:
@@ -125,4 +125,36 @@ Update the rbac cluster role binding authorization configuration yaml to `v1`
 roles/rbac/files/rbac-clusterrole.yaml
 -apiVersion: rbac.authorization.k8s.io/v1beta1
 +apiVersion: rbac.authorization.k8s.io/v1
+```
+
+
+```
+[INFO] plugin/ready: Still waiting on: "kubernetes"
+
+W0130 06:34:04.721855       1 reflector.go:324] pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
+E0130 06:34:04.721936       1 reflector.go:138] pkg/mod/k8s.io/client-go@v0.23.1/tools/cache/reflector.go:167: Failed to watch *v1.EndpointSlice: failed to list *v1.EndpointSlice: endpointslices.discovery.k8s.io is forbidden: User "system:serviceaccount:kube-system:coredns" cannot list resource "endpointslices" in API group "discovery.k8s.io" at the cluster scope
+```
+
+```
+Jan 30 01:38:41 master-1 kube-apiserver[4817]: E0130 01:38:41.469791    4817 authentication.go:63] "Unable to authenticate the request" err="invalid bearer token"
+```
+
+```
+2022-01-30 06:50:26.157 [WARNING][60] active_rules_calculator.go 326: Profile not known or invalid, generating dummy profile that drops all traffic. profileID="ksa.kube-system.coredns"
+
+```
+
+
+
+## verify
+
+```
+curl --cacert k8s-certs/ca.pem https://127.0.0.1:6443/version
+kubectl get nodes
+kubectl get pods --all-namespaces
+kubectl create deployment nginx --image=nginx
+sleep 30
+kubectl get pods -l app=nginx
+kubectl exec --stdin --tty nginx-85b98978db-mkkn -- /bin/bash
+
 ```
