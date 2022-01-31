@@ -329,7 +329,7 @@ node_archive_dependencies:
    dest: "/opt/cni/bin/"
    extra_opts: []
  - name: "containerd"
-   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.filinux-amd64.tar.gz"
+   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
    dest: "/usr/local/bin/"
    extra_opts: ["--strip-components=1"]
 
