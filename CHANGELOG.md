@@ -10,7 +10,7 @@ containerd_version: "1.5.9" # https://github.com/containerd/containerd/releases/
 cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.23.0
 cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases/tag/v1.6.1
 runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases/tag/v1.1.0
-coredns_version: "1.8.7"    # https://github.com/coredns/coredns/releases/tag/v1.8.7
+coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases/tag/v1.9.0
 calico_version: "3.21.4"    # https://github.com/projectcalico/calico/releases/tag/v3.21.4
 ```
 
