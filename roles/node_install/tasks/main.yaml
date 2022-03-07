@@ -181,6 +181,6 @@
   loop: "{{ node_services }}"
   become: True
 
- - name: Allow Kubernetes Nodes services to fully initialize
-   pause:
-     seconds: 90
+- name: Allow Kubernetes Nodes services to fully initialize
+  pause:
+    seconds: 90
