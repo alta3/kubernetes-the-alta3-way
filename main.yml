@@ -31,7 +31,7 @@
      when: run_master
 
 - name: deploy load balancers
-  hosts: localhost
+  hosts: localhost,nodes
   gather_facts: False
   roles:
    - name: nginx_localhost_load_balancer

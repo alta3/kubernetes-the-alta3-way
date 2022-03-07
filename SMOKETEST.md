@@ -19,6 +19,7 @@ kubectl expose pod nginx --namespace=test --port=80
 sleep 60
 
 # test network and dns
+kubectl -n test get pods
 kubectl exec -n test d1 -- ping -W 1 -c 1 8.8.8.8 | egrep "100% packet loss"
 kubectl exec -n test d1 -- ping -W 1 -c 1 10.0.0.1 | egrep "100% packet loss" 
 kubectl exec -n test d2 -- ping -W 1 -c 1 8.8.8.8 | egrep "100% packet loss" 
