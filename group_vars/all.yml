@@ -22,15 +22,15 @@ run_rbac: "{{ run_all }}"
 run_trusted_ca: "{{ run_all }}"
 
 # versions
-k8s_version: "1.23.3"       # https://kubernetes.io/releases/#release-v1-23
-etcd_version: "3.5.1"       # https://github.com/etcd-io/etcd/releases/tag/v3.5.1
-cni_version: "1.0.1"        # https://github.com/containernetworking/cni/releases/tag/v1.0.1
-containerd_version: "1.5.9" # https://github.com/containerd/containerd/releases/tag/v1.5.9
-cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.23.0
-cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases/tag/v1.6.1
-runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases/tag/v1.1.0
-coredns_version: "1.8.7"    # https://github.com/coredns/coredns/releases/tag/v1.8.7
-calico_version: "3.21.4"    # https://github.com/projectcalico/calico/releases/tag/v3.21.4
+k8s_version: "1.23.4"       # https://kubernetes.io/releases/#release-v1-23
+etcd_version: "3.5.2"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.0.1"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.1" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools
+cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases
+calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
 
 # cluster specifics
 cluster_name: "kubernetes-the-alta3-way"
