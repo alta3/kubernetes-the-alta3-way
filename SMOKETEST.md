@@ -12,8 +12,8 @@ kubectl run d1 --image=k8s.gcr.io/e2e-test-images/jessie-dnsutils:1.3 -n test --
 kubectl run d2 --image=k8s.gcr.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-2"} }' --command sleep 10000
 kubectl run d3 --image=k8s.gcr.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-3"} }' --command sleep 10000
 kubectl run c1 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
-kubectl run c2 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
-kubectl run c3 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
+kubectl run c2 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-2"} }' --command sleep 10000
+kubectl run c3 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-3"} }' --command sleep 10000
 kubectl run --namespace=test nginx --image=nginx
 kubectl expose pod nginx --namespace=test --port=80
 sleep 60
@@ -31,6 +31,8 @@ kubectl exec -n test c2 -- wget -T 2 -q nginx -O - | grep Welcome
 kubectl exec -n test c3 -- wget -T 2 -q nginx -O - | grep Welcome
 
 # troubleshoot
-kubectl -n kube-system get pods
 source <(kubectl completion bash)
+kubectl -n kube-system get pods
+kubectl describe pods -n kube-system | egrep "^Name:|Node:"
+
 ```

@@ -193,6 +193,13 @@ Fix:
 +   extra_opts: ["--strip-components=1"]
 ```
 
+### CoreDNS starts unsync'd
+
+```
+[WARNING] plugin/kubernetes: starting server with unsynced Kubernetes API
+```
+
+
 ### Network setup failure on pods
 
 
