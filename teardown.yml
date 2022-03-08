@@ -11,7 +11,7 @@
     ignore_errors: True
 
   - name: Remove calico service
-    command: "kubectl delete -f {{ calico_manifest_config}}"
+    command: "kubectl delete -f {{ calico_manifest_config }}"
     ignore_errors: True # TODO only run when kubectl binary is present
 
   - name: Remove kube-dns service
@@ -25,8 +25,7 @@
   - name: Drain all nodes
     command: "kubectl drain {{ item }} --force"
     ignore_errors: True
-    with_items:
-    - "{{ nodes }}"
+    loop: "{{ groups['nodes'] }}"
 
   - name: Remove kubelet from bchd
     systemd:
@@ -35,6 +34,7 @@
       state: stopped
     ignore_errors: True # TODO only run when item.service_path exists
     become: True
+
 - name: uninstall nodes
   hosts: nodes
   vars:

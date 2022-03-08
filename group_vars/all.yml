@@ -1,10 +1,4 @@
 ---
-nodes:
-- node-1
-- node-2
-- node-3
-
-# python
 ansible_python_interpreter: "/usr/bin/python3"
 
 # versions
