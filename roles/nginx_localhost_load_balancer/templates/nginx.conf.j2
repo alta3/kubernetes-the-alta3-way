@@ -17,7 +17,7 @@ http {
 stream {
 	upstream kube_apiserver {
 		least_conn;
-		{% for m in groups['masters'] %}
+		{% for m in groups['controllers'] %}
 		server {{ hostvars[m].public_ip }}:6443;
 		{% endfor %}
 	}

@@ -5,7 +5,7 @@ Documentation=https://github.com/kubernetes/kubernetes
 [Service]
 ExecStart=/usr/local/bin/kube-scheduler \
   --config={{deployed_kube_scheduler_config_file }} \
-  --v=2
+  --v={{ kube_verbose_level }}
 Restart=on-failure
 RestartSec=5
 

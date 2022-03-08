@@ -7,32 +7,20 @@ nodes:
 # python
 ansible_python_interpreter: "/usr/bin/python3"
 
-# control flow
-run_all: True
-run_makecerts: "{{ run_all }}"
-run_nodeconfig: "{{ run_all }}"
-run_localconfig: "{{ run_all }}"
-run_services: "{{ run_all }}"
-run_bootstrap: "{{ run_all }}"
-run_etcd: "{{ run_all }}"
-run_master: "{{ run_all }}"
-run_nginx_lb: "{{ run_all }}"
-run_nodes: "{{ run_all }}"
-run_rbac: "{{ run_all }}"
-run_trusted_ca: "{{ run_all }}"
-
 # versions
-k8s_version: "1.18.0"
-etcd_version: "3.4.6"
-cni_version: "0.8.5"
-containerd_version: "1.3.3"
-cri_tools_version: "1.17.0"
-cfssl_version: "1.4.1"
-runc_version: "1.0.0-rc8"
-coredns_version: "1.6.9"
-calico_version: "3.13.1"
+k8s_version: "1.23.4"       # https://kubernetes.io/releases/#release-v1-23
+etcd_version: "3.5.2"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.0.1"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.1" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools
+cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases
+calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
 
 # cluster specifics
+kube_verbose_level: 9
+kube_cluster_domain: "cluster.local"
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
@@ -46,7 +34,7 @@ cfssl_source_url: "https://github.com/cloudflare/cfssl/releases/download"
 cfssl_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
 cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
 
-# masters, nodes and localhost all need kubectl
+# controllers, nodes and localhost all need kubectl
 kubectl:
   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
   path: "/usr/local/bin/kubectl"
@@ -64,20 +52,13 @@ city_csr: Harrisburg
 state_csr: Pennsylvania
 ou_csr: Kubernetes The Alta3 Way
 
-# cert and misc config files
-ca_config_file: "{{ config_dir }}/ca-config.json"
-encryption_config_file: "{{ config_dir }}/encryption-config.yaml"
-kube_scheduler_config_file: "{{ config_dir }}/kube-scheduler.yaml"
-
-kube_scheduler_kubeconfig_file: "{{ config_dir }}/kube-scheduler.kubeconfig"
-kube_controller_manager_kubeconfig_file: "{{ config_dir }}/kube-controller-manager.kubeconfig"
-
 k8s_certs_list:
  - "ca"
  - "admin"
  - "kube-controller-manager"
  - "kube-proxy"
  - "kube-scheduler"
+ - "service-account"
  - "kubernetes"
  - "registry-web"
  - "front-proxy-client"
@@ -96,43 +77,57 @@ kube_controller_manager_crt: "kube-controller-manager.pem"
 kube_controller_manager_key: "kube-controller-manager-key.pem"
 front_proxy_client_crt: "front-proxy-client.pem"
 front_proxy_client_key: "front-proxy-client-key.pem"
+service_account_crt: "service-account.pem"
+service_account_key: "service-account-key.pem"
+
+# cert and misc config files
+ca_config_file: "{{ config_dir }}/ca-config.json"
+encryption_config_file: "{{ config_dir }}/{{ encryption_config }}"
+kube_scheduler_config_file: "{{ config_dir }}/{{ kube_scheduler_config }}"
+kube_scheduler_kubeconfig_file: "{{ config_dir }}/{{ kube_scheduler_kubeconfig }}"
+kube_controller_manager_kubeconfig_file: "{{ config_dir }}/{{ kube_controller_manager_kubeconfig }}"
 
 # generated cert and key files
-ca_pem_file: "{{ cert_dir }}/ca.pem"
-ca_key_file: "{{ cert_dir }}/ca-key.pem"
-k8s_pem_file: "{{ cert_dir }}/kubernetes.pem"
-k8s_key_file: "{{ cert_dir }}/kubernetes-key.pem"
+ca_pem_file: "{{ cert_dir }}/{{ ca_crt }}"
+ca_key_file: "{{ cert_dir }}/{{ ca_key }}"
+k8s_pem_file: "{{ cert_dir }}/{{ k8s_crt }}"
+k8s_key_file: "{{ cert_dir }}/{{ k8s_key }}"
+kube_controller_manager_pem_file: "{{ cert_dir }}/{{ kube_controller_manager_crt }}"
+kube_controller_manager_key_file: "{{ cert_dir }}/{{ kube_controller_manager_key }}"
+kube_scheduler_pem_file: "{{ cert_dir }}/{{ kube_scheduler_crt }}"
+kube_scheduler_key_file: "{{ cert_dir }}/{{ kube_scheduler_key }}"
+front_proxy_client_pem_file: "{{ cert_dir }}/{{ front_proxy_client_crt }}"
+front_proxy_client_key_file: "{{ cert_dir }}/{{ front_proxy_client_key }}"
+service_account_pem_file: "{{ cert_dir }}/{{ service_account_crt }}"
+service_account_key_file: "{{ cert_dir }}/{{ service_account_key }}"
+
 admin_pem_file: "{{ cert_dir }}/admin.pem"
 admin_key_file: "{{ cert_dir }}/admin-key.pem"
 kube_proxy_pem_file: "{{ cert_dir }}/kube-proxy.pem"
 kube_proxy_key_file: "{{ cert_dir }}/kube-proxy-key.pem"
-kube_controller_manager_pem_file: "{{ cert_dir }}/kube-controller-manager.pem"
-kube_controller_manager_key_file: "{{ cert_dir }}/kube-controller-manager-key.pem"
-kube_scheduler_pem_file: "{{ cert_dir }}/kube-scheduler.pem"
-kube_scheduler_key_file: "{{ cert_dir }}/kube-scheduler-key.pem"
 registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
 registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
-front_proxy_client_pem_file: "{{ cert_dir }}/front-proxy-client.pem"
-front_proxy_client_key_file: "{{ cert_dir }}/front-proxy-client-key.pem"
 
-# master and node certificates
+# controller and node certificates
 deployed_k8s_config_dir: "/var/lib/kubernetes"
-deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/ca.pem"
-deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/ca-key.pem"
-deployed_k8s_pem_file: "{{ deployed_k8s_config_dir }}/kubernetes.pem"
-deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/kubernetes-key.pem"
-deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/encryption-config.yaml"
-deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.pem"
-deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/kube-scheduler-key.pem"
-deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.yaml"
-deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-scheduler.kubeconfig"
-deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.kubeconfig"
-deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager.pem"
-deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/kube-controller-manager-key.pem"
-deployed_front_proxy_client_pem_file: "{{ deployed_k8s_config_dir }}/front-proxy-client.pem"
-deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/front-proxy-client-key.pem"
+deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/{{ ca_crt }}"
+deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/{{ ca_key }}"
+deployed_k8s_pem_file: "{{ deployed_k8s_config_dir }}/{{ k8s_crt }}"
+deployed_k8s_key_file: "{{ deployed_k8s_config_dir }}/{{ k8s_key }}"
+deployed_encryption_config_file: "{{ deployed_k8s_config_dir }}/{{ encryption_config }}"
+deployed_kube_scheduler_pem_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_crt }}"
+deployed_kube_scheduler_key_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_key }}"
+deployed_kube_scheduler_config_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_config }}"
+deployed_kube_scheduler_kubeconfig_file: "{{ deployed_k8s_config_dir }}/{{ kube_scheduler_kubeconfig }}"
+deployed_kube_controller_manager_kubeconfig_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_kubeconfig }}"
+deployed_kube_controller_manager_pem_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_crt }}"
+deployed_kube_controller_manager_key_file: "{{ deployed_k8s_config_dir }}/{{ kube_controller_manager_key }}"
+deployed_front_proxy_client_pem_file: "{{ deployed_k8s_config_dir }}/{{ front_proxy_client_crt }}"
+deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/{{ front_proxy_client_key }}"
+deployed_service_account_pem_file: "{{ deployed_k8s_config_dir }}/{{ service_account_crt }}"
+deployed_service_account_key_file: "{{ deployed_k8s_config_dir }}/{{ service_account_key }}"
 
-# deployed to both masters and nodes
+# deployed to both controllers and nodes
 deployed_cert_and_config_files:
  - src: "{{ ca_pem_file }}"
    dest: "{{ deployed_ca_pem_file }}"
@@ -170,6 +165,12 @@ deployed_cert_and_config_files:
  - src:  "{{ front_proxy_client_pem_file }}"
    dest: "{{ deployed_front_proxy_client_pem_file }}"
    mode: "0664"
+ - src:  "{{ service_account_key_file }}"
+   dest: "{{ deployed_service_account_key_file }}"
+   mode: "0600"
+ - src:  "{{ service_account_pem_file }}"
+   dest: "{{ deployed_service_account_pem_file }}"
+   mode: "0664"
 
 auth_kubeconfigs:
    - name: "kube-proxy"
@@ -180,14 +181,14 @@ auth_kubeconfigs:
      user: "kube-proxy"
 
    - name: "kube-controller-manager"
-     server: "{{ master_api_localhost_url }}"
+     server: "{{ controller_api_localhost_url }}"
      config: "kube-controller-manager.kubeconfig"
      pem: "{{ kube_controller_manager_pem_file }}"
      key: "{{ kube_controller_manager_key_file }}"
      user: "system:kube-controller-manager"
 
    - name: "kube-scheduler"
-     server: "{{ master_api_localhost_url }}"
+     server: "{{ controller_api_localhost_url }}"
      config: "kube-scheduler.kubeconfig"
      pem: "{{ kube_scheduler_pem_file }}"
      key: "{{ kube_scheduler_key_file }}"
@@ -200,12 +201,12 @@ auth_kubeconfigs:
      key: "{{ admin_key_file }}"
      user: "admin"
 
-# master vars
-master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_api_localhost_url: "https://127.0.0.1:6443"
+# controller vars
+controller_ips_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_fqdn_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_api_localhost_url: "https://127.0.0.1:6443"
 
-master_services:
+controller_services:
  - display_name: "Kubernetes API Server"
    name: "kube-apiserver"
    url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
@@ -232,11 +233,11 @@ master_services:
 
 
 # rbac configs
-master_rbac_role:
+controller_rbac_role:
   file: "{{ role_path }}/files/rbac-clusterrole.yaml"
   path: "{{ config_dir }}/rbac-clusterrole.yaml"
 
-master_rbac_rolebind:
+controller_rbac_rolebind:
   file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
   path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
 
@@ -251,13 +252,12 @@ etcd_port:
   client: 2379
   s2s: 2380
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
 
 # calico
-calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
-calico_veth_mtu: "1440" # hmmm
-calico_manifest_config: "{{ config_dir }}/calico-etcd.yaml"
-calico_rbac_config: "{{ config_dir }}/calico-v3.1-rbac.yaml"
+calico_etcd_endpoints: "{{ controller_etcd_cluster_urls }}"
+calico_manifest_config: "{{ config_dir }}/calico.yaml"
+calico_veth_mtu: "1440" 
 
 # nodes
 localhost_lb_apiserver_address: "https://127.0.0.1:6443"
@@ -329,7 +329,7 @@ node_archive_dependencies:
    dest: "/opt/cni/bin/"
    extra_opts: []
  - name: "containerd"
-   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}.linux-amd64.tar.gz"
+   url: "https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz"
    dest: "/usr/local/bin/"
    extra_opts: ["--strip-components=1"]
 

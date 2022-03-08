@@ -72,7 +72,7 @@
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ apiserver_cluster_ip }},{{ master_ips_csv }},{{ master_fqdn_csv }},127.0.0.1,kubernetes.default \
+         -hostname={{ apiserver_cluster_ip }},{{ controller_ips_csv }},{{ controller_fqdn_csv }},127.0.0.1,kubernetes.default \
          -profile=kubernetes \
          {{ csr_dir }}/kubernetes-csr.json | cfssljson -bare kubernetes
   args:
@@ -123,16 +123,16 @@
     chdir: "{{ cert_dir }}"
     creates: "{{ kube_scheduler_pem_file }}" # also kube-scheduler.csr kube-scheduler-key.pem
 
-    #- name: Generate service-account client cert and private key 
-    #  shell: cfssl gencert \
-    #         -ca={{ ca_pem_file }} \
-    #         -ca-key={{ ca_key_file }} \
-    #         -config={{ ca_config_file }} \
-    #         -profile=kubernetes \
-    #         {{ kube_service_account_csr_config_file }} | cfssljson -bare service-account
-    #  args:
-    #    chdir: "{{ cert_dir }}"
-    #    creates: "{{ kube_service_account_pem_file }}" # also kube-service-account.csr kube-service-account-key.pem
+- name: Generate service-account client cert and private key 
+  shell: cfssl gencert \
+         -ca={{ ca_pem_file }} \
+         -ca-key={{ ca_key_file }} \
+         -config={{ ca_config_file }} \
+         -profile=kubernetes \
+         {{ csr_dir }}/service-account-csr.json | cfssljson -bare service-account
+  args:
+    chdir: "{{ cert_dir }}"
+    creates: "{{ service_account_pem_file }}" # also service-account.csr service-account-key.pem
 
 - name: Generate registry web cert and private key 
   shell: cfssl gencert \

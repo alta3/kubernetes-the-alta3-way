@@ -1,5 +1,5 @@
 ---
- - name: Create k8s directories on masters
+ - name: Create k8s directories on controllers
    file:
      path: "{{ item }}"
      state: directory
@@ -16,21 +16,21 @@
    loop: "{{ deployed_cert_and_config_files }}"
    become: True
  
- - name: Download the master service binaries
+ - name: Download the controller service binaries
    get_url:
      url: "{{ item.url }}"
      dest: "{{ item.path }}"
      mode: "{{ item.mode }}"
-   loop: "{{ master_services }}"
+   loop: "{{ controller_services }}"
    loop_control: 
      label: "{{ item.display_name }} -> {{ item.path }}"
    become: True
  
- - name: Push the config files for the master services
+ - name: Push the config files for the controller services
    template:
      src: "{{ item.service_j2 }}"
      dest: "{{ item.service_path }}"
-   loop: "{{ master_services }}"
+   loop: "{{ controller_services }}"
    loop_control: 
      label: "{{ item.display_name }} -> {{ item.service_path }}"
    become: True 
@@ -57,7 +57,7 @@
      name: "{{ item.name }}"
      enabled: yes
      state: restarted
-   loop: "{{ master_services }}"
+   loop: "{{ controller_services }}"
    loop_control: 
      label: "{{ item.display_name }} Service -> {{ item.name }}"
    become: True
@@ -66,13 +66,13 @@
    pause:
      seconds: 90
 
- - name: Create a route from masters to the service ip cidr
+ - name: Create a route from controllers to the service ip cidr
    template: 
      src: "{{  role_path  }}/templates/service-cluster-route.sh.j2"
      dest: "/etc/network/if-up.d/service-cluster-route.sh"
      mode: "0775"
    become: True
 
- - name: execute ifup script to insert route from masters to service ip cidr
+ - name: execute ifup script to insert route from controllers to service ip cidr
    command: "/etc/network/if-up.d/service-cluster-route.sh"
    become: True

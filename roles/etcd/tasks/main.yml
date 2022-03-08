@@ -16,7 +16,7 @@
    - { source: "{{ k8s_key_file }}",  dest: "{{ etcd_config_dir }}/kubernetes-key.pem",   mode: "0600" }
    become: yes
 
- - name: Unpack the etcd binaries on each master
+ - name: Unpack the etcd binaries on each controller
    unarchive:
      remote_src: yes
      src: "{{ etcd_url }}"

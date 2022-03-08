@@ -1,5 +1,5 @@
 ---
- - name: Install nginx for localhost loadbalancing access to the HA masters
+ - name: Install nginx for localhost loadbalancing access to the HA controllers
    apt:
     name: nginx
     state: present
