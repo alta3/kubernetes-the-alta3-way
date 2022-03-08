@@ -143,7 +143,7 @@ spec:
         - --domain={{ kube_cluster_domain }}.
         - --dns-port=10053
         - --config-dir=/kube-dns-config
-        - --v={{ kube_verbos_level }}
+        - --v={{ kube_verbose_level }}
         env:
         - name: PROMETHEUS_PORT
           value: "10055"
