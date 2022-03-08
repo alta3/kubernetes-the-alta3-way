@@ -9,3 +9,7 @@
 
 - name: Apply calico service 
   command: "kubectl apply -f {{ calico_manifest_config }}"
+
+- name: Allow Calico Nodes services to fully initialize
+  pause:
+    seconds: 90
