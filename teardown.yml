@@ -1,34 +1,28 @@
 - name: uninstall cluster services
   hosts: localhost
+  ignore_errors: True
   tasks:
 
   - name: Remove all resources
     command: "kubectl delete all --all"
-    ignore_errors: True 
 
   - name: Remove all namespaces
     command: "kubectl delete --all namespaces"
-    ignore_errors: True 
 
   - name: Remove calico service
     command: "kubectl delete -f {{ calico_manifest_config }}"
-    ignore_errors: True
 
   - name: Remove kube-dns service
     command: "kubectl delete -f {{ config_dir }}/kube-dns.yaml"
-    ignore_errors: True
 
   - name: Remove all service resources
     command: "kubectl delete all --all -n kube-system"
-    ignore_errors: True 
 
   - name: Remove kube-system
     command: "kubectl delete ns kube-system"
-    ignore_errors: True 
 
   - name: Drain all nodes
     command: "kubectl drain {{ item }} --force"
-    ignore_errors: True
     loop: "{{ groups['nodes'] }}"
 
   - name: Remove kubelet from bchd
@@ -36,11 +30,11 @@
       enabled: False
       name: "kubelet"
       state: stopped
-    ignore_errors: True # TODO only run when item.service_path exists
     become: True
 
 - name: uninstall nodes
   hosts: nodes
+  ignore_errors: True
   vars:
     role_path: "" # short circuit some var lists that will complain if this isn't set
   tasks:
@@ -60,7 +54,6 @@
       name: "{{ item.name }}"
       state: stopped
     loop: "{{ node_services }}"
-    ignore_errors: True # TODO only run when item.service_path exists
     become: True
   
   - name: remove Kubernetes kubectl
@@ -81,17 +74,6 @@
     loop_control:
        label: "k8s v{{ k8s_version }} - {{ item.path }}"
     become: True
-
-  # TODO not easy to undo, enumerate and remove files 
-  # - name: Download and unarchive Node dependencies
-  #   unarchive:
-  #     remote_src: yes
-  #     src: "{{ item.url }}"
-  #     dest: "{{ item.dest }}"
-  #   loop: "{{ node_archive_dependencies }}"
-  #   loop_control:
-  #      label: "{{ item.name }}"
-  #   become: yes
 
   - name: get all the possible pesky pods
     command: ls /var/lib/kubelet/pods
@@ -123,6 +105,7 @@
 
 - name: remove nginx load balancers
   hosts: localhost,nodes
+  ignore_errors: True
   tasks:
   
    - name: Stop the nginx service
@@ -141,6 +124,7 @@
 
 - name: uninstall controllers
   hosts: controllers
+  ignore_errors: True
   vars:
     role_path: "" # short circuit some var lists that will complain if this isn't set
   tasks: 
@@ -153,7 +137,6 @@
     loop: "{{ controller_services }}"
     loop_control:
       label: "{{ item.display_name }} Service -> {{ item.name }}"
-    ignore_errors: True # TODO only run when item.service_path exists
     become: True
 
   - name: remove config files for the controller services
@@ -185,6 +168,7 @@
 
 - name: remove etcd
   hosts: etcd
+  ignore_errors: True
   tasks:
 
   - name: stop the etcd daemon for the services
@@ -192,7 +176,6 @@
       name: etcd.service
       enabled: False
       state: stopped
-    ignore_errors: True # TODO only run when etcd.service exists
     become: True
  
   - name: remove etcd files
@@ -208,6 +191,7 @@
 
 - name: uninstall cluster configs
   hosts: localhost
+  ignore_errors: True
   tasks:
 
   - name: remove the k8s config dirs
