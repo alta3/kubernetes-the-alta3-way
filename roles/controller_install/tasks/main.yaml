@@ -67,6 +67,8 @@
      seconds: 90
 
  - name: Create a route from controllers to the service ip cidr
+   vars:
+     nodes: "{{ groups['nodes'] }}"
    template: 
      src: "{{  role_path  }}/templates/service-cluster-route.sh.j2"
      dest: "/etc/network/if-up.d/service-cluster-route.sh"
