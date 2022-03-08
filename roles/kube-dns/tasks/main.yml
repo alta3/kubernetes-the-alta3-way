@@ -1,8 +1,8 @@
 
 - name: Generate cluster dns installation yaml file
   template:
-    src: "{{ role_path }}/templates/coredns.yaml.j2" 
-    dest: "{{ config_dir }}/coredns.yaml"
+    src: "{{ role_path }}/templates/kube-dns.yaml.j2" 
+    dest: "{{ config_dir }}/kube-dns.yaml"
 
 - name: Apply cluser dns service 
-  command: kubectl apply -f {{ config_dir }}/coredns.yaml 
+  command: kubectl apply -f {{ config_dir }}/kube-dns.yaml 

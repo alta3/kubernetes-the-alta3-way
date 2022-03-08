@@ -34,6 +34,7 @@ calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
 
 # cluster specifics
 kube_verbose_level: 9
+kube_cluster_domain: "cluster.local"
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
