@@ -4,19 +4,27 @@
 
   - name: Remove all resources
     command: "kubectl delete all --all"
-    ignore_errors: True # TODO only run when kubectl binary is present
+    ignore_errors: True 
+
+  - name: Remove all namespaces
+    command: "kubectl delete --all namespaces"
+    ignore_errors: True 
 
   - name: Remove calico service
     command: "kubectl delete -f {{ calico_manifest_config }}"
-    ignore_errors: True # TODO only run when kubectl binary is present
+    ignore_errors: True
 
   - name: Remove kube-dns service
     command: "kubectl delete -f {{ config_dir }}/kube-dns.yaml"
-    ignore_errors: True # TODO only run when kubectl binary is present
+    ignore_errors: True
 
   - name: Remove all service resources
     command: "kubectl delete all --all -n kube-system"
-    ignore_errors: True # TODO only run when kubectl binary is present
+    ignore_errors: True 
+
+  - name: Remove kube-system
+    command: "kubectl delete ns kube-system"
+    ignore_errors: True 
 
   - name: Drain all nodes
     command: "kubectl drain {{ item }} --force"
