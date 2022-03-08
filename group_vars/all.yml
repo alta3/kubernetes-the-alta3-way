@@ -7,20 +7,6 @@ nodes:
 # python
 ansible_python_interpreter: "/usr/bin/python3"
 
-# control flow
-run_all: True
-run_makecerts: "{{ run_all }}"
-run_nodeconfig: "{{ run_all }}"
-run_localconfig: "{{ run_all }}"
-run_services: "{{ run_all }}"
-run_bootstrap: "{{ run_all }}"
-run_etcd: "{{ run_all }}"
-run_master: "{{ run_all }}"
-run_nginx_lb: "{{ run_all }}"
-run_nodes: "{{ run_all }}"
-run_rbac: "{{ run_all }}"
-run_trusted_ca: "{{ run_all }}"
-
 # versions
 k8s_version: "1.23.4"       # https://kubernetes.io/releases/#release-v1-23
 etcd_version: "3.5.2"       # https://github.com/etcd-io/etcd/releases
@@ -48,7 +34,7 @@ cfssl_source_url: "https://github.com/cloudflare/cfssl/releases/download"
 cfssl_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
 cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
 
-# masters, nodes and localhost all need kubectl
+# controllers, nodes and localhost all need kubectl
 kubectl:
   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
   path: "/usr/local/bin/kubectl"
@@ -122,7 +108,7 @@ kube_proxy_key_file: "{{ cert_dir }}/kube-proxy-key.pem"
 registry_web_pem_file: "{{ cert_dir }}/registry-web.pem"
 registry_web_key_file: "{{ cert_dir }}/registry-web-key.pem"
 
-# master and node certificates
+# controller and node certificates
 deployed_k8s_config_dir: "/var/lib/kubernetes"
 deployed_ca_pem_file: "{{ deployed_k8s_config_dir }}/{{ ca_crt }}"
 deployed_ca_key_file: "{{ deployed_k8s_config_dir }}/{{ ca_key }}"
@@ -141,7 +127,7 @@ deployed_front_proxy_client_key_file: "{{ deployed_k8s_config_dir }}/{{ front_pr
 deployed_service_account_pem_file: "{{ deployed_k8s_config_dir }}/{{ service_account_crt }}"
 deployed_service_account_key_file: "{{ deployed_k8s_config_dir }}/{{ service_account_key }}"
 
-# deployed to both masters and nodes
+# deployed to both controllers and nodes
 deployed_cert_and_config_files:
  - src: "{{ ca_pem_file }}"
    dest: "{{ deployed_ca_pem_file }}"
@@ -195,14 +181,14 @@ auth_kubeconfigs:
      user: "kube-proxy"
 
    - name: "kube-controller-manager"
-     server: "{{ master_api_localhost_url }}"
+     server: "{{ controller_api_localhost_url }}"
      config: "kube-controller-manager.kubeconfig"
      pem: "{{ kube_controller_manager_pem_file }}"
      key: "{{ kube_controller_manager_key_file }}"
      user: "system:kube-controller-manager"
 
    - name: "kube-scheduler"
-     server: "{{ master_api_localhost_url }}"
+     server: "{{ controller_api_localhost_url }}"
      config: "kube-scheduler.kubeconfig"
      pem: "{{ kube_scheduler_pem_file }}"
      key: "{{ kube_scheduler_key_file }}"
@@ -215,12 +201,12 @@ auth_kubeconfigs:
      key: "{{ admin_key_file }}"
      user: "admin"
 
-# master vars
-master_ips_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_fqdn_csv: "{% for m in groups['masters'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_api_localhost_url: "https://127.0.0.1:6443"
+# controller vars
+controller_ips_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_fqdn_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_api_localhost_url: "https://127.0.0.1:6443"
 
-master_services:
+controller_services:
  - display_name: "Kubernetes API Server"
    name: "kube-apiserver"
    url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
@@ -247,11 +233,11 @@ master_services:
 
 
 # rbac configs
-master_rbac_role:
+controller_rbac_role:
   file: "{{ role_path }}/files/rbac-clusterrole.yaml"
   path: "{{ config_dir }}/rbac-clusterrole.yaml"
 
-master_rbac_rolebind:
+controller_rbac_rolebind:
   file: "{{ role_path }}/files/rbac-clusterrolebind.yaml"
   path: "{{ config_dir }}/rbac-clusterrolebind.yaml"
 
@@ -266,10 +252,10 @@ etcd_port:
   client: 2379
   s2s: 2380
 etcd_cluster_urls: "{% for e in groups['etcd'] %}{{ hostvars[e].inventory_hostname }}=https://{{ hostvars[e].public_ip }}:{{ etcd_port.s2s }}{% if not loop.last%},{% endif %}{% endfor %}"
-master_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
+controller_etcd_cluster_urls: "{% for e in groups['etcd'] %}https://{{ hostvars[e].public_ip }}:{{ etcd_port.client }}{% if not loop.last%},{% endif %}{% endfor %}"
 
 # calico
-calico_etcd_endpoints: "{{ master_etcd_cluster_urls }}"
+calico_etcd_endpoints: "{{ controller_etcd_cluster_urls }}"
 calico_manifest_config: "{{ config_dir }}/calico.yaml"
 calico_veth_mtu: "1440" 
 

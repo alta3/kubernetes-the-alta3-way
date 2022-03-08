@@ -72,7 +72,7 @@
          -ca={{ ca_pem_file }} \
          -ca-key={{ ca_key_file }} \
          -config={{ ca_config_file }} \
-         -hostname={{ apiserver_cluster_ip }},{{ master_ips_csv }},{{ master_fqdn_csv }},127.0.0.1,kubernetes.default \
+         -hostname={{ apiserver_cluster_ip }},{{ controller_ips_csv }},{{ controller_fqdn_csv }},127.0.0.1,kubernetes.default \
          -profile=kubernetes \
          {{ csr_dir }}/kubernetes-csr.json | cfssljson -bare kubernetes
   args:

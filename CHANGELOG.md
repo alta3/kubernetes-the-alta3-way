@@ -223,6 +223,15 @@ https://projectcalico.docs.tigera.io/reference/resources/workloadendpoint
 sudo journalctl -n 2000 -f | egrep -v "sudo|pam|sshd|systemd-logind|ansible|systemd\[1\]"
 ```
 
+# s/master/controller/g
+https://github.com/kubernetes/website/issues/6525
+
+cannot change:
+```
+roles/calico/templates/calico.yaml.j2:        - key: node-role.kubernetes.io/master
+roles/make_certs/templates/admin-csr.json.j2:      "O": "system:masters",
+```
+
 
 
 ## verify

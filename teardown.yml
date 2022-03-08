@@ -15,7 +15,7 @@
     ignore_errors: True # TODO only run when kubectl binary is present
 
   - name: Remove kube-dns service
-    command: "kubectl delete -f {{ config_dir }}/coredns.yaml"
+    command: "kubectl delete -f {{ config_dir }}/kube-dns.yaml"
     ignore_errors: True # TODO only run when kubectl binary is present
 
   - name: Remove all service resources
@@ -135,42 +135,42 @@
        state: absent
      become: True
 
-- name: uninstall masters
-  hosts: masters
+- name: uninstall controllers
+  hosts: controllers
   vars:
     role_path: "" # short circuit some var lists that will complain if this isn't set
   tasks: 
 
-  - name: remove daemon for the master services
+  - name: remove daemon for the controller services
     service:
       name: "{{ item.name }}"
       enabled: False
       state: stopped
-    loop: "{{ master_services }}"
+    loop: "{{ controller_services }}"
     loop_control:
       label: "{{ item.display_name }} Service -> {{ item.name }}"
     ignore_errors: True # TODO only run when item.service_path exists
     become: True
 
-  - name: remove config files for the master services
+  - name: remove config files for the controller services
     file:
       path: "{{ item.service_path }}"
       state: absent
-    loop: "{{ master_services }}"
+    loop: "{{ controller_services }}"
     loop_control:
       label: "{{ item.display_name }} -> {{ item.service_path }}"
     become: True
 
-  - name: remove the master service binaries
+  - name: remove the controller service binaries
     file:
       path: "{{ item.path }}"
       state: absent
-    loop: "{{ master_services }}"
+    loop: "{{ controller_services }}"
     loop_control:
       label: "{{ item.display_name }} -> {{ item.path }}"
     become: True
 
-  - name: Remove k8s directories on masters
+  - name: Remove k8s directories on controllers
     file:
       path: "{{ item }}"
       state: absent
