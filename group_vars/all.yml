@@ -33,6 +33,7 @@ coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases
 calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
 
 # cluster specifics
+kube_verbose_level: 9
 cluster_name: "kubernetes-the-alta3-way"
 cluster_cidr: "192.168.0.0/16"
 upstream_dns: "10.0.0.1"
