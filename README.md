@@ -24,11 +24,15 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 
 Components and versions:
 
-* [kubernetes](https://github.com/kubernetes/kubernetes) [1.23.4](https://kubernetes.io/releases/#release-v1-23)
-* [containerd](https://github.com/containerd/containerd) [1.6.1](https://github.com/containerd/containerd/releases/tag/v1.6.1)
-* [coredns](https://github.com/coredns/coredns) [v1.9.0](https://github.com/coredns/coredns/releases/tag/v1.9.9)
-* [cni](https://github.com/containernetworking/cni) [v1.0.1](https://github.com/containernetworking/cni/releases/tag/v1.0.1)
-* [calico](https://www.projectcalico.org/) [v3.22.1](https://github.com/projectcalico/calico/releases/tag/v3.22.1)
-* [etcd](https://github.com/coreos/etcd) [v3.5.2](https://github.com/etcd-io/etcd/releases/tag/v3.5.2)
-* [cfssl](https://github.com/cloudflare/cfssl) [v1.6.1](https://github.com/cloudflare/cfssl/releases/tag/v1.6.1)
-
+``` yaml
+k8s_version: "1.23.4"       # https://kubernetes.io/releases/#release-v1-23
+etcd_version: "3.5.2"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.0.1"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.1" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.23.0" # https://github.com/kubernetes-sigs/cri-tools
+cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases
+calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
+helm_version: "3.8.0"       # https://github.com/helm/helm/releases
+```

@@ -11,6 +11,7 @@ cfssl_version: "1.6.1"      # https://github.com/cloudflare/cfssl/releases
 runc_version: "1.1.0"       # https://github.com/opencontainers/runc/releases
 coredns_version: "1.9.0"    # https://github.com/coredns/coredns/releases
 calico_version: "3.22.1"    # https://github.com/projectcalico/calico/releases
+helm_version: "3.8.0"       # https://github.com/helm/helm/releases
 
 # cluster specifics
 kube_verbose_level: 9
@@ -27,6 +28,11 @@ dns_cluster_ip: "172.16.3.10"
 cfssl_source_url: "https://github.com/cloudflare/cfssl/releases/download"
 cfssl_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
 cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
+
+
+helm: 
+  url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"
+  path: "/usr/local/bin/helm"
 
 # controllers, nodes and localhost all need kubectl
 kubectl:
