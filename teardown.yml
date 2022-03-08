@@ -6,10 +6,6 @@
     command: "kubectl delete all --all"
     ignore_errors: True # TODO only run when kubectl binary is present
 
-  - name: Remove calico daemonset
-    command: "kubectl delete daemonset calico-node --namespace kube-system"
-    ignore_errors: True
-
   - name: Remove calico service
     command: "kubectl delete -f {{ calico_manifest_config }}"
     ignore_errors: True # TODO only run when kubectl binary is present
