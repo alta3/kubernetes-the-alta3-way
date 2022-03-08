@@ -126,10 +126,10 @@ spec:
             path: /healthcheck/kubedns
             port: 10054
             scheme: HTTP
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 5
+          failureThreshold: 2
         readinessProbe:
           httpGet:
             path: /readiness
@@ -172,10 +172,10 @@ spec:
             path: /healthcheck/dnsmasq
             port: 10054
             scheme: HTTP
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 5
+          failureThreshold: 2
         args:
         - -v=2
         - -logtostderr
@@ -219,10 +219,10 @@ spec:
             path: /metrics
             port: 10054
             scheme: HTTP
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           timeoutSeconds: 5
           successThreshold: 1
-          failureThreshold: 5
+          failureThreshold: 2
         args:
         - --v={{ kube_verbose_level }}
         - --logtostderr
