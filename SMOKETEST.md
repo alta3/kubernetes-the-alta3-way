@@ -36,3 +36,12 @@ kubectl -n kube-system get pods
 kubectl describe pods -n kube-system | egrep "^Name:|Node:"
 
 ```
+
+```
+#!/bin/bash
+export COREDNS_POD=$(kubectl get pods --namespace=kube-system -l k8s-app=kube-dns -o name)
+kubectl -n kube-system get ${COREDNS_POD} -o=custom-columns=NAME:.metadata.name,NODE:.spec.nodeName
+kubectl -n kube-system logs ${COREDNS_POD} | egrep "WARN" # bad
+kubectl exec -n test c1 -- wget -T 2 -q nginx -O - | egrep "Welcome" # good
+kubectl -n kube-system delete ${COREDNS_POD}
+```

@@ -403,18 +403,19 @@ spec:
               - /bin/calico-node
               - -felix-live
               - -bird-live
-            periodSeconds: 10
-            initialDelaySeconds: 10
-            failureThreshold: 6
-            timeoutSeconds: 10
+            periodSeconds: 30
+            initialDelaySeconds: 60
+            failureThreshold: 2
+            timeoutSeconds: 60
           readinessProbe:
             exec:
               command:
               - /bin/calico-node
               - -felix-ready
               - -bird-ready
-            periodSeconds: 10
-            timeoutSeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 60
+            initialDelaySeconds: 60
           volumeMounts:
             # For maintaining CNI plugin API credentials.
             - mountPath: /host/etc/cni/net.d
@@ -578,16 +579,17 @@ spec:
               command:
               - /usr/bin/check-status
               - -l
-            periodSeconds: 10
-            initialDelaySeconds: 10
-            failureThreshold: 6
-            timeoutSeconds: 10
+            periodSeconds: 30
+            initialDelaySeconds: 60
+            failureThreshold: 2
+            timeoutSeconds: 60
           readinessProbe:
             exec:
               command:
               - /usr/bin/check-status
               - -r
-            periodSeconds: 10
+            periodSeconds: 30
+            initialDelaySeconds: 60
       volumes:
         # Mount in the etcd TLS secrets with mode 400.
         # See https://kubernetes.io/docs/concepts/configuration/secret/
