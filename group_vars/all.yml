@@ -32,7 +32,8 @@ cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_v
 
 helm: 
   url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"
-  path: "/usr/local/bin/helm"
+  dest: "/usr/local/bin/"
+  extra_opts: ["--strip-components=1"]
 
 # controllers, nodes and localhost all need kubectl
 kubectl:

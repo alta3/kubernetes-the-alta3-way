@@ -1,12 +1,9 @@
-- name: Install helm
-  get_url:
-    url: "{{ item.url }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  loop:
-  - { url: "{{ helm.url }}",
-      dest: "{{ helm.path }}",
-      mode: '0755' }
+- name: Download and unarchive Helm
+  unarchive:
+    remote_src: yes
+    src: "{{ helm.url }}"
+    dest: "{{ helm.dest }}"
+    extra_opts: "{{ helm.extra_opts }}"
   become: True
 
 - name: bchd-k8s-config - setup localhost loadbalancer for kubectl (as admin)
