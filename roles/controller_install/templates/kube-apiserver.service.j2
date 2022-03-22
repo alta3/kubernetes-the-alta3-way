@@ -27,7 +27,9 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --runtime-config=api/all=true \
   --service-account-key-file={{ deployed_service_account_pem_file }} \
   --service-account-signing-key-file={{ deployed_service_account_key_file }} \
-  --service-account-issuer=https://{{ public_ip }}:6443 \
+{% for e in groups['controllers'] %}
+  --service-account-issuer=https://{{ hostvars[e].public_ip }}:{{ controller_api_port }} \
+{% endfor %}
   --service-cluster-ip-range={{ service_cluster_ip_range }} \
   --service-node-port-range={{ service_cluster_port_range }} \
   --tls-cert-file=/var/lib/kubernetes/kubernetes.pem \

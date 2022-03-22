@@ -203,9 +203,10 @@ auth_kubeconfigs:
      user: "admin"
 
 # controller vars
+controller_api_port: 6443
 controller_ips_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_ip }}{% if not loop.last%},{% endif %}{% endfor %}"
 controller_fqdn_csv: "{% for m in groups['controllers'] %}{{ hostvars[m].public_fqdn }}{% if not loop.last%},{% endif %}{% endfor %}"
-controller_api_localhost_url: "https://127.0.0.1:6443"
+controller_api_localhost_url: "https://127.0.0.1:{{ controller_api_port }}"
 
 controller_services:
  - display_name: "Kubernetes API Server"
@@ -261,7 +262,7 @@ calico_manifest_config: "{{ config_dir }}/calico.yaml"
 calico_veth_mtu: "1440" 
 
 # nodes
-localhost_lb_apiserver_address: "https://127.0.0.1:6443"
+localhost_lb_apiserver_address: "https://127.0.0.1:{{ controller_api_port }}"
 
 kubelet_config_dir: "/var/lib/kubelet"
 kubelet_kubeconfig_file: "{{ kubelet_config_dir }}/kubeconfig"
