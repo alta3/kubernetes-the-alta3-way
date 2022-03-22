@@ -64,7 +64,7 @@
  
  - name: Allow Kubernetes API Server to fully initialize
    pause:
-     seconds: 90
+     seconds: "{{ pause_seconds }}"
 
  - name: Create a route from controllers to the service ip cidr
    vars:

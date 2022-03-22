@@ -183,4 +183,4 @@
 
 - name: Allow Kubernetes Nodes services to fully initialize
   pause:
-    seconds: 90
+    seconds: "{{ pause_seconds }}"

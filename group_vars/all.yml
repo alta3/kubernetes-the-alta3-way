@@ -23,13 +23,14 @@ service_cluster_ip_range: "172.16.3.0/24"
 service_cluster_port_range: "30000-32767"
 apiserver_cluster_ip: "172.16.3.1"
 dns_cluster_ip: "172.16.3.10"
+pause_seconds: 15 # waiting for service startup
 
 # dependencies and their destinations
 cfssl_source_url: "https://github.com/cloudflare/cfssl/releases/download"
 cfssl_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssl_{{ cfssl_version }}_linux_amd64"
 cfssljson_url: "{{ cfssl_source_url }}/v{{ cfssl_version }}/cfssljson_{{ cfssl_version }}_linux_amd64"
 
-
+# helm
 helm: 
   url: "https://get.helm.sh/helm-v{{ helm_version }}-linux-amd64.tar.gz"
   dest: "/usr/local/bin/"
