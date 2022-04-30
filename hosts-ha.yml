@@ -9,7 +9,7 @@ all:
         controller-1:
           ansible_host: controller-1
         controller-2:
-          ansible_host: controller-2|
+          ansible_host: controller-2
         controller-3:
           ansible_host: controller-3
       vars: 
