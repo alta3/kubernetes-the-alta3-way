@@ -8,7 +8,7 @@
    - "/var/lib/kubernetes"
    become: True
  
- - name: Copy Certs and Config to Masters
+ - name: Copy Certs and Config to Controllers
    copy:
      src: "{{ item.src }}"
      dest: "{{ item.dest }}"

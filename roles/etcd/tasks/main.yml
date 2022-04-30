@@ -5,7 +5,7 @@
      state: directory
    become: yes
 
- - name: Copy Certs and Config to Masters
+ - name: Copy Certs and Config to Controllers
    copy:
      src: '{{ item.source }}'
      dest: '{{ item.dest }}'
@@ -38,6 +38,8 @@
    template: 
      src: "{{ role_path }}/templates/etcd.service.j2"
      dest: /etc/systemd/system/etcd.service 
+   vars:
+     cluster_size: "{{ groups['controllers'] | length | int }}"
    become: yes    
 
  - name: Reload systemd manager
