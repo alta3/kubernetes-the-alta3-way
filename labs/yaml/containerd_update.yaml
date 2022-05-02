@@ -1,0 +1,39 @@
+- name: Containerd Update
+  hosts: all
+  tasks:
+  - name: copy the file over
+    copy:
+      src: "containerd_config.toml"
+      dest: "/etc/containerd/config.toml"
+    become: True
+    when: inventory_hostname != 'localhost'
+
+  - name: restart containerd
+    systemd:
+      name: containerd
+      state: restarted
+    become: True
+    when: inventory_hostname != 'localhost'
+
+  - name: add bchd.registry pointer
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ hostvars['localhost']['ansible_default_ipv4']['address']}} bchd.registry"
+    become: True
+
+- name: push base alta3-webby image
+  hosts: bchd
+  tasks:
+  - name: push base webby image
+    get_url:
+      url: https://static.alta3.com/courses/k8s/888-sam-webby.tar
+      dest: /home/student/888-sam-webby.tar
+
+  - command: docker image load -i 888-sam-webby.tar
+    become: True
+
+  - command: docker tag reg.alta3.com/888-sam-webby bchd.registry/alta3-webby
+    become: True
+
+  - command: docker push bchd.registry/alta3-webby
+    become: True

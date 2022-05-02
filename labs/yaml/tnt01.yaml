@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      tolerable: yep
+  template:
+    metadata:
+      labels:
+        tolerable: yep
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.19.6
+        imagePullPolicy: IfNotPresent
+

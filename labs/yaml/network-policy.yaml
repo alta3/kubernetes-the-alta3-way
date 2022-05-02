@@ -1,0 +1,12 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpol-1
+  namespace: test
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+

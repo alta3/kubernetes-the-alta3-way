@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app  # the deployment name
+  labels:
+    app: vault-agent-demo
+spec:
+  selector:
+    matchLabels:
+      app: vault-agent-demo
+  replicas: 1    # 1 pod will be created
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: vault-agent-demo
+    spec:
+      serviceAccountName: app  # tied to our service account name
+      containers:  # what we wish to deploy
+      - name: app  # name of our single container
+        image: jweissig/app:0.0.1 # webserver container image
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app  # referenced in previous vault step (ties to vault)
+  labels:
+    app: vault-agent-demo
+

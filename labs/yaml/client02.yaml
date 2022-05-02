@@ -1,0 +1,20 @@
+---
+kind: Pod   # create a Pod
+apiVersion: v1
+metadata:
+  name: client02   # name of pod
+  namespace: test  # namespace we will operate in
+  labels:
+    run: client02
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.35.0    # https://www.busybox.net/about.html
+    resources:
+      requests:
+        cpu: "300m"   # slice of core
+        memory: 128Mi   # Mb of RAM
+    args:
+    - sleep
+    - "10000"
+

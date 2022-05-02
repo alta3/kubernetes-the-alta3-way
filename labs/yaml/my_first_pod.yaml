@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myfirstpod
+spec:
+  containers:
+  - name: webster
+    image: bchd.registry/alta3-webby

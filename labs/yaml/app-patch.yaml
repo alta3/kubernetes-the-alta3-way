@@ -1,0 +1,8 @@
+    spec:
+      template:
+        metadata:
+          annotations:
+            vault.hashicorp.com/agent-inject: "true"   # lets apply a vault secret
+            vault.hashicorp.com/agent-inject-secret-helloworld: "secret/helloworld"  # this is the vault secret to inject
+            vault.hashicorp.com/role: "myapp"  # this account links to the vault policy
+

@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+   name: webservice
+   labels:
+     app: webby
+spec:
+  selector:
+    matchLabels:
+      app: webby
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: webby
+    spec:
+      containers:
+      - name: webby
+        image: bchd.registry/alta3-webby  # Or use your own webby image!
+        ports:
+        - containerPort: 8888
+

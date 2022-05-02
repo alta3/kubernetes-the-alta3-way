@@ -1,0 +1,15 @@
+#filename
+FROM scratch
+
+#name of the binary (image)
+ADD webserver /
+
+#add a directory
+ADD deploy /deploy/
+
+#there can only be one CMD in a Dockerfile
+CMD ["/webserver"]
+
+# port that the container will listen on
+EXPOSE 8888
+

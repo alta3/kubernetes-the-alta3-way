@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: authpod
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.19.6
+  serviceAccountName: pod-user
+

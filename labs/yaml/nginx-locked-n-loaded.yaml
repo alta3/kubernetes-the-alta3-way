@@ -1,0 +1,40 @@
+apiVersion: v1                 # API on kubernetes Master target
+kind: Pod                      # type of resource to create
+metadata:
+  name: nginx-locked-n-loaded  # name for Pod
+  labels:
+    app: nginx-configured
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.18.0       # image:version to launch
+    ports:                   # ports to expose on container
+      - containerPort: 80
+      - containerPort: 443
+    volumeMounts:
+    - name: nginx-proxy-config
+      mountPath: /etc/nginx/nginx.conf
+      subPath: nginx.conf
+    - name: my-index-file
+      mountPath: /var/www/index.html
+      subPath: index.html
+    - name: static-demo-data
+      mountPath: /var/www/static/nginx.txt
+      subPath: nginx.txt
+    - name: top-secret-keys           # just like a configmap this must match a value in spec.volumes[x].name
+      mountPath: /etc/nginx/ssl       # this is where secret will be found inside of the container
+      readOnly: true                  # container has readonly access on secret
+  volumes:
+  - name: nginx-proxy-config
+    configMap:
+      name: nginx-conf
+  - name: my-index-file
+    configMap:
+      name: index-file
+  - name: static-demo-data
+    configMap:
+      name: nginx-txt
+  - name: top-secret-keys              # this maps to spec.volumeMounts[3].name
+    secret:                            # this is the kubernetes resource type
+      secretName: webby-keys           # name of a secret object
+

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vnc
+spec:
+  containers:
+  - name: vnc
+    image: bchd.registry/ubuntu23
+    ports:
+    - name: novnc-html
+      containerPort: 6901
+      protocol: TCP
+    - name: novnc
+      containerPort: 5901
+      protocol: TCP
+

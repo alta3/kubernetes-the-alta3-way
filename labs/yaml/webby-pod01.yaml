@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webservice01
+spec:
+  containers:
+  - name: webby
+    image: bchd.registry/alta3-webby
+    ports:
+    - name: web
+      containerPort: 8888
+      protocol: TCP
+

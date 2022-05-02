@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yellowapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: yellow
+      version: v1.0
+  template:
+    metadata:
+      labels:
+        app: yellow
+        version: v1.0
+    spec:
+      containers:
+      - name: container01
+        image: hashicorp/http-echo
+        args:
+        - '-text="Welcome to the Yellow App (1.0)!"'  
+

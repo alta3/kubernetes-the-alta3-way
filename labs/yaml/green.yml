@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greenblueapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: greenblue
+      version: v2.0
+  template:
+    metadata:
+      labels:
+        app: greenblue
+        version: v2.0
+    spec:
+      containers:
+      - name: container01
+        image: hashicorp/http-echo
+        args:
+        - '-text="Welcome to the Green App (2.0)!"'
+

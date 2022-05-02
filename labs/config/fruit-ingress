@@ -1,0 +1,17 @@
+upstream nodes {
+  server node-1:NODE_PORT;
+  server node-2:NODE_PORT;
+  server node-3:NODE_PORT;
+}
+
+server {
+
+  listen 2224 default_server;
+  listen [::]:2224 default_server;
+
+  location / {
+    proxy_pass https://nodes;
+    proxy_set_header Host $http_host;
+  }
+}
+

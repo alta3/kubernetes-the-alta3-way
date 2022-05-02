@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>K8s</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to K8s!</h1>
+<p>There is a mailbox here. To the north is a house.</p>
+<p>Open Mailbox</p>
+<p/There is a leaflet inside</p>
+<p>take leaflet</p>
+<p>Taken</p>
+<p>Read leaflet</p>
+<p>Welcome to the land of Kubernetes.</p>
+<p>No cloud should be without one!</p>
+
+<p><em>Thank you for using K8s.</em></p>
+<a href="/static/">Click to see static files (once they are configured)</a>
+<a href="/webby/"> Click to see webby (once it is configured)</a>
+</body>
+</html>

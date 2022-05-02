@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bluegreenapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bluegreen
+      version: v1.0
+  template:
+    metadata:
+      labels:
+        app: bluegreen
+        version: v1.0
+    spec:
+      containers:
+      - name: container01
+        image: hashicorp/http-echo
+        args:
+        - '-text="Welcome to the Blue App (1.0)!"'
+

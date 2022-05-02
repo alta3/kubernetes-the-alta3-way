@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Pod       # resource to create
+metadata:
+  name: badpod  # name of pod to create
+spec:
+  containers:
+  - name: sise  # name of container to create
+    image: mhausenblas/simpleservice:0.5.0   # image from hub.docker.com
+    ports:
+    - containerPort: 9876
+    env:                # injecting ENV vars to the image simpleservice causes behavior changes
+    - name: HEALTH_MIN  #  the min. and max. delay in milliseconds that the /health endpoint responds
+      value: "2000"     # in ms (wait a min of 2 seconds before responding to GET)
+    - name: HEALTH_MAX  #  the min. and max. delay in milliseconds that the /health endpoint responds
+      value: "4000"     # in ms (wait a max of 4 seconds before responding to GET)
+    livenessProbe:
+      initialDelaySeconds: 2   # wait this long after restarting to do the first HTTP GET (default 0)
+      periodSeconds: 5         # how often to probe (default is 1)
+      timeoutSeconds: 1        # how long to wait until timeout occurs (default is 1)
+      successThreshold: 1      # min consecutive successes to be considered "up" after a fail (default 1)
+      failureThreshold: 3      # how many consecutive fails before pod is restarted (default 3)
+      httpGet:                 # send HTTP GET to :9876/health/
+        path: /health
+        port: 9876
+

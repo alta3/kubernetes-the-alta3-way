@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+  labels:
+    app: blog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blog
+  template:
+    metadata:
+      labels:
+        app: blog
+    spec:
+      containers:
+      - name: blog
+        image: ghost:2.6-alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 2368
+        env:
+        - name: url
+          value: http://localhost:2368/
+

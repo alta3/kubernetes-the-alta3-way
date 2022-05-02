@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simpleservice
+  labels:
+    name: simpleservice-web
+spec:
+  containers:
+  -
+    name: simpleservice-web
+    image: mhausenblas/simpleservice:0.5.0
+    ports:
+    -
+      name: web
+      containerPort: 9876
+      protocol: TCP
+

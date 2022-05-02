@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service    # resource type is a service
+metadata:
+  name: myservice   # name of the service (this can be resolved by DNS)
+spec:      # think of this as replacing something like a kubectl port-forward (which is not at all production friendly)
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+

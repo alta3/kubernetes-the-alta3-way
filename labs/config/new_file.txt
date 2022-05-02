@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-configured
+  labels:
+    app: nginx-configured
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.18.0
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: nginx-proxy-config
+      mountPath: /etc/nginx/nginx.conf
+      subPath: nginx.conf
+    - name: my-index-file
+      mountPath: /var/www/index.html
+      subPath: index.html
+    - name: static-demo-data
+      mountPath: /var/www/static/nginx.txt
+      subPath: nginx.txt
+    - name: challenge-config             # this matches spec.volumes[3].name
+      mountPath: /var/www/static/new_file.txt   # this is where the file appears INSIDE the pod
+      subPath: new_file.txt              # if this file already exists, overwrite it
+  volumes:
+  - name: nginx-proxy-config
+    configMap:
+      name: nginx-conf
+  - name: my-index-file
+    configMap:
+      name: index-file
+  - name: static-demo-data
+    configMap:
+      name: nginx-txt
+  - name: challenge-config          # this is the name to be used in spec.containers.volumeMounts
+    configMap:
+      name: new-file-cm             # must match the configMap stored in etcd (created with kubectl)
+

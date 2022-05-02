@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: linux-pod-rl
+spec:
+  containers:
+  - name: ubuntu-rl
+    image: ubuntu
+    command: ["/bin/bash", "-ec", "while :; do echo '.'; sleep 5 ; done"]
+    resources:
+      requests:
+        cpu: "300m"
+        memory: 256Mi
+      limits:
+        cpu: "300m"
+        memory: 512Mi
+    ports:
+    - containerPort: 80
+
