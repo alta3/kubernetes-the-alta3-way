@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Pod   # create a Pod
+metadata:
+  name: netgrab   # name of pod
+  labels:
+    run: tcpdump   # <-- run: client is a key/value applied to this machine
+spec:
+  containers:
+  - name: tcpdumper                      # name to apply to container
+    image: docker.io/dockersec/tcpdump   # image to pull
+    imagePullPolicy: Always              # do not use a cached image
+  - name: busybox
+    image: busybox:1.35.0    # https://www.busybox.net/about.html
+    args:             # arguments passed to
+    - sleep
+    - "10000"
