@@ -10,7 +10,7 @@
 
   - name: map registry lookups to default to bchd
     copy:
-      src: "containerd_config.toml"
+      src: "/home/student/mycode/config/containerd_config.toml"
       dest: "/etc/containerd/config.toml"
     become: True
 
