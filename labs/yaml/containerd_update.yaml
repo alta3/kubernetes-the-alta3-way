@@ -1,27 +1,33 @@
 - name: Containerd Update
-  hosts: all
+  hosts: nodes
   tasks:
-  - name: copy the file over
+
+  - name: mkdir /etc/containerd
+    file:
+      path: /etc/containerd
+      state: directory
+    become: true
+
+  - name: map registry lookups to default to bchd
     copy:
       src: "containerd_config.toml"
       dest: "/etc/containerd/config.toml"
     become: True
-    when: inventory_hostname != 'localhost'
 
   - name: restart containerd
     systemd:
       name: containerd
       state: restarted
     become: True
-    when: inventory_hostname != 'localhost'
 
-  - name: add bchd.registry pointer
+  - name: add bchd.registry IP address to /etc/hosts on all cluster members
     lineinfile:
       path: /etc/hosts
-      line: "{{ hostvars['localhost']['ansible_default_ipv4']['address']}} bchd.registry"
+      line: "{{lookup('dig','bchd')}} bchd.registry"
+      insertafter: '127.0.0.1 .*\n'
     become: True
 
-- name: push base alta3-webby image
+- name: make sure it works
   hosts: bchd
   tasks:
   - name: push base webby image
