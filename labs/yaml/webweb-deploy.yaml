@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1   # kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/
+kind: Deployment  # kubernetes resource to make
+metadata:
+  name: webweb     # metadata.name the "human name" to apply
+  labels:         # metadata.labels are interactive tools for organization
+   app: webweb     # label key:pair (label for the deployment)
+spec:             # the state to achieve
+  selector:     
+    matchLabels:  # matches the pod being built
+      app: webweb
+  replicas: 3     # number of replicated pods to have
+  template:       # how to build our pod
+    metadata:   
+      labels:     # label for the pod
+        app: webweb
+    spec:         # how to build the CONTINERS within the pod
+      containers:
+      - name: webweb      # build one container name webweb
+        image: bchd.registry/alta3-webby     # REPLACE "888-sam" with the name of your image you created!!
+        ports:
+        - containerPort: 8888   # port container is listening on
