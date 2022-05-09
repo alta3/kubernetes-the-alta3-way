@@ -1,0 +1,8 @@
+server {
+    listen bchd.registry;
+    client_max_body_size 100M;
+
+    location / {
+        proxy_pass http://127.0.0.1:2345;
+        }
+    }
