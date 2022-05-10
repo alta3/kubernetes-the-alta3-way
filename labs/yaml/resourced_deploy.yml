@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resourced-deploy
+  namespace: dev
+  labels:
+    resourced: yeppers
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      resourced: yeppers
+  template:
+    metadata:
+      name: resourced-pod
+      labels:
+        resourced: yeppers
+    spec:
+      containers:
+      - image: nginx
+        name: nginx-resources
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "333m"
+          requests:
+            memory: "64Mi"
+            cpu: "249m"
+
