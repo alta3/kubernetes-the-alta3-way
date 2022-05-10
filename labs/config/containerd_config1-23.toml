@@ -1,0 +1,13 @@
+version = 2
+
+[plugins]
+  [plugins."io.containerd.grpc.v1.cri"]
+    [plugins."io.containerd.grpc.v1.cri".registry]
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."bchd.registry"]
+          endpoint = ["http://bchd:2345"]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+          endpoint = ["https://registry.alta3.com"]
+      [plugins."io.containerd.grpc.v1.cri".registry.configs."bchd.registry".tls]
+        insecure_skip_verify = true
+

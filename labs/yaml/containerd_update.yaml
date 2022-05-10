@@ -10,7 +10,7 @@
 
   - name: map registry lookups to default to bchd
     copy:
-      src: "/home/student/mycode/config/containerd_config.toml"
+      src: "/home/student/mycode/config/containerd_config1-23.toml"
       dest: "/etc/containerd/config.toml"
     become: True
 
@@ -18,28 +18,4 @@
     systemd:
       name: containerd
       state: restarted
-    become: True
-
-  - name: add bchd.registry IP address to /etc/hosts on all cluster members
-    lineinfile:
-      path: /etc/hosts
-      line: "{{lookup('dig','bchd')}} bchd.registry"
-      insertafter: '127.0.0.1 .*\n'
-    become: True
-
-- name: make sure it works
-  hosts: bchd
-  tasks:
-  - name: push base webby image
-    get_url:
-      url: https://static.alta3.com/courses/k8s/888-sam-webby.tar
-      dest: /home/student/888-sam-webby.tar
-
-  - command: docker image load -i 888-sam-webby.tar
-    become: True
-
-  - command: docker tag reg.alta3.com/888-sam-webby bchd.registry/alta3-webby
-    become: True
-
-  - command: docker push bchd.registry/alta3-webby
     become: True
