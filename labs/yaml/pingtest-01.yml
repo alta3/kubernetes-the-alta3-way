@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pingtest01
+spec:
+  containers:
+  - name: busybox
+    image: busybox:1.33.2
+    command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+  nodeName: node-1
+
