@@ -1,0 +1,16 @@
+---
+apiVersion:      # the apiVersion to use
+kind:            # example Pod / Deployment
+metadata:
+  name:          # name to apply
+  labels:
+    name:        # label name
+spec:
+  containers:
+  - name:        # name of container
+    image:       # image to use if no URL provided hub.docker.com is used
+    ports:
+    - name:      # port name
+      containerPort:      # access on this port (int)
+      protocol:           # TCP or UDP
+
