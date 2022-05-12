@@ -1,4 +1,6 @@
 #!/usr/bin/bash
 
+echo STARTING ----------
+kubectl get nodes || printf "\n\n Looks like K8s may not be installed?\n\n"
 kubectl config use-context kubernetes-the-alta3-way
-echo "Nothing else to setup for this lab" >> /dev/null
+echo END OF SETUP ----------
