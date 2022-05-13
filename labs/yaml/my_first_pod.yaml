@@ -5,4 +5,4 @@ metadata:
 spec:
   containers:
   - name: webster
-    image: bchd.registry/alta3-webby
+    image: registry.gitlab.com/alta3research/webby:latest
