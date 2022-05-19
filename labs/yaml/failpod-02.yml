@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: fail02
+
+    ---
+apiVersion: v1
+kind: Pod
+metadata:
+    name: failingpod02
+      namespace: fail02
+      spec:
+          containers:
+              - image: nginxx
+                    name: failing
