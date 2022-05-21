@@ -33,5 +33,5 @@
   loop:
    - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/setup"
      dest: "{{ localhost_home_dir }}/.local/bin/setup"
-   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/lt"
-     dest: "{{ localhost_home_dir }}/.local/bin/lt"
+   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/tl"
+     dest: "{{ localhost_home_dir }}/.local/bin/tl"
