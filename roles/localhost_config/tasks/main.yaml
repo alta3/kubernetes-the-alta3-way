@@ -27,6 +27,11 @@
 
 - name: setup setup
   file:
-    src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/setup"
-    dest: "{{ localhost_home_dir }}/.local/bin/setup"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     state: link
+  loop:
+   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/setup"
+     dest: "{{ localhost_home_dir }}/.local/bin/setup"
+   - src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/lt"
+     dest: "{{ localhost_home_dir }}/.local/bin/lt"
