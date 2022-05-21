@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -xeuo pipefail
 
 kubectl run --port=8888 --image=registry.gitlab.com/alta3research/webby webweb
 kubectl wait --for condition=Ready --timeout 60s pod/webweb
