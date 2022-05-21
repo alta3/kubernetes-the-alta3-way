@@ -8,6 +8,11 @@ if [ -z ${1+x} ]; then
 fi
 LAB_ID=$1
 
+if [ ! -f "{$LAB_ID}/test.sh" ]; then
+    echo "[-] ${LAB_ID} no test found"
+    exit 1
+fi
+
 setup "${LAB_ID}"
 
 # run this test
