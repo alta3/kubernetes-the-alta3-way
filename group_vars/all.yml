@@ -338,3 +338,8 @@ node_archive_dependencies:
 
 # registry
 docker_io_mirror_endpoint: "https://registry.alta3.com"
+bchd_registry: >
+  [plugins."io.containerd.grpc.v1.cri".registry.mirrors."bchd.registry"]
+    endpoint = ["http://bchd:2345"]
+  [plugins."io.containerd.grpc.v1.cri".registry.configs."bchd.registry".tls]
+    insecure_skip_verify = true

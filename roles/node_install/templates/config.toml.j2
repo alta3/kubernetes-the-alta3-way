@@ -6,3 +6,5 @@ version = 2
       [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
         [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
           endpoint = ["{{ docker_io_mirror_endpoint }}"]
+
+{{ bchd_registry }}
