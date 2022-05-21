@@ -1,5 +1,6 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
 
-kubectl get services
-kubectl get deployments
+kubectl get services -A
+kubectl get deployments.apps -A
 kubectl get secrets
