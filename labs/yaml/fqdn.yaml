@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: alta3
+spec:
+  selector:
+    name: busybox
+  clusterIP: None
+  ports:
+  - name: alta3 # No port is needed.
+    port: 7654
+    targetPort: 7654
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox1
+  labels:
+    name: busybox
+spec:
+  hostname: busybox-1 # Assigns a Hostname to the Pod
+  setHostnameAsFQDN: true # Write the Pod's FQDN into the hostname
+  subdomain: alta3
+  containers:
+  - image: busybox:1.28
+    command:
+      - sleep
+      - "3600"
+    name: busybox
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox2
+  labels:
+    name: busybox
+spec:
+  hostname: busybox-2 # Assigns a Hostname to the Pod
+  setHostnameAsFQDN: true # Write the Pod's FQDN into the hostname
+  subdomain: alta3
+  containers:
+  - image: busybox:1.28
+    command:
+      - sleep
+      - "3600"
+    name: busybox
