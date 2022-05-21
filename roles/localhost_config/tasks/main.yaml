@@ -25,3 +25,8 @@
 - name: bchd-k8s-config - setup use-context for the admin user
   shell: kubectl config use-context {{ cluster_name }}
 
+- name: setup setup
+  file:
+    src: "{{ localhost_home_dir }}/git/kubernetes-the-alta3-way/labs/setup/setup"
+    dest: "{{ localhost_home_dir }}/.local/bin/setup"
+    state: link
