@@ -1,4 +1,3 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/bash
 
-echo "[+] Teardown $(readlink -f $BASH_SOURCE)"
+echo "Nothing else to teardown for this lab" >> /dev/null

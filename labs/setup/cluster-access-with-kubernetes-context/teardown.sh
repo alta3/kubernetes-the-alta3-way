@@ -1,4 +1,3 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/bash
 
-echo "[+] Teardown $(readlink -f $BASH_SOURCE)"
+kubectl config use-context kubernetes-the-alta3-way
