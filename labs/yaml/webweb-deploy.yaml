@@ -17,6 +17,6 @@ spec:             # the state to achieve
     spec:         # how to build the CONTINERS within the pod
       containers:
       - name: webweb      # build one container name webweb
-        image: bchd.registry/alta3-webby     # REPLACE "888-sam" with the name of your image you created!!
+        image: registry.gitlab.com/alta3research/webby
         ports:
         - containerPort: 8888   # port container is listening on

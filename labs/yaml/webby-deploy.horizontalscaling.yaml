@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: webby
-        image: bchd.registry/alta3-webby  # Or use your own webby image!
+        image: registry.gitlab.com/alta3research/webby 
         ports:
         - containerPort: 8888
 

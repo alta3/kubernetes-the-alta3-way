@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
   - name: webby
-    image: bchd.registry/alta3-webby
+    image: registry.gitlab.com/alta3research/webby
     ports:
     - containerPort: 8888          
   - name: nginx
