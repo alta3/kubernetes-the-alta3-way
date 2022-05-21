@@ -1,0 +1,15 @@
+#!/bin/bash
+set -uo pipefail
+
+if [ -z ${1+x} ]; then 
+    echo "[-] missing lab-name, to run:"
+    printf "\tsetup lab-name\n"
+    exit 1
+fi
+LAB_ID=$1
+
+setup "${LAB_ID}"
+
+# run this test
+echo "[+] Testing ${LAB_ID}"
+bash "${LAB_ID}/test.sh" 
