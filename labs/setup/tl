@@ -23,6 +23,10 @@ setup "${LAB_ID}"
 # run this test
 echo "[+] Testing ${LAB_ID}"
 bash "${LAB_ID}/test.sh"
+if [ $? -ne 0 ]; then
+    echo "[-] Test failed"
+    exit 1
+fi
 
 popd >> /dev/null || exit 1
 echo "[+] Test complete"
