@@ -3,7 +3,7 @@ set -euo pipefail
 
 KTA3W="${HOME}/git/kubernetes-the-alta3-way/labs"
 kubectl apply -f ../yaml/prod-ns.yaml -f ../yaml/test-ns.yaml -f ../yaml/dev-ns.yaml
-kubectl create configmap nginx-conf --from-file="${KTA3W}/config/nginx.conf"
+kubectl create configmap index-file --from-file="${KTA3W}/config/index.html"
 
 CERTS="${HOME}/k8s-certs"
 openssl genrsa -out "${CERTS}/webby.com.key" 2048
