@@ -1,4 +1,4 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "[-] No teardown"
+kubectl config delete-context dev-context
