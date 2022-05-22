@@ -22,5 +22,5 @@ openssl x509 -req \
 kubectl create secret generic webby-keys \
   --from-file="${CERTS}/webby.com.crt" \
   --from-file="${CERTS}/webby.com.key"
-echo "It was a bright cold day in April, and the clocks were striking thirteen." >> "${HOME}nginx.txt"
+echo "It was a bright cold day in April, and the clocks were striking thirteen." >> "${HOME}/nginx.txt"
 kubectl create configmap nginx-txt --from-file="${HOME}/nginx.txt"
