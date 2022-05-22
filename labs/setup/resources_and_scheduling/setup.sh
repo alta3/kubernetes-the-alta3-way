@@ -1,7 +1,8 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -euo pipefail
 
-echo STARTING ----------
-kubectl get nodes || printf "\n\n Looks like K8s may not be installed?\n\n"
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-kubectl apply -f ~/mycode/yaml/prod-ns.yaml -f ~/mycode/yaml/test-ns.yaml -f ~/mycode/yaml/dev-ns.yaml
-echo END OF SETUP ----------
+kubectl apply \
+  -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml \
+  -f ../yaml/prod-ns.yaml \
+  -f ../yaml/test-ns.yaml \
+  -f ../yaml/dev-ns.yaml
