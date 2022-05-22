@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Pod
+metadata:
+  name: mysql-locked
+spec:
+  containers:
+  - image: mysql:5.6
+    name: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: mysql-secret
+          key: password
+    ports:
+    - containerPort: 3306
+      name: mysql
