@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
 
 kubectl apply -f  ../yaml/test-ns.yaml
 kubectl apply -f  ../yaml/dev-ns.yaml
