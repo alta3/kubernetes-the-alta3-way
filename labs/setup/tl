@@ -42,3 +42,4 @@ if [ $? -eq 0 ]; then
 fi
 
 popd >> /dev/null || exit 1
+echo "[+] Test complete"
