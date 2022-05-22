@@ -1,5 +1,6 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
 
 kubectl delete pod no-lr
-kubectl delete -f ~/mycode/yaml/lim-ran.yml
-
+kubectl delete --ignore-not-found \
+  -f ../yaml/lim-ran.yml
