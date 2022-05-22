@@ -1,3 +1,5 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
+
 
 
