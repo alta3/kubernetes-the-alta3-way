@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Pod             # create this kind of resource
+metadata:
+  name: sise-rp         # name of the Pod (siMPLE seRVICE rEADINESSpROBE)
+spec:
+  containers:
+  - name: sise   # name of the container
+    image: mhausenblas/simpleservice:0.5.0
+    ports:
+    - name: web
+      protocol: TCP
+      containerPort: 9876     # port the container is listening on
+    readinessProbe:
+      initialDelaySeconds: 10   # wait this long after restarting to do the first HTTP GET (default 0)
+      periodSeconds: 3          # how often to probe (default is 1)
+      timeoutSeconds: 2         # how long to wait until timeout occurs (default is 1)
+      successThreshold: 1       # min consecutive successes to be considered "up" after a fail (default 1)
+      failureThreshold: 3       # how many consecutive fails before pod is restarted (default 3)
+      httpGet:                  # use HTTP GET to test :9876/health/
+        path: /health
+        port: 9876
