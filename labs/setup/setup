@@ -33,7 +33,7 @@ echo "[+] Cleaning cluster"
 TD_LOG_DIR=$(mktemp --directory --tmpdir "teardown.${LAB_ID}.XXXX")
 for f in *; do
     export WAIT="false"
-    if [ "${f}" -eq "${LAB_ID}" ]; then
+    if [ "${f}" = "${LAB_ID}" ]; then
         export WAIT="true"
     fi
     if [ -d "$f" ]; then
