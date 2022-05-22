@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding # Case Sensitive
+metadata:
+  name: t3-support
+  namespace: prod
+subjects:
+- kind: User # Specifies a User is the type of subject
+  name: alice # Specifies the specific User
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: t3-support # Must match the name of the Role
+  apiGroup: rbac.authorization.k8s.io

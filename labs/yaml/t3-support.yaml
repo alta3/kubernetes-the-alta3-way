@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role # Case-Sensitive
+metadata:
+  namespace: prod # The Namespace the role is attached to
+  name: t3-support # The name of the role
+rules:
+- apiGroups: [""] 
+  resources: ["pods"] # The Resources the Role grants permission to
+  verbs: ["get", "watch", "list"] # The specific commands allowed
