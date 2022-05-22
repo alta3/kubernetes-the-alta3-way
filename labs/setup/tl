@@ -17,7 +17,6 @@ fi
 LAB_ID=$1
 
 if [ ! -f "${LAB_ID}/test.sh" ]; then
-    ls -al
     echo "[-] ${LAB_ID} no test found"
     exit 1
 fi
