@@ -1,3 +1,6 @@
-#!/usr/bin/bash
-kubectl delete -f mycode/yaml/linux-pod-r.yaml
-kubectl delete -f mycode/yaml/linux-pod-rl.yaml
+#!/bin/bash
+set -euo pipefail
+
+kubectl delete --ignore-not-found \
+  -f ../yaml/linux-pod-r.yaml \
+  -f ../yaml/linux-pod-rl.yaml \
