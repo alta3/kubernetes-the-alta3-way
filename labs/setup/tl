@@ -1,6 +1,10 @@
 #!/bin/bash
 set -uo pipefail
 
+function now() {
+    printf '%x' "$(date +%s%3N)"
+}
+
 # cd into the test directory
 TEST_DIR=$(dirname "$(readlink -f "$0")")
 pushd "${TEST_DIR}" >> /dev/null || exit 1
@@ -22,11 +26,20 @@ setup "${LAB_ID}"
 
 # run this test
 echo "[+] Testing ${LAB_ID}"
-bash "${LAB_ID}/test.sh"
+TEST_LOG="/tmp/$(now)_${LAB_ID}_test.log"
+bash "${LAB_ID}/test.sh" 2>&1 | tee "${TEST_LOG}"
 if [ $? -ne 0 ]; then
     echo "[-] Test failed"
     exit 1
 fi
 
+BROKE="deprecat|warn"
+egrep -i "${BROKE}" "${TEST_LOG}" >> /dev/null
+if [ $? -eq 0 ]; then
+    echo "[-] Deprecation or warning found. Examine log:"
+    echo "    ${TEST_LOG}"
+    egrep --color -i "${BROKE}" "${TEST_LOG}"
+fi
+
 popd >> /dev/null || exit 1
-echo "[+] Test complete"
+e
