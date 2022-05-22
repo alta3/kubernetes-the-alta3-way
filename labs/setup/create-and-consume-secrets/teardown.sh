@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -euo pipefail
 
 kubectl delete --ignore-not-found  \
   -f ../yaml/prod-ns.yaml \
