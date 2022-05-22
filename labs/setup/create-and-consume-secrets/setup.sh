@@ -28,4 +28,5 @@ kubectl create secret generic webby-keys \
   --from-file="${CERTS}/webby.com.crt" \
   --from-file="${CERTS}/webby.com.key"
 
+kubectl create configmap nginx-conf --from-file="${KTA3W}/config/nginx.conf.createandconsumesecrets"
 kubectl apply -f ../yaml/nginx-configured.yaml
