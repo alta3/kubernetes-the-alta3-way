@@ -1,9 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
+kubectl apply \
+  -f ../yaml/prod-ns.yaml \
+  -f ../yaml/test-ns.yaml \
+  -f ../yaml/dev-ns.yaml
+
 KTA3W="${HOME}/git/kubernetes-the-alta3-way/labs"
-kubectl apply -f ../yaml/prod-ns.yaml -f ../yaml/test-ns.yaml -f ../yaml/dev-ns.yaml
 kubectl create configmap index-file --from-file="${KTA3W}/config/index.html"
+echo "It was a bright cold day in April, and the clocks were striking thirteen." >> "${HOME}/nginx.txt"
+kubectl create configmap nginx-txt --from-file="${HOME}/nginx.txt"
 
 CERTS="${HOME}/k8s-certs"
 openssl genrsa -out "${CERTS}/webby.com.key" 2048
@@ -21,6 +27,3 @@ openssl x509 -req \
 kubectl create secret generic webby-keys \
   --from-file="${CERTS}/webby.com.crt" \
   --from-file="${CERTS}/webby.com.key"
-
-echo "It was a bright cold day in April, and the clocks were striking thirteen." >> "${HOME}/nginx.txt"
-kubectl create configmap nginx-txt --from-file="${HOME}/nginx.txt"

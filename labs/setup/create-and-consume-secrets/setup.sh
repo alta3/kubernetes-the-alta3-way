@@ -1,15 +1,16 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -euo pipefail
 
-echo STARTING ----------
-kubectl get nodes || printf "\n\n Looks like K8s may not be installed?\n\n"
-kubectl apply -f ~/mycode/yaml/prod-ns.yaml -f ~/mycode/yaml/test-ns.yaml -f ~/mycode/yaml/dev-ns.yaml
-kubectl create configmap nginx-conf --from-file=/home/student/mycode/config/nginx.conf
-kubectl create configmap index-file --from-file=/home/student/mycode/config/index.html
-echo "It was a bright cold day in April, and the clocks were striking thirteen." >> /home/student/nginx.txt
-kubectl create configmap nginx-txt --from-file=/home/student/nginx.txt
-kubectl get configmap
-kubectl delete pod nginx
-kubectl create -f ~/mycode/yaml/nginx-configured.yaml
-sleep 30
-kubectl get pod nginx-configured
-echo END OF SETUP ----------
+kubectl apply \
+  -f ../yaml/prod-ns.yaml \
+  -f ../yaml/test-ns.yaml \
+  -f ../yaml/dev-ns.yaml
+
+KTA3W="${HOME}/git/kubernetes-the-alta3-way/labs"
+kubectl create configmap nginx-conf --from-file="${KTA3W}/config/nginx.conf"
+kubectl create configmap index-file --from-file="${KTA3W}/config/index.html"
+echo "It was a bright cold day in April, and the clocks were striking thirteen." >> "${HOME}/nginx.txt"
+kubectl create configmap nginx-txt --from-file="${HOME}/nginx.txt"
+
+kubectl apply -f ../yaml/nginx-configured.yaml
+#kubectl get pod nginx-configured
