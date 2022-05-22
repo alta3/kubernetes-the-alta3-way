@@ -11,4 +11,4 @@ kubectl delete --ignore-not-found --wait="${WAIT}" \
   -f ../yaml/alice-csr.yaml \
   -f ../yaml/t3-support-binding.yaml
 
-#kubectl certificate approve alice
+kubectl delete certificatesigningrequests.certificates.k8s.io alice
