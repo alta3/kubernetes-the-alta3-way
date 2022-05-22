@@ -36,7 +36,7 @@ fi
 BROKE="deprecat|warn"
 egrep -i "${BROKE}" "${TEST_LOG}" >> /dev/null
 if [ $? -eq 0 ]; then
-    echo "[-] Deprecation or warning found. Examine log:"
+    echo "[-] Deprications or warnings found. Examine log:"
     echo "    ${TEST_LOG}"
     egrep --color -i "${BROKE}" "${TEST_LOG}"
 fi
