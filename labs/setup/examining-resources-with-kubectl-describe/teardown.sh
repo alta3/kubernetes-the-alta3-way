@@ -1,5 +1,5 @@
 #!/bin/bash
 set -euo pipefail
 
-kubectl delete --ignore-not-found --wait=false pod webweb
-kubectl delete --ignore-not-found --wait=false -f ../yaml/webweb-deploy.yaml
+kubectl delete --ignore-not-found --wait="${WAIT}" pod webweb
+kubectl delete --ignore-not-found --wait="${WAIT}" -f ../yaml/webweb-deploy.yaml
