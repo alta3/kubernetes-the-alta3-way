@@ -1,3 +1,5 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -euo pipefail
 
-echo "Nothing else to teardown for this lab" >> /dev/null
+echo "[-] No teardown"
+

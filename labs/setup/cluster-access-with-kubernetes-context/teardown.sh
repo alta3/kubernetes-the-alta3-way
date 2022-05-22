@@ -1,3 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -euo pipefail
 
-kubectl config use-context kubernetes-the-alta3-way
+echo "[-] No teardown"
