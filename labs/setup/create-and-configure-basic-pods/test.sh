@@ -1,10 +1,7 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
 
-kubectl config use-context kubernetes-the-alta3-way
-kubectl create -f ~/mycode/yaml/simpleservice.yaml
-kubectl apply -f ~/mycode/yaml/webby-pod01.yaml
-sleep 35
-kubectl get pods
-kubectl delete -f ~/mycode/yaml/simpleservice.yaml
-kubectl delete -f ~/mycode/yaml/webby-pod01.yaml
-
+kubectl apply -f ../yaml/simpleservice.yaml
+kubectl wait --for condition=Ready --timeout 60s -f ../yaml/simpleservice.yaml
+kubectl apply -f ../yaml/webby-pod01.yaml
+kubectl wait --for condition=Ready --timeout 60s -f ../yaml/webby-pod01.yaml
