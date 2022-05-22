@@ -1,12 +1,10 @@
-#!/usr/bin/bash
+#!/bin/bash
+set -xeuo pipefail
 
-kubectl apply -f ~/mycode/yaml/netgrabber.yaml
-kubectl exec netgrab -c busybox -- sh "ping 8.8.8.8 -c 10"
-sleep 10
-kubectl delete pod netgrab
-kubectl delete configmap nginx-conf
-kubectl create -f ~/mycode/yaml/nginx-conf.yaml
-kubectl create -f ~/mycode/yaml/webby-nginx-combo.yaml
-sudo rm /etc/nginx/sites-enabled/fruit-ingress
-sudo nginx -s reload
-
+kubectl apply -f ../yaml/netgrabber.yaml
+kubectl wait --for condition=Ready --timeout 60s -f ../yaml/netgrabber.yaml
+kubectl exec netgrab -c busybox -- sh -c "ping 8.8.8.8 -c 1"
+kubectl apply -f ../yaml/nginx-conf.yaml
+kubectl wait --for condition=Ready --timeout 60s -f ../yaml/nginx-conf.yaml
+kubectl apply -f ../yaml/webby-nginx-combo.yaml
+kubectl wait --for condition=Ready --timeout 60s -f ../yaml/webby-nginx-combo.yaml
