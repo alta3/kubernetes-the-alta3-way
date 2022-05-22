@@ -1,5 +1,23 @@
-...
-spec:
-  replicas: 5  # change this value to something OTHER than what it was...
-...
-
+---
+apiVersion: apps/v1 # MUST - see https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/ on what to use
+kind: Deployment # MUST - https://kubernetes.io/docs/reference/kubectl/overview/#resource-types
+metadata: # MUST - (AT LEAST! NAMES)
+  name: sise-deploy # MUST - PROVIDES A NAME
+spec: # MUST - THIS IS WHAT YOU ARE BUILDING!!
+  replicas: 2 # tells deployment to run 2 pods matching the template
+  selector: # MUST
+    matchLabels: # MUST
+      app: sise # MUST MATCH spec.template.meatadata.labels
+  template: # MUST - description of what we want to build
+    metadata: # MUST - metadata.labels MUST match spec.selector.matchLabels
+      labels:
+        app: sise
+    spec: # This is the containers that will appear int he PODS
+      containers:
+      - name: sise
+        image: mhausenblas/simpleservice:0.5.0 # image:version we want to install
+        ports:
+        - containerPort: 9876 # ports that the CONTAINER will listen on
+        env:
+        - name: SIMPLE_SERVICE_VERSION
+          value: "1.0"
