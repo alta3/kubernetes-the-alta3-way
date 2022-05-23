@@ -23,7 +23,7 @@ data:
     <match **>
       @type http
 
-      endpoint http://<BCHD_IP>:10001/logs
+      endpoint http://{{ BCHD_IP }}:10001/logs
       open_timeout 2
 
       <format>
