@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  index-html-zork.html: |
+  index.html: |
     <!DOCTYPE html>
     <html>
     <head>
@@ -31,9 +31,9 @@ data:
     </html>
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2022-05-23T00:36:49Z"
+  creationTimestamp: "2022-05-23T04:26:53Z"
   name: index-html-zork
   namespace: default
-  resourceVersion: "35657"
+  resourceVersion: "53867"
   selfLink: /api/v1/namespaces/default/configmaps/index-html-zork
-  uid: 849bdf01-983d-4c0d-ad8a-8b72f1dfb4da
+  uid: fcf1eac8-e2c1-4fb6-aef1-eb8e53cfa071
