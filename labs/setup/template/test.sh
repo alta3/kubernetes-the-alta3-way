@@ -11,3 +11,4 @@ set -xeuo pipefail
 # NOTE: use 2 or 3 commands to show the success
 #kubectl get pods a-pod-worth-wating-for
 #kubectl get deployment.apps a-deployment-worth-waiting-for
+kubectl get pods
