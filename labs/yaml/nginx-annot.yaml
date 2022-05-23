@@ -1,0 +1,13 @@
+---
+apiVersion: v1          # API version (endpoint) to use
+kind: Pod               # this is the resource to create
+metadata:
+  name: nginx-annot     # this is the name of the kubernetes resource
+  annotations:          # this is an annotation
+    alta3.com/logo-url: "https://static.alta3.com/images/Alta3-logo_large.png"
+spec:
+  containers:
+  - name: nginx         # name of the container
+    image: nginx:1.18.0  # image and version of image to use
+    ports:
+    - containerPort: 80
