@@ -1,0 +1,39 @@
+apiVersion: v1
+data:
+  index-html-zork.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>K8s</title>
+    <style>
+        body {
+            width: 35em;
+            margin: 0 auto;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+    </head>
+    <body>
+    <h1>Welcome to K8s!</h1>
+    <p>There is a mailbox here. To the north is a house.</p>
+    <p>Open Mailbox</p>
+    <p/There is a leaflet inside</p>
+    <p>take leaflet</p>
+    <p>Taken</p>
+    <p>Read leaflet</p>
+    <p>Welcome to the land of Kubernetes.</p>
+    <p>No cloud should be without one!</p>
+
+    <p><em>Thank you for using K8s.</em></p>
+    <a href="/static/">Click to see static files (once they are configured)</a>
+    <a href="/webby/"> Click to see webby (once it is configured)</a>
+    </body>
+    </html>
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-05-23T00:36:49Z"
+  name: index-html-zork
+  namespace: default
+  resourceVersion: "35657"
+  selfLink: /api/v1/namespaces/default/configmaps/index-html-zork
+  uid: 849bdf01-983d-4c0d-ad8a-8b72f1dfb4da
