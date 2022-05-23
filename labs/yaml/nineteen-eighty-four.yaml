@@ -1,12 +1,12 @@
 apiVersion: v1
 data:
-  nineteen-eighty-four: |
+  1984.txt: |
     It was a bright cold day in April, and the clocks were striking thirteen.
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2022-05-22T22:42:01Z"
+  creationTimestamp: "2022-05-23T04:27:03Z"
   name: nineteen-eighty-four
   namespace: default
-  resourceVersion: "26739"
+  resourceVersion: "53881"
   selfLink: /api/v1/namespaces/default/configmaps/nineteen-eighty-four
-  uid: 8354a11a-33db-4c6a-aba6-57aba62be264
+  uid: 66664827-06e1-4725-a42d-db529553c480
