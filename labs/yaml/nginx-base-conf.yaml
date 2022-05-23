@@ -1,0 +1,33 @@
+apiVersion: v1
+data:
+  nginx.conf: "user  nginx;          #You are not ready for lines 1 -16, skip
+    to line 17 where it gets interesting\nworker_processes  1;       \nerror_log  /var/log/nginx/error.log
+    warn;     \npid        /var/run/nginx.pid;       \nevents {\n    worker_connections
+    \ 1024;  \n}    \nhttp {\n    include       /etc/nginx/mime.types;\n    default_type
+    \ application/octet-stream;\n    log_format  main  '$remote_addr - $remote_user
+    [$time_local] \"$request\" '\n                      '$status $body_bytes_sent
+    \"$http_referer\" '\n                      '\"$http_user_agent\" \"$http_x_forwarded_for\"';\n
+    \   access_log  /var/log/nginx/access.log  main;  \n    sendfile        on;\n
+    \   keepalive_timeout  65;\n    server {                    # This tells NGINX
+    to be an HTTP server or reverse proxy\n        server_name  localhost; # This
+    tells NGINX to serve requests on the localhost IP address\n        listen 80;
+    \             # This tells NGINX to listen on (TCP) port 80\n        root /var/www;
+    \         # This tells NGINX to establish the HTTP root at /var/www\n\n        location
+    / {            # If the path is just a slash, then do the following\n        sendfile
+    \ on;           # This tells NGINX to send files if path matches slash (/).\n
+    \        index index.html;      # and this is the file that NGINX will send if
+    the HTTP request matches this path (/)\n        }                       # The
+    end of the (/) path directive\n\n        location /static {      # NGINX performs
+    the following tasks if the HTTP request matches this path (/static).\n        autoindex
+    on;           # This tells NGINX to add autoindex, a feature that shows files
+    almost like an \"FTP GUI\".\n        }                       # The end of the
+    (/) path directive\n\n    }                           # The end of the server
+    block\n}                               # The end of the http block\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2022-05-22T21:18:47Z"
+  name: nginx-base-conf
+  namespace: default
+  resourceVersion: "20266"
+  selfLink: /api/v1/namespaces/default/configmaps/nginx-base-conf
+  uid: 1f850973-2de3-40f7-a637-3e4b7562fd31	
