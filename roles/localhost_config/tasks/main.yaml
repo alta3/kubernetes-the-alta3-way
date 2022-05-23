@@ -6,6 +6,7 @@
     extra_opts: "{{ helm.extra_opts }}"
   become: True
 
+
 - name: bchd-k8s-config - setup localhost loadbalancer for kubectl (as admin)
   shell: kubectl config set-cluster {{ cluster_name }} \
          --certificate-authority={{ ca_pem_file }}  \
@@ -24,6 +25,12 @@
 
 - name: bchd-k8s-config - setup use-context for the admin user
   shell: kubectl config use-context {{ cluster_name }}
+
+- name: ensure j2cli installed for setup functions
+  apt:
+   name: j2cli
+   state: present
+  become: yes
 
 - name: setup setup
   file:
