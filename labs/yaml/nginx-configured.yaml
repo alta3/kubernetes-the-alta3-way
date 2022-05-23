@@ -27,7 +27,7 @@ spec:
       name: nginx-base-conf                 # The nginx-conf.yaml configmap
   - name: zork                             ## links to spec.containers[0]volumeMounts[1]name above
     configMap:
-      name: index-html                      # The index.html.yaml configmap
+      name: index-html-zork                 # The index.html.yaml configmap
   - name: georgeorwell                     ## links to spec.containers[0]volumeMounts[2]name above
     configMap:
       name: nineteen-eighty-four            # The nineteen-eighty-four.yaml configmap
