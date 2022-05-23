@@ -25,7 +25,7 @@ data:
     <p>No cloud should be without one!</p>
 
     <p><em>Thank you for using K8s.</em></p>
-    <a href="/static/">Click to see static files (once they are configured)</a>
+    <a href="/static/">Click to see static files (once they are configured)</a><br>
     <a href="/webby/"> Click to see webby (once it is configured)</a>
     </body>
     </html>
