@@ -19,8 +19,8 @@ spec:
       mountPath: /var/www/index.html        # the path inside the container
       subPath: index.html                   # mandatory if file exists in the container
     - name: georgeorwell                   ## links to spec.volumes.name[2] below
-      mountPath: /var/www/static/nginx.txt  # the path inside the container
-      subPath: nginx.txt                    # mandatory if file exists in the container
+      mountPath: /var/www/static/1984.txt   # the path inside the container
+      subPath: 1984.txt                     # mandatory if file exists in the container
   volumes:
   - name: nginx-base-config                ## links to spec.containers[0]volumeMounts[0]name above
     configMap:
