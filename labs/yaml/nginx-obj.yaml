@@ -1,0 +1,20 @@
+---
+apiVersion: apps/v1
+kind: Deployment  # the type of resource to create
+metadata:  # describes deployment itself
+  name: nginx-obj-create  # name applied to the deployment
+spec:
+  selector:
+    matchLabels:   # matchLabels tell the deployment which Pods to associate with
+      app: nginx   # this label MUST match the label found in spec.template.metadata.labels
+  replicas: 3  # create this many replicated pods
+  template:
+    metadata:
+      labels:  # every pod will have the following labels
+        app: nginx  # pods are labeled app: nginx (match label matches on this)
+    spec:
+      containers:  # describes a list with only 1 container
+      - name: nginx  # name of the container will be 'nginx'
+        image: nginx:1.18.0  # image:version downloaded from hub.docker.com
+        ports:   # port(s) to expose
+        - containerPort: 80  # exposed port for this container
