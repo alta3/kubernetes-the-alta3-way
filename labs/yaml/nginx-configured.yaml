@@ -31,4 +31,3 @@ spec:
   - name: georgeorwell                     ## links to spec.containers[0]volumeMounts[2]name above
     configMap:
       name: nineteen-eighty-four            # The nineteen-eighty-four.yaml configmap
-  
