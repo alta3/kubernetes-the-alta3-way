@@ -12,7 +12,7 @@ spec:
     ports:
     - containerPort: 80
     volumeMounts:                           # these 3 files are to be injected into the container
-    - name: nginx-proxy-config             ## links to spec.volumes.name[0] below
+    - name: nginx-base-config              ## links to spec.volumes.name[0] below
       mountPath: /etc/nginx/nginx.conf      # the path inside the container
       subPath: nginx.conf                   # mandatory if file exists in the container
     - name: zork                           ## links to spec.volumes.name[1] below
