@@ -23,4 +23,3 @@ spec:
         value: yessir
         operator: "Equal"
         effect: "NoSchedule"
-
