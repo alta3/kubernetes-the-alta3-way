@@ -26,3 +26,78 @@ KUBEADM_INIT
 
 JOIN_CMD=$(ssh controller kubeadm token create --print-join-command)
 ssh -o StrictHostKeyChecking=no node-1 sudo "${JOIN_CMD}"
+
+# kubectl setup for bchd
+bash $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh
+scp student@controller:/home/student/.kube/config /home/student/.kube/config
+
+# local answer dirs
+sudo mkdir -p /opt/cka/answers
+sudo chown student:student /opt/cka/answers
+
+echo STARTING TASK SETUP
+
+# 1 Dragon Deployment
+kubectl apply -f https://static.alta3.com/courses/cka/exam/dragon.yml
+
+# 2 Deppy
+kubectl apply -f https://static.alta3.com/courses/cka/exam/deppy.yml
+
+# 3 Pre-made PV (for PVC and Pod use)
+kubectl apply -f https://static.alta3.com/courses/cka/exam/rwopv.yml
+
+# 4 - Nothing needed
+
+# 5 Ingress
+# TODO make image for aloha to use!!! Broken right now
+kubectl apply -f https://static.alta3.com/courses/cka/exam/aloha.yml
+
+# 6 CPU Topper
+kubectl create ns integration
+kubectl apply -f https://static.alta3.com/courses/cka/exam/basenginx.yml
+kubectl apply -f https://static.alta3.com/courses/cka/exam/lowcpunginx.yml
+kubectl apply -f https://static.alta3.com/courses/cka/exam/highcpunginx.yml
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# 7 Node Selector
+kubectl label node node-1 disk=nvme --overwrite
+
+
+# 10 Log inspection (file not found)
+kubectl apply -f https://static.alta3.com/courses/cka/exam/filenotfound.yml
+
+# 11 Add container to existing Pod
+kubectl apply -f https://static.alta3.com/courses/cka/exam/loggy.yml
+
+# 12 - Nothing needed
+
+# 13 - Nothing needed
+
+# 14 - ?
+
+# 15 - ?
+
+# 16 - ?
+
+# 17 - ?
+
+# 18 - ?
+
+# 19 - Nothing Needed
+
+# 20 - Nothing Needed
+
+# 21 Etcd Backup and Restore
+ssh -o StrictHostKeyChecking=no controller << "ETCD_BACKUP"
+sudo apt install etcd-client -y
+sudo mkdir /opt/cka/help -p
+sudo chown student:student /opt/cka/help
+kubectl run isitback --image=nginx
+sleep 20
+ETCDCTL_API=3 sudo etcdctl snapshot save /opt/cka/help/restore.backup --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
+kubectl delete pod isitback
+ETCD_BACKUP
+
+
+# 22 Stopped Kubelet  (on bchd?)
+# TODO - sudo systemctl stop kubelet    ---- somewhere
