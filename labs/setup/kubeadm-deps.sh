@@ -50,5 +50,4 @@ EOF
 sudo sysctl --system
 sudo systemctl restart containerd
 sudo systemctl enable containerd
-sudo kubeadm config images pull
 sudo apt-mark hold kubelet kubeadm kubectl
