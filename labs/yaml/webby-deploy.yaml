@@ -1,22 +1,22 @@
+---
 apiVersion: apps/v1
-kind:
+kind: Deployment
 metadata:
-  name:
-  labels:
-    app:
+   name: webservice
+   labels:
+     app: webby
 spec:
   selector:
     matchLabels:
-      app:
-  replicas:
+      app: webby
+  replicas: 3
   template:
     metadata:
       labels:
-        app:
+        app: webby
     spec:
       containers:
-      - name:
+      - name: webby
         image: registry.gitlab.com/alta3research/webby 
         ports:
-        - containerPort:
-
+        - containerPort: 8888
