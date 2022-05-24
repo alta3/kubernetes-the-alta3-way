@@ -13,4 +13,3 @@ spec:
     - name:      # port name
       containerPort:      # access on this port (int)
       protocol:           # TCP or UDP
-
