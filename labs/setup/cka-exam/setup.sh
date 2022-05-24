@@ -9,7 +9,7 @@ ssh node-1 "bash /tmp/kubeadm-deps.sh" &
 ssh node-2 "bash /tmp/kubeadm-deps.sh" &
 wait
 
-ssh -o StrictHostKeyChecking=no controller << KUBEADM_INIT
+ssh -o StrictHostKeyChecking=no controller << "KUBEADM_INIT"
 export PUBLIC_IP=$(dig controller +search +noall +short)
 sudo kubeadm init \
 --pod-network-cidr=192.168.0.0/16 \
