@@ -10,4 +10,3 @@ spec:
     - name: # name for port mapping
       containerPort: # we mapped this with the port-forward command
       protocol: # TCP or UDP
-
