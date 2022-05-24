@@ -21,7 +21,7 @@ if [ ! -d "$LAB_ID" ]; then
     exit 1
 fi
 
-if [ "${LAB_ID}" != cka-exam ]
+if [ "${LAB_ID}" != cka-exam ]; then
     # check if a cluster exists
     kubectl get nodes >> /dev/null
     if [ $? -ne 0 ]; then
