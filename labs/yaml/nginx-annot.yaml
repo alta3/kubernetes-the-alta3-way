@@ -4,7 +4,7 @@ kind: Pod               # this is the resource to create
 metadata:
   name: nginx-annot     # this is the name of the kubernetes resource
   annotations:          # this is an annotation
-    alta3.com/logo-url: "https://static.alta3.com/images/Alta3-logo_large.png"
+    alta3.com/logo-url: "https://static.alta3.com/images/Alta3-logo_large.png"      
 spec:
   containers:
   - name: nginx         # name of the container
