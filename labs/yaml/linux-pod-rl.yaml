@@ -16,4 +16,3 @@ spec:
         memory: 512Mi
     ports:
     - containerPort: 80
-
