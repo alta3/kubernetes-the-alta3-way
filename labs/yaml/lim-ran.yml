@@ -13,4 +13,3 @@ spec:
     min:
       memory: 100Mi
     type: Container
-
