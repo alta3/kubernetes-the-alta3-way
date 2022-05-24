@@ -1,5 +1,5 @@
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1 
 kind: Deployment  # the type of resource to create
 metadata:  # describes deployment itself
   name: nginx-obj-create  # name applied to the deployment
