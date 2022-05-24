@@ -28,7 +28,7 @@ JOIN_CMD=$(ssh controller kubeadm token create --print-join-command)
 ssh -o StrictHostKeyChecking=no node-1 sudo "${JOIN_CMD}"
 
 # kubectl setup for bchd
-# bash $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh
+bash $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh
 mkdir -p $HOME/.kube
 scp student@controller:/home/student/.kube/config /home/student/.kube/config
 
