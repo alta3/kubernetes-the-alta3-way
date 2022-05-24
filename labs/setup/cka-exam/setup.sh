@@ -50,7 +50,22 @@ kubectl apply -f https://static.alta3.com/courses/cka/exam/rwopv.yml
 # 4 - Nothing needed
 
 # 5 Ingress
-# TODO make image for aloha to use!!! Broken right now
+echo docker registry setup
+sudo apt remove containerd.io -y
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt install docker.io -y
+
+sudo docker run -d -p 2345:5000 registry:2
+sudo sed -i '/127.0.0.1/!b;/bchd.registry/!s/$/ bchd.registry/' /etc/hosts
+sudo cp mycode/config/bchd.registry /etc/nginx/sites-enabled/reg && batcat  mycode/config/bchd.registry && cat /etc/nginx/sites-enabled/reg
+sudo nginx -s reload
+
+echo aloha image setup
+wget https://static.alta3.com/courses/cka/exam/aloha.tar
+sudo docker load -i aloha.tar
+sudo docker image tag aloha bchd.registry/aloha
+sudo docker image push bchd.registry/aloha
+
 kubectl apply -f https://static.alta3.com/courses/cka/exam/aloha.yml
 
 # 6 CPU Topper
