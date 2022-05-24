@@ -54,6 +54,7 @@ echo docker registry setup
 sudo apt remove containerd.io -y
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt install docker.io -y
+sleep 20
 
 sudo docker run -d -p 2345:5000 registry:2
 sudo sed -i '/127.0.0.1/!b;/bchd.registry/!s/$/ bchd.registry/' /etc/hosts
