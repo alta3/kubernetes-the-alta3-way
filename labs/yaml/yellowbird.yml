@@ -11,4 +11,3 @@ spec:
     app: yellow
   sessionAffinity: None
   type: ClusterIP
-
