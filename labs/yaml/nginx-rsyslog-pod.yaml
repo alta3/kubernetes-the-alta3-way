@@ -8,4 +8,3 @@ spec:
   - name: nginx-rsyslog-pod
     image: nginx:1.19.6
   nodeName: node-1   # ensures placement on a specific node
-
