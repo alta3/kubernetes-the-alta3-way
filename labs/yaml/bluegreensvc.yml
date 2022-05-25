@@ -12,4 +12,3 @@ spec:
     version: v1.0
   sessionAffinity: None
   type: ClusterIP
-
