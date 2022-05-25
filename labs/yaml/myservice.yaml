@@ -7,4 +7,3 @@ spec:      # think of this as replacing something like a kubectl port-forward (w
   - protocol: TCP
     port: 80
     targetPort: 9376
-
