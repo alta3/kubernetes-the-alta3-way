@@ -18,5 +18,4 @@ spec:
       - name: container01
         image: hashicorp/http-echo
         args:
-        - '-text="Welcome to the Yellow App (1.0)!"'  
-
+        - '-text="Welcome to the Yellow App (1.0)!"'
