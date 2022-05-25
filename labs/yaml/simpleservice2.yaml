@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: simpleservice
+  name: simpleservice2
   labels:
-    name: simpleservice
+    name: simpleservice2
 spec:
   containers:
   - name: simpleservice-web
@@ -19,4 +19,3 @@ spec:
       httpGet:
         path: /health
         port: 9876
-
