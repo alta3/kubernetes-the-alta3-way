@@ -18,4 +18,3 @@ spec:
       httpGet:                 # send HTTP GET to :9876/health/
         path: /health
         port: 9876
-
