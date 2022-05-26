@@ -1,17 +1,17 @@
 user  nginx;          #You are not ready for lines 1 -16, skip to line 17 where it gets interesting
-worker_processes  1;       
-error_log  /var/log/nginx/error.log warn;     
-pid        /var/run/nginx.pid;       
+worker_processes  1;
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
 events {
-    worker_connections  1024;  
-}    
+    worker_connections  1024;
+}
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
-    access_log  /var/log/nginx/access.log  main;  
+    access_log  /var/log/nginx/access.log  main;
     sendfile        on;
     keepalive_timeout  65;
     server {                    # This tells NGINX to be an HTTP server or reverse proxy
@@ -29,5 +29,4 @@ http {
         }                       # The end of the (/) path directive
 
     }                           # The end of the server block
-}                               # The end of the http block
-
+}
