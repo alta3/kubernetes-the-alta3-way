@@ -1,0 +1,7 @@
+spec:
+  template:
+    spec:
+      tolerations:
+      - effect: NoSchedule
+        key: disktype
+        value: ssd
