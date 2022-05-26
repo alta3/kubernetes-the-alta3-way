@@ -1,0 +1,34 @@
+---
+apiVersion: v1   # https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#_v1_podspec
+kind: Pod                      # MUST - create a Pod resource
+metadata:                      # MUST - metadata.name provides the 'name' for the resource
+  name: nginx-configured       # MUST - name of the resource
+  labels:                      # OPTIONAL (best practice) - allows manipulation of resource by label
+    app: nginx-configured      # OPTIONAL - example of a key: value key pair
+spec:                          # MUST - what you want to build
+  containers:                  # MUST - describe 1 or more containers within the pod
+  - name: nginx                # MUST - name of the container within the pod
+    image: nginx:1.18.0         # MUST - image nginx and version 1.18.0 from hub.docker.com
+    ports:                     # exposes ports on the pod
+    - name: chris              # name of mapped port (could also be Tim, or pinecone)
+      containerPort: 80        # exposed port
+    volumeMounts:                     # describes where your volumes will be available within the container
+    - name: nginx-proxy-config        # matches spec.volumes[0].name
+      mountPath: /etc/nginx/nginx.conf  # this is WHERE it will appear inside of the container
+      subPath: nginx.conf             # required to overwrite a file that is already within the container
+    - name: my-index-file             # matches spec.volumes[1].name
+      mountPath: /var/www/index.html
+      subPath: index.html
+    - name: static-demo-data          # matches spec.volumes[2].name
+      mountPath: /var/www/static/nginx.txt
+      subPath: nginx.txt
+  volumes:  
+  - name: nginx-proxy-config      # matches spec.volumeMounts[0].name
+    configMap:
+      name: nginx-conf            # name of a configMap
+  - name: my-index-file           # matches spec.volumeMounts[1].name
+    configMap:
+      name: index-file            # name of a configMap
+  - name: static-demo-data        # matches spec.volumeMounts[2].name
+    configMap:
+      name: nginx-txt             # name of a configMap
