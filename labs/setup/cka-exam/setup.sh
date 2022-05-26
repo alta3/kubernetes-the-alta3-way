@@ -59,7 +59,7 @@ sleep 20
 
 sudo docker run -d -p 2345:5000 registry:2
 sudo sed -i '/127.0.0.1/!b;/bchd.registry/!s/$/ bchd.registry/' /etc/hosts
-sudo cp mycode/config/bchd.registry /etc/nginx/sites-enabled/reg
+sudo cp ~/mycode/config/bchd.registry /etc/nginx/sites-enabled/reg
 sudo nginx -s reload
 
 echo aloha image setup
