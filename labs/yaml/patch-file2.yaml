@@ -1,0 +1,6 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: patch-demo-ctr-3
+        image: gcr.io/google-samples/node-hello:1.0
