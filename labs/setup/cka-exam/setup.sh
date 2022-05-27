@@ -58,6 +58,7 @@ kubectl apply -f https://static.alta3.com/courses/cka/exam/rwopv.yml
 
 # 5 Ingress
 kubectl apply -f https://static.alta3.com/courses/cka/exam/aloha.yml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/baremetal/deploy.yaml
 
 # 6 CPU Topper
 kubectl create ns integration
