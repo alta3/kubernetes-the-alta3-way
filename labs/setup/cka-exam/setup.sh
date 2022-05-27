@@ -37,7 +37,9 @@ sudo mkdir -p /opt/cka/answers
 sudo chown student:student /opt/cka/answers
 
 echo Metrics Server Pre-Reqs
-kubectl apply -f $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-metrics-cm.yaml
+#kubectl apply -f $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-metrics-cm.yaml
+ssh node-1 'echo "serverTLSBootstrap: true" | sudo tee -a /var/lib/kubelet/config.yaml'
+ssh node-1 sudo systemctl restart kubelet
 CSR=`kubectl get csr -o name`
 kubectl certificate approve $CSR
 echo STARTING TASK SETUP
