@@ -108,3 +108,5 @@ ETCD_BACKUP
 
 # 22 Stopped Kubelet  (on bchd?)
 # TODO - sudo systemctl stop kubelet    ---- somewhere
+
+for CSR in `kubectl get csr -o name`; do kubectl certificate approve $CSR; done
