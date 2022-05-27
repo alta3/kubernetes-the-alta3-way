@@ -40,8 +40,9 @@ echo Metrics Server Pre-Reqs
 #kubectl apply -f $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-metrics-cm.yaml
 ssh node-1 'echo "serverTLSBootstrap: true" | sudo tee -a /var/lib/kubelet/config.yaml'
 ssh node-1 sudo systemctl restart kubelet
-CSR=`kubectl get csr -o name`
-kubectl certificate approve $CSR
+ssh controller 'echo "serverTLSBootstrap: true" | sudo tee -a /var/lib/kubelet/config.yaml'
+ssh controller sudo systemctl restart kubelet
+for CSR in `kubectl get csr -o name`; do kubectl certificate approve $CSR; done
 echo STARTING TASK SETUP
 
 # 1 Dragon Deployment
