@@ -39,7 +39,7 @@ sudo chown student:student /opt/cka/answers
 echo Metrics Server Pre-Reqs
 kubectl apply -f $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-metrics-cm.yaml
 CSR=`kubectl get csr -o name`
-kubectl certificate approve csr $CSR
+kubectl certificate approve $CSR
 echo STARTING TASK SETUP
 
 # 1 Dragon Deployment
