@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+ name: cpu-and-memory-limits
+spec:
+  limits:
+  - default:
+      cpu: "1"
+      memory: 200Mi
+    defaultRequest:
+      cpu: 500m
+      memory: 100Mi
+    max:
+      cpu: "2"
+      memory: 1Gi
+    min:
+      cpu: 200m
+      memory: 3Mi
+    type: Container
