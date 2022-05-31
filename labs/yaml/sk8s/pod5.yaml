@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod5
+  labels:
+    band: monkees
+spec:
+  containers:
+  - image: nginx
+    name: band
