@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: pods-low
+spec:
+  hard:
+    cpu: "3"
+    memory: 3Gi
+    pods: "5"
