@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: opensuse-deployment
+ labels:
+   env: "app"
+   owner: opensuse
+spec:
+ selector:
+   matchLabels:
+     app: opensuse
+ replicas: 1
+ template:
+   metadata:
+     labels:
+       app: opensuse
+   spec:
+     containers:
+     - name: opensuse
+       image: opensuse/leap
+       command: ["/bin/sh"]
+       args: ["-c","while true; do echo hello; sleep 10; done"]
+       resources:
+         requests:
+           cpu: "1.5"
+           memory: "1Gi"
+         limits:
+           cpu: "2"
+           memory: "1Gi"
