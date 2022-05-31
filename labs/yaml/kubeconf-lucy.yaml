@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    certificate-authority-data: CA_DATA
+    server: SERVER
+  name: CLUSTER_NAME
+contexts:
+- context:
+    cluster: CLUSTER_NAME
+    user: lucy
+  name: CLUSTER_NAME
+current-context: CLUSTER_NAME
+users:
+- name: lucy
+  user:
+    token: USER_TOKEN
