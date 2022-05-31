@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: john
+  labels:
+    band: beatles
+    role: singer
+spec:
+  containers:
+  - name: band
+    image: nginx
+  tolerations:
+  - key: band
+    operator: Equal
+    value: beatles
+    effect: NoSchedule 
