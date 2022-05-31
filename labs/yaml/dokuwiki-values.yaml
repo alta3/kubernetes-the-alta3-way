@@ -1,0 +1,9 @@
+dokuwikiUsername: user
+dokuwikiPassword: password123
+service:
+ type: NodePort
+persistence:
+ enabled: false
+# storageClass: nfs-client
+# accessMode: ReadWriteOnce
+# size: 8Gi
