@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod3
+  labels:
+    band: beatles
+spec:
+  containers:
+  - image: nginx
+    name: band
