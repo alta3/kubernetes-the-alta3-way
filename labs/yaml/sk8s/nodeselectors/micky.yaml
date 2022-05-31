@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: michael
+  name: micky
   labels:
     band: monkees
-    role: guitar 
+    role: drummer 
 spec:
   containers:
   - name: band
