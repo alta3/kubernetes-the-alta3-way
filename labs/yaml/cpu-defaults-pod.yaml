@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-defaults-pod
+spec:
+  containers:
+  - name: cpu-defaults-pod
+    image: nginx:1.19.6
