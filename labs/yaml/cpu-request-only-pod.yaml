@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-request-only-pod
+spec:
+  containers:
+  - name: cpu-request-only-pod
+    image: nginx:1.19.6
+    resources:
+      requests:
+        cpu: "0.75"
