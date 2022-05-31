@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: charlie-walnuts-deployment-manager
+  namespace: walnuts
+subjects:
+- kind: User
+  name: charlie
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: walnuts-deployment-manager
+  apiGroup: rbac.authorization.k8s.io
