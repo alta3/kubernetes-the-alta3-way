@@ -7,6 +7,6 @@ subjects:
   name: linus
   apiGroup: rbac.authorization.k8s.io
 roleRef:
- kind: Role
+ kind: ClusterRole
  name: cluster-pod-watcher
  apiGroup: rbac.authorization.k8s.io
