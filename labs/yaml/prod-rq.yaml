@@ -5,5 +5,5 @@ metadata:
   name: prod-resourcequota  # name of ResourceQuota
 spec:
   hard:                  # "may not exceed"
-    cpu: "1"             # 1 cpu is == 1 vcore on a hypervisor or 1 hyperthread on bare metal
-    memory: 1Gi          # 1 gig of memory
+    cpu: "2"             # 1 cpu is == 1 vcore on a hypervisor or 1 hyperthread on bare metal
+    memory: 2Gi          # 2 gigs of memory
