@@ -5,7 +5,7 @@ metadata:
   name: nginx-nfs-example
 spec:
   containers:
-    - image: nginx
+    - image: nginx:1.19.6
       name: nginx
       ports:
         - containerPort: 80
