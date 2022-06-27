@@ -28,7 +28,7 @@ deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https:
 EOF
 
 sudo apt-get update 
-sudo apt-get install -y containerd.io kubelet=1.23.6-00 kubeadm=1.23.6-00 kubectl=1.23.6-00
+sudo apt-get install -y containerd.io kubelet=1.23.7-00 kubeadm=1.23.7-00 kubectl=1.23.7-00
 
 sudo scp -o StrictHostKeyChecking=no -i "${HOME}/.ssh/id_rsa" student@bchd:~/git/kubernetes-the-alta3-way/labs/config/containerd_config.toml /etc/containerd/config.toml
 

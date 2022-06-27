@@ -4,6 +4,6 @@ metadata:
   name: pods-high
 spec:
   hard:
-    cpu: "10"
+    cpu: "2"
     memory: 20Gi
     pods: "10"
