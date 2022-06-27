@@ -5,7 +5,7 @@
             "containers": [
                {
                   "name": "patch-demo-ctr-2",
-                  "image": "redis"
+                  "image": "redis:7.0.2"
                }
             ]
          }
