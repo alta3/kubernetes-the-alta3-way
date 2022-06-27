@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: container01
-        image: hashicorp/http-echo
+        image: hashicorp/http-echo:alpine
         args:
         - '-text="Welcome to the Blue App (1.0)!"'
