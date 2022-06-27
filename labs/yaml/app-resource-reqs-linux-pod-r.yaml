@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: linux-pod-r
+spec:
+  containers:
+  - name: ubuntu-r
+    image: ubuntu
+    command: ["/bin/bash", "-ec", "while :; do echo '.'; sleep 5 ; done"]
+    resources:
+      requests:
+        cpu: "300m"
+        memory: 256Mi
+    ports:
+    - containerPort: 80
+
