@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: ubuntu-r
-    image: ubuntu
+    image: ubuntu:jammy
     command: ["/bin/bash", "-ec", "while :; do echo '.'; sleep 5 ; done"]
     resources:
       requests:
