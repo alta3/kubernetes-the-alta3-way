@@ -26,9 +26,6 @@ spec:
     - name: static-demo-data
       mountPath: /var/www/static/nginx.txt
       subPath: nginx.txt
-    - name: top-secret-keys
-      mountPath: /etc/nginx/ssl
-      readOnly: true   
   volumes:
   - name: nginx-proxy-config
     configMap:
@@ -39,6 +36,3 @@ spec:
   - name: static-demo-data
     configMap:
       name: nginx-txt
-  - name: top-secret-keys
-    secret:
-      secretName: webby-keys  
