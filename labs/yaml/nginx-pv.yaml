@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-with-pv
+spec:
+  containers:
+  - name: nginx-with-pv
+    image: nginx:1.18.0
+    ports:
+    - name: http
+      containerPort: 80
+      protocol: TCP
+    volumeMounts:
+    - name: nginx-pv-storage
+      mountPath: "/data"
+  nodeSelector:
+    kubernetes.io/hostname: node-1
+  volumes:
+  - name: nginx-pv-storage
+    persistentVolumeClaim:
+      claimName: nginx-pvc
