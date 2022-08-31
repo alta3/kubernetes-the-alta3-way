@@ -14,6 +14,7 @@ calico_version: "3.24.2"    # https://github.com/projectcalico/calico/releases
 helm_version: "3.9.4"       # https://github.com/helm/helm/releases
 ```
 
+### Removed depreciated kube-apiserver flag (RemoveSelfLink)
 Observed error:
 ```
 controller kube-apiserver[3805]: Error: invalid argument "RemoveSelfLink=false" for "--feature-gates" flag: cannot set feature gate RemoveSelfLink to false, feature is locked to true
@@ -29,6 +30,26 @@ Fix:
 ```diff
 roles/controller_install/templates/kube-apiserver.service.j2
 -  --feature-gates=RemoveSelfLink=false \
+```
+
+### Removed dockershim-related kublet flags
+
+Observed error:
+```
+node-1 kubelet[8760]: Error: failed to parse kubelet flag: unknown flag: --image-pull-progress-deadline
+```
+
+Documentation links:
+- https://github.com/kubernetes/kubernetes/pull/106907
+- https://github.com/kubernetes/kubernetes/pull/107094
+- https://www.armosec.io/blog/kubernetes-version-1-24/
+
+Fix
+```
+roles/node_install/templates/kubelet.service.j2
+-  --container-runtime=remote \
+-  --network-plugin=cni \
+-  --image-pull-progress-deadline=2m \
 ```
 
 ## from `1.18.0` to `1.23.3`
