@@ -21,7 +21,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --etcd-servers={{ controller_etcd_cluster_urls }} \
   --event-ttl=1h \
   --encryption-provider-config={{ deployed_encryption_config_file }} \
-  --feature-gates=RemoveSelfLink=false \
   --kubelet-certificate-authority={{ deployed_ca_pem_file }} \
   --kubelet-client-certificate={{ deployed_k8s_pem_file }} \
   --kubelet-client-key={{ deployed_k8s_key_file }} \

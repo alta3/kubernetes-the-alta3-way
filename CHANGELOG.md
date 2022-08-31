@@ -1,3 +1,36 @@
+## from `1.23.3` to `1.24.4`
+
+### Updated versions
+``` yaml
+k8s_version: "1.24.3"       # https://kubernetes.io/releases/#release-v1-24 
+etcd_version: "3.5.4"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.1.2"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.8" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.24.2" # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.2"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.4"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.3"    # https://github.com/coredns/coredns/releases
+calico_version: "3.24.2"    # https://github.com/projectcalico/calico/releases
+helm_version: "3.9.4"       # https://github.com/helm/helm/releases
+```
+
+Observed error:
+```
+controller kube-apiserver[3805]: Error: invalid argument "RemoveSelfLink=false" for "--feature-gates" flag: cannot set feature gate RemoveSelfLink to false, feature is locked to true
+```
+
+Documentaton links:
+
+- https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+- https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/1164-remove-selflink
+- https://github.com/alta3/labs/issues/400
+
+Fix:
+```diff
+roles/controller_install/templates/kube-apiserver.service.j2
+-  --feature-gates=RemoveSelfLink=false \
+```
+
 ## from `1.18.0` to `1.23.3`
 
 ### Updated Versions:
