@@ -1,7 +1,24 @@
+## from `1.24.4` to `1.25.0`
+
+### Versions
+
+```yaml
+k8s_version: "1.25.0"       # https://kubernetes.io/releases/#release-v1-24 
+etcd_version: "3.5.4"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.1.1"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.8" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.25.0" # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.2"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.4"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.3"    # https://github.com/coredns/coredns/releases
+calico_version: "3.24.1"    # https://github.com/projectcalico/calico/releases
+helm_version: "3.9.4"       # https://github.com/helm/helm/releases
+```
+
 ## from `1.23.3` to `1.24.4`
 
-### Updated versions
-``` yaml
+### Versions
+```yaml
 k8s_version: "1.24.3"       # https://kubernetes.io/releases/#release-v1-24 
 etcd_version: "3.5.4"       # https://github.com/etcd-io/etcd/releases
 cni_version: "1.1.1"        # https://github.com/containernetworking/cni/releases
@@ -122,7 +139,7 @@ roles/node_install/templates/kubelet.service.j2
 
 ## from `1.18.0` to `1.23.3`
 
-### Updated Versions:
+### Versions:
 
 ```
 k8s_version: "1.23.3"       # https://kubernetes.io/releases/#release-v1-23
