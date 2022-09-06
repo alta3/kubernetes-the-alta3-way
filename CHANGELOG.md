@@ -2,7 +2,7 @@
 
 ### Updated versions
 ``` yaml
-k8s_version: "1.24.3"       # https://kubernetes.io/releases/#release-v1-24 
+k8s_version: "1.24.4"       # https://kubernetes.io/releases/#release-v1-24 
 etcd_version: "3.5.4"       # https://github.com/etcd-io/etcd/releases
 cni_version: "1.1.1"        # https://github.com/containernetworking/cni/releases
 containerd_version: "1.6.8" # https://github.com/containerd/containerd/releases
@@ -112,8 +112,8 @@ Documentation links:
 - https://github.com/kubernetes/kubernetes/pull/107094
 - https://www.armosec.io/blog/kubernetes-version-1-24/
 
-Fix
-```
+Fix:
+```diff
 roles/node_install/templates/kubelet.service.j2
 -  --container-runtime=remote \
 -  --network-plugin=cni \
@@ -352,37 +352,4 @@ cannot change:
 ```
 roles/calico/templates/calico.yaml.j2:        - key: node-role.kubernetes.io/master
 roles/make_certs/templates/admin-csr.json.j2:      "O": "system:masters",
-```
-
-
-
-## verify
-
-```
-curl --cacert ~/k8s-certs/ca.pem https://127.0.0.1:6443/version
-source <(kubectl completion bash)
-kubectl get nodes
-kubectl get pods --all-namespaces
-
-# test dns
-# https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
-kubectl exec -i -t dnsutils -- nslookup kubernetes.default
-
-
-kubectl create deployment nginx1 --image=nginx
-kubectl create deployment nginx2 --image=nginx
-kubectl create deployment nginx3 --image=nginx
-kubectl create deployment nginx4 --image=nginx
-kubectl create deployment nginx5 --image=nginx
-sleep 30
-kubectl get pods -l app=nginx2
-kubectl exec --stdin --tty nginx- -- /bin/bash
-
-kubectl delete deployment nginx1 
-kubectl delete deployment nginx2 
-kubectl delete deployment nginx3 
-kubectl delete deployment nginx4 
-kubectl delete deployment nginx5 
-
-
 ```
