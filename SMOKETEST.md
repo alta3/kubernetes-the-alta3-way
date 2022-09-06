@@ -1,3 +1,22 @@
+### Lab testing
+
+Generate lists of setup directories used by labs
+
+```bash
+# within a mdBook, find labs and print their source (between parens)
+grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/'
+
+# find setup commands
+grep '\`setup' lab-name.md | cut -d '`' -f 4
+
+# get only the setup folder name
+grep '\`setup' lab-name.md | cut -d '`' -f 4 | cut -d ' ' -f 2
+
+# all together now
+grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | cut -d '`' -f 4 | cut -d ' ' -f 2 | xargs -I {} echo -e "setup {}\ntl {}"
+```
+
+### Super basic functionality testing (DNS + Network)
 
 ```
 # run playbook
