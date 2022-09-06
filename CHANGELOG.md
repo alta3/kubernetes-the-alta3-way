@@ -353,36 +353,3 @@ cannot change:
 roles/calico/templates/calico.yaml.j2:        - key: node-role.kubernetes.io/master
 roles/make_certs/templates/admin-csr.json.j2:      "O": "system:masters",
 ```
-
-
-
-## verify
-
-```
-curl --cacert ~/k8s-certs/ca.pem https://127.0.0.1:6443/version
-source <(kubectl completion bash)
-kubectl get nodes
-kubectl get pods --all-namespaces
-
-# test dns
-# https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
-kubectl exec -i -t dnsutils -- nslookup kubernetes.default
-
-
-kubectl create deployment nginx1 --image=nginx
-kubectl create deployment nginx2 --image=nginx
-kubectl create deployment nginx3 --image=nginx
-kubectl create deployment nginx4 --image=nginx
-kubectl create deployment nginx5 --image=nginx
-sleep 30
-kubectl get pods -l app=nginx2
-kubectl exec --stdin --tty nginx- -- /bin/bash
-
-kubectl delete deployment nginx1 
-kubectl delete deployment nginx2 
-kubectl delete deployment nginx3 
-kubectl delete deployment nginx4 
-kubectl delete deployment nginx5 
-
-
-```
