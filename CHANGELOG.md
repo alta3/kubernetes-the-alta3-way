@@ -112,8 +112,8 @@ Documentation links:
 - https://github.com/kubernetes/kubernetes/pull/107094
 - https://www.armosec.io/blog/kubernetes-version-1-24/
 
-Fix
-```
+Fix:
+```diff
 roles/node_install/templates/kubelet.service.j2
 -  --container-runtime=remote \
 -  --network-plugin=cni \
