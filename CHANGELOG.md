@@ -14,6 +14,74 @@ calico_version: "3.24.1"    # https://github.com/projectcalico/calico/releases
 helm_version: "3.9.4"       # https://github.com/helm/helm/releases
 ```
 
+### Re-baslined kubernetes-the-alta3-way changes to calico manifest
+
+Source yaml: [v3.24.1 calcio-etcd.yaml](https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico-etcd.yaml)
+
+`diff calico-etcd.yaml roles/calico/templates/calico.yaml.j2`
+
+```diff
+47,49c47,50
+<   # etcd-key: null
+<   # etcd-cert: null
+<   # etcd-ca: null
+---
+>   # alta3-the-hard-way managed item
+>   etcd-key:  "{{ lookup('file', k8s_key_file ) | b64encode }}"
+>   etcd-cert: "{{ lookup('file', k8s_pem_file ) | b64encode }}"
+>   etcd-ca:   "{{ lookup('file', ca_pem_file  ) | b64encode }}"
+60c61,62
+<   etcd_endpoints: "http://<ETCD_IP>:<ETCD_PORT>"
+---
+>   # alta3-the-hard-way managed item
+>   etcd_endpoints: "{{ calico_etcd_endpoints }}"
+63,65c65,68
+<   etcd_ca: ""   # "/calico-secrets/etcd-ca"
+<   etcd_cert: "" # "/calico-secrets/etcd-cert"
+<   etcd_key: ""  # "/calico-secrets/etcd-key"
+---
+>   # alta3-the-hard-way managed item
+>   etcd_ca:   "/calico-secrets/etcd-ca"
+>   etcd_cert: "/calico-secrets/etcd-cert"
+>   etcd_key:  "/calico-secrets/etcd-key"
+74c77,78
+<   veth_mtu: "0"
+---
+>   # alta3-the-hard-way managed item
+>   veth_mtu: "{{ calico_veth_mtu }}"
+269c273,274
+<           image: docker.io/calico/cni:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/cni:v{{ calico_version }}
+315c320,321
+<           image: docker.io/calico/node:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/node:v{{ calico_version }}
+341c347,348
+<           image: docker.io/calico/node:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/node:v{{ calico_version }}
+389a397,399
+>             # alta3-the-hard-way managed item
+>             - name: IP_AUTODETECTION_METHOD
+>               value: "can-reach=8.8.8.8"
+419a430,432
+>             # alta3-the-hard-way managed item
+>             - name: CALICO_IPV4POOL_CIDR
+>               value: "{{ cluster_cidr }}"
+432a446,448
+>             # alta3-the-hard-way managed item
+>             - name: WAIT_FOR_DATASTORE
+>               value: "true"
+581c597
+<           image: docker.io/calico/kube-controllers:v3.24.1
+---
+>           image: docker.io/calico/kube-controllers:v{{ calico_version }}
+```
+
 ### Removed depreciated kube-apiserver flag (RemoveSelfLink)
 Observed error:
 ```
