@@ -1,3 +1,125 @@
+## from `1.23.3` to `1.24.4`
+
+### Updated versions
+``` yaml
+k8s_version: "1.24.4"       # https://kubernetes.io/releases/#release-v1-24 
+etcd_version: "3.5.4"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.1.1"        # https://github.com/containernetworking/cni/releases
+containerd_version: "1.6.8" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.24.2" # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.2"      # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.4"       # https://github.com/opencontainers/runc/releases
+coredns_version: "1.9.3"    # https://github.com/coredns/coredns/releases
+calico_version: "3.24.1"    # https://github.com/projectcalico/calico/releases
+helm_version: "3.9.4"       # https://github.com/helm/helm/releases
+```
+
+### Re-baslined kubernetes-the-alta3-way changes to calico manifest
+
+Source yaml: [v3.24.1 calcio-etcd.yaml](https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico-etcd.yaml)
+
+`diff calico-etcd.yaml roles/calico/templates/calico.yaml.j2`
+
+```diff
+47,49c47,50
+<   # etcd-key: null
+<   # etcd-cert: null
+<   # etcd-ca: null
+---
+>   # alta3-the-hard-way managed item
+>   etcd-key:  "{{ lookup('file', k8s_key_file ) | b64encode }}"
+>   etcd-cert: "{{ lookup('file', k8s_pem_file ) | b64encode }}"
+>   etcd-ca:   "{{ lookup('file', ca_pem_file  ) | b64encode }}"
+60c61,62
+<   etcd_endpoints: "http://<ETCD_IP>:<ETCD_PORT>"
+---
+>   # alta3-the-hard-way managed item
+>   etcd_endpoints: "{{ calico_etcd_endpoints }}"
+63,65c65,68
+<   etcd_ca: ""   # "/calico-secrets/etcd-ca"
+<   etcd_cert: "" # "/calico-secrets/etcd-cert"
+<   etcd_key: ""  # "/calico-secrets/etcd-key"
+---
+>   # alta3-the-hard-way managed item
+>   etcd_ca:   "/calico-secrets/etcd-ca"
+>   etcd_cert: "/calico-secrets/etcd-cert"
+>   etcd_key:  "/calico-secrets/etcd-key"
+74c77,78
+<   veth_mtu: "0"
+---
+>   # alta3-the-hard-way managed item
+>   veth_mtu: "{{ calico_veth_mtu }}"
+269c273,274
+<           image: docker.io/calico/cni:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/cni:v{{ calico_version }}
+315c320,321
+<           image: docker.io/calico/node:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/node:v{{ calico_version }}
+341c347,348
+<           image: docker.io/calico/node:v3.24.1
+---
+>           # alta3-the-hard-way managed item
+>           image: docker.io/calico/node:v{{ calico_version }}
+389a397,399
+>             # alta3-the-hard-way managed item
+>             - name: IP_AUTODETECTION_METHOD
+>               value: "can-reach=8.8.8.8"
+419a430,432
+>             # alta3-the-hard-way managed item
+>             - name: CALICO_IPV4POOL_CIDR
+>               value: "{{ cluster_cidr }}"
+432a446,448
+>             # alta3-the-hard-way managed item
+>             - name: WAIT_FOR_DATASTORE
+>               value: "true"
+581c597
+<           image: docker.io/calico/kube-controllers:v3.24.1
+---
+>           image: docker.io/calico/kube-controllers:v{{ calico_version }}
+```
+
+### Removed depreciated kube-apiserver flag (RemoveSelfLink)
+Observed error:
+```
+controller kube-apiserver[3805]: Error: invalid argument "RemoveSelfLink=false" for "--feature-gates" flag: cannot set feature gate RemoveSelfLink to false, feature is locked to true
+```
+
+Documentaton links:
+
+- https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/
+- https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/1164-remove-selflink
+- https://github.com/alta3/labs/issues/400
+
+Fix:
+```diff
+roles/controller_install/templates/kube-apiserver.service.j2
+-  --feature-gates=RemoveSelfLink=false \
+```
+
+### Removed dockershim-related kublet flags
+
+Observed error:
+```
+node-1 kubelet[8760]: Error: failed to parse kubelet flag: unknown flag: --image-pull-progress-deadline
+```
+
+Documentation links:
+- https://github.com/kubernetes/kubernetes/pull/106907
+- https://github.com/kubernetes/kubernetes/pull/107094
+- https://www.armosec.io/blog/kubernetes-version-1-24/
+
+Fix:
+```diff
+roles/node_install/templates/kubelet.service.j2
+-  --container-runtime=remote \
+-  --network-plugin=cni \
+-  --image-pull-progress-deadline=2m \
+```
+
 ## from `1.18.0` to `1.23.3`
 
 ### Updated Versions:
@@ -230,37 +352,4 @@ cannot change:
 ```
 roles/calico/templates/calico.yaml.j2:        - key: node-role.kubernetes.io/master
 roles/make_certs/templates/admin-csr.json.j2:      "O": "system:masters",
-```
-
-
-
-## verify
-
-```
-curl --cacert ~/k8s-certs/ca.pem https://127.0.0.1:6443/version
-source <(kubectl completion bash)
-kubectl get nodes
-kubectl get pods --all-namespaces
-
-# test dns
-# https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
-kubectl exec -i -t dnsutils -- nslookup kubernetes.default
-
-
-kubectl create deployment nginx1 --image=nginx
-kubectl create deployment nginx2 --image=nginx
-kubectl create deployment nginx3 --image=nginx
-kubectl create deployment nginx4 --image=nginx
-kubectl create deployment nginx5 --image=nginx
-sleep 30
-kubectl get pods -l app=nginx2
-kubectl exec --stdin --tty nginx- -- /bin/bash
-
-kubectl delete deployment nginx1 
-kubectl delete deployment nginx2 
-kubectl delete deployment nginx3 
-kubectl delete deployment nginx4 
-kubectl delete deployment nginx5 
-
-
 ```
