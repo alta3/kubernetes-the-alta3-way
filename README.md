@@ -1,10 +1,8 @@
 # Kubernetes The Alta3 Way
 
-This playbook walks you through setting up Kubernetes the Alta3 way. This guide is a fully automated command to bring up a Kubernetes cluster using Ansible.
+This repo contains a fully automated installer to deploy a Highly Available Kubernetes cluster using Ansible.  The Kubernetes The Alta3 Way playbook is optimized for learning; with explict steps and install mechanisms which ensure understanding each task required to bootstrap a production-grade Kubernetes cluster.
 
-Kubernetes The Alta3 Way is optimized for learning, which means taking the long route to ensure you understand each task required to bootstrap a Kubernetes cluster.
-
-Kubernetes The Alta3 Way is used extensively within the student lab environments for Alat3's [Kubernetes Bootcamp](https://alta3.com/overview-kubernetes-ckad) and [Certified Kubernetes Administrator](https://alta3.com/overview-cka-training) courses.  In this course each student has access to their own high availability Kubernetes environment capable of demonstrating all of the “K8s” features and components used in CKAD and CKA certifications (Certified Kubernetes Application Developer, Certified Kubernetes Administrator).
+Kubernetes The Alta3 Way is used extensively within the student lab environments for Alat3's [Kubernetes Bootcamp](https://alta3.com/overview-kubernetes-ckad) and [Certified Kubernetes Administrator](https://alta3.com/overview-cka-training) courses.  In each course students have access to their own Kubernetes environments capable of demonstrating all of the “K8s” features and components used in CKAD and CKA certifications (Certified Kubernetes Application Developer, Certified Kubernetes Administrator).
 
 ## Copyright
 
