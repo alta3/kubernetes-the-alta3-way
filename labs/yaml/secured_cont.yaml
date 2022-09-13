@@ -13,6 +13,7 @@ spec:
       runAsUser: 1000
       runAsGroup: 3000
       allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
     volumeMounts:
     - name: secured-volume
       mountPath: /data/secured
