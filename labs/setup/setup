@@ -17,7 +17,12 @@ fi
 LAB_ID=$1
 
 if [ ! -d "$LAB_ID" ]; then
-    echo "[-] ${LAB_ID} setup not found"
+    echo "[-] ${LAB_ID} setup dir ${LAB_ID} not found"
+    exit 1
+fi
+
+if [ ! -f "$LAB_ID/setup" ]; then
+    echo "[-] setup.sh in ${LAB_ID} not found"
     exit 1
 fi
 
