@@ -6,7 +6,8 @@ metadata:
     app.kubernetes.io/name: tracee                                        
     app.kubernetes.io/component: tracee                                   
     app.kubernetes.io/part-of: tracee                                     
-  name: tracee                                                            
+  name: tracee
+  namespace: kube-system
 spec:                                                                                                     
   selector:                                                                                                                                                                               
     matchLabels:                                                                                                                                                                          
