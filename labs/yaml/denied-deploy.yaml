@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-alpine
+  namespace: prod
+  labels:
+    app: alpine
+    role: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine
+      role: prod
+  template:
+    metadata:
+      labels:
+        app: alpine
+        role: prod
+    spec:
+      containers:
+      - image: janeczku/alpine-kubernetes
+        name: prod-alpine
+        ports:
+        - containerPort: 6379
