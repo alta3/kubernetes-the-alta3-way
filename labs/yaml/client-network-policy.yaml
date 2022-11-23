@@ -9,7 +9,7 @@ spec:
   ingress:
   - from:
     - podSelector:
-      matchLabels:
-        run: client
+        matchLabels:
+          run: client
   policyTypes:
   - Ingress
