@@ -1,0 +1,18 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: ns-must-have-pss
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+  parameters:
+    labels:
+      - "kubernetes.io/metadata.name"
+      - "pod-security.kubernetes.io/enforce"
+      - "pod-security.kubernetes.io/enforce-version"
+      - "pod-security.kubernetes.io/warn"
+      - "pod-security.kubernetes.io/warn-version"
+      - "pod-security.kubernetes.io/audit"
+      - "pod-security.kubernetes.io/audit-version"
