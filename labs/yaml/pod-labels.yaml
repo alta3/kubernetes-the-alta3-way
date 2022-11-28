@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-label
+  labels:
+    app: nginx
+    ver: latest
+    namespace: default # This is a label
+  namespace: default # This is setting the namespace to default
+spec:
+  containers:
+  - name: no-label
+    image: nginx
