@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: busybox:1.34.1    # https://www.busybox.net/about.html
+    image: busybox:1.34.0    # https://www.busybox.net/about.html
     resources:
       requests:
         cpu: "300m"   # slice of core

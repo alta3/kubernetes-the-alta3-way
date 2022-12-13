@@ -7,12 +7,12 @@ metadata:
 spec:
   containers:       # containers are the "rock stars", this is the "solution"
   - name: myapp-container    # name of the container
-    image:  busybox:1.34.1      # image to run
+    image:  busybox:1.34.0      # image to run
     command: ['sh', '-c', 'echo The app is running! && sleep 3600']
   initContainers:   # init containers are "opening acts", they MUST run BEFORE "containers" are launched!
   - name: init-myservice   # name of init container
-    image:  busybox:1.34.1    # image of init container
+    image:  busybox:1.34.0    # image of init container
     command: ['sh', '-c', 'until nslookup myservice; do echo waiting for myservice; sleep 2; done;']
   - name: init-mydb        # name of init container
-    image:  busybox:1.34.1    # image of init container
+    image:  busybox:1.34.0    # image of init container
     command: ['sh', '-c', 'until nslookup mydb; do echo waiting for mydb; sleep 2; done;']

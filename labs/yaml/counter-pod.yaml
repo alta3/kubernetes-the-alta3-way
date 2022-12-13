@@ -5,10 +5,10 @@ metadata:
 spec:
   containers:
   - name: count
-    image: busybox:1.34.1
+    image: busybox:1.34.0
     args: [/bin/sh, -c,
             'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done']
   - name: countby3
-    image: busybox:1.34.1
+    image: busybox:1.34.0
     args: [/bin/sh, -c,
             'i=0; while true; do echo "$(date): $i"; i=$((i+1)); sleep 3; done']
