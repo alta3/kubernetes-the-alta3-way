@@ -11,7 +11,7 @@ spec:
     image: docker.io/dockersec/tcpdump   # image to pull
     imagePullPolicy: Always              # do not use a cached image
   - name: busybox
-    image: busybox:1.35.0    # https://www.busybox.net/about.html
+    image: busybox:1.34.1    # https://www.busybox.net/about.html
     args:             # arguments passed to
     - sleep
     - "10000"
