@@ -10,7 +10,7 @@
 ```yaml
 k8s_version: "1.25.5"        # https://kubernetes.io/releases/#release-v1-25
 etcd_version: "3.5.6"        # https://github.com/etcd-io/etcd/releases
-cni_version: "1.1.2"         # https://github.com/containernetworking/cni/releases
+cni_version: "1.1.1"         # https://github.com/containernetworking/cni/releases
 containerd_version: "1.6.12" # https://github.com/containerd/containerd/releases
 cri_tools_version: "1.25.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
 cfssl_version: "1.6.3"       # https://github.com/cloudflare/cfssl/releases
@@ -22,7 +22,7 @@ helm_version: "3.10.2"       # https://github.com/helm/helm/releases
 
 Supporting release links
 - https://github.com/etcd-io/etcd/releases/tag/v3.5.6 
-- https://github.com/containernetworking/cni/releases/tag/v1.1.2 
+- https://github.com/containernetworking/cni/releases/tag/v1.1.1
 - https://github.com/containerd/containerd/releases/tag/v1.6.12 
 - https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.25.0 
 - https://github.com/cloudflare/cfssl/releases/tag/v1.6.3 
