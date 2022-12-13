@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: yellowapp
+  name: existingapp
 spec:
   replicas: 3
   selector:
@@ -18,4 +18,4 @@ spec:
       - name: container01
         image: hashicorp/http-echo:alpine
         args:
-        - '-text="Welcome to the Yellow App (1.0)!"'
+        - '-text="Welcome to the Existing App (1.0)!"'
