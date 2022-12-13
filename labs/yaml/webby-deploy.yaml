@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name:
-        image: registry.gitlab.com/alta/webby 
+        image: registry.gitlab.com/alta3/webby 
         ports:
         - containerPort:
