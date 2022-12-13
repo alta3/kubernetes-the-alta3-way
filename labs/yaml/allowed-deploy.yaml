@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-alpine
+  namespace: test
+  labels:
+    app: alpine
+    role: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine
+      role: test
+  template:
+    metadata:
+      labels:
+        app: alpine
+        role: test
+    spec:
+      containers:
+      - image: janeczku/alpine-kubernetes
+        name: test-alpine
+        ports:
+        - containerPort: 6379

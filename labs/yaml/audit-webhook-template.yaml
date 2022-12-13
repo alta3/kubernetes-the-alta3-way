@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Config
+clusters:
+- cluster:
+    server: SERVERIP # <--- We'll replace this with your server IP using SED
+  name: falco
+contexts:
+- context:
+    cluster: falco
+    user: ""
+  name: default-context
+current-context: default-context
+preferences: {}
+users: []

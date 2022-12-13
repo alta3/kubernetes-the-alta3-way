@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dev-network-policy
+  namespace: dev
+spec:
+  podSelector:
+    matchLabels:
+      app: simpleservice
+      role: dev
+  ingress:
+    - from:
+      - namespaceSelector: # Source
+          matchLabels:
+            kubernetes.io/metadata.name: test

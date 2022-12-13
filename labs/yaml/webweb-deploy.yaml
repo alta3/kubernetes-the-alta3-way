@@ -17,6 +17,6 @@ spec:             # the state to achieve
     spec:         # how to build the CONTINERS within the pod
       containers:
       - name: webweb      # build one container name webweb
-        image: registry.gitlab.com/alta3research/webby
+        image: registry.gitlab.com/alta3/webby
         ports:
         - containerPort: 8888   # port container is listening on

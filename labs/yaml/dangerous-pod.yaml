@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dangerous-pod
+  labels:
+    pss: baseline-violation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pss: baseline-violation
+  template:
+    metadata:
+      labels:
+        pss: baseline-violation
+    spec:
+      containers:
+      - image: centos/httpd
+        name: baseline-violation
+        volumeMounts:
+        - mountPath: /web
+          name: test-volume
+      volumes:
+      - name: test-volume
+        hostPath:
+          path: /
