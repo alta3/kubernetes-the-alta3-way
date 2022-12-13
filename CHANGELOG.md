@@ -2,7 +2,7 @@
 
 #### Kubernetes v1.25: Combiner
 
-<img src="https://user-images.githubusercontent.com/116113/188537177-16e36780-8cf1-43ea-9b15-cbfc2b9a9151.png" width="400" height="400" />
+<img src="https://user-images.githubusercontent.com/116113/188537177-16e36780-8cf1-43ea-9b15-cbfc2b9a9151.png" width="200" height="200" />
 
 - https://github.com/kubernetes/kubernetes/releases/tag/v1.25.4
 - https://kubernetes.io/blog/2022/08/23/kubernetes-v1-25-release/
