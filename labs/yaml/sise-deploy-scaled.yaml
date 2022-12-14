@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sise-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sise
+  template:
+    metadata:
+      labels:
+        app: sise
+    spec:
+      containers:
+      - name: sise
+        image: mhausenblas/simpleservice:0.5.0
+        ports:
+        - containerPort: 9876
+        env:
+        - name: SIMPLE_SERVICE_VERSION
+          value: "1.0"
+        resources:
+          requests:
+            cpu: '15m'
+            memory: '16Mi'
+          limits:
+            cpu: '30m'
+            memory: '32Mi'
