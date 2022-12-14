@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronechocomplete
+spec:
+  schedule: "*/3 * * * *"
+  jobTemplate:
+    spec:
+      successfulJobHistoryLimit: 2
+      parallelism: 5
+      completions: 10
+      template:
+        spec:
+          containers:
+          - name: echo
+            image: alpine:3.2
+            command: ["/bin/sh"]
+            args: ["-c", "echo hello world; sleep 10"]
+          restartPolicy: Never

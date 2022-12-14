@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  name: echocompleteneverendsttl
+spec: 
+  ttlSecondsAfterFinished: 30
+  template:
+    metadata:
+      name: echocompleteneverendsttl
+    spec:
+      containers:
+      - name: echo
+        image: alpine:3.2
+        command: ["/bin/sh"]
+        args: ["-c", "echo hello; sleep 10"]
+      restartPolicy: Never
