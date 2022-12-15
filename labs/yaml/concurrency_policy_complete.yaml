@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronechocomplete
+  name: concurrencypolicyechocomplete
 spec:
   schedule: "*/1 * * * *"
+  concurrencyPolicy: Allow
   jobTemplate:
     spec:
-      concurrencyPolicy: Allowed
       parallelism: 1
       completions: 1
       template:
