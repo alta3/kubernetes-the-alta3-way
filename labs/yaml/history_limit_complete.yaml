@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronechocomplete
+  name: historylimitechocomplete
 spec:
   schedule: "*/1 * * * *"
   jobTemplate:
