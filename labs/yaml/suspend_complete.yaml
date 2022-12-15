@@ -1,12 +1,12 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronechocomplete
+  name: suspendechocomplete
 spec:
   schedule: "*/1 * * * *"
+  suspend: true
   jobTemplate:
     spec:
-      suspend: true
       parallelism: 1
       completions: 1
       template:
