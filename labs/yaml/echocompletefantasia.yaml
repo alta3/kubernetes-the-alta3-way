@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  name: echocompletefantasia
+spec:
+  parallelism: 2
+  completions: 6  
+  template:
+    metadata:
+      name: echocompletefantasia
+    spec:
+      containers:
+      - name: echo
+        image: alpine:3.2
+        command: ["/bin/sh"]
+        args: ["-c", "echo hello; sleep 10"]            
+      restartPolicy: Never

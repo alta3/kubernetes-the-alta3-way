@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  name: echocompleteneverends
+spec:
+  template:
+    metadata:
+      name: echocompleteneverends
+    spec:
+      containers:
+      - name: echo
+        image: alpine:3.2
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo This is the job that never ends. Yes it goes on and on my friends! Somebody started running it not knowing what it was, and they continued running it forever just because, ; sleep 10; done"]
+      restartPolicy: Never
