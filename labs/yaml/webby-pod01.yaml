@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: webby
-    image: registry.gitlab.com/alta3research/webby
+    image: registry.gitlab.com/alta3/webby
     ports:
     - name: web
       containerPort: 8888

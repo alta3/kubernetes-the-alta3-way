@@ -7,7 +7,7 @@ spec:
     fsGroup: 2000
   containers:
   - name: secured-container
-    image: busybox:1.35.0
+    image: busybox:1.34.0
     command: [ "sh", "-c", "sleep 1h" ]
     securityContext:
       runAsUser: 1000

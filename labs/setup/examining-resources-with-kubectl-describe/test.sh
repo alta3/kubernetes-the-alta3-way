@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xeuo pipefail
 
-kubectl run --port=8888 --image=registry.gitlab.com/alta3research/webby webweb
+kubectl run --port=8888 --image=registry.gitlab.com/alta3/webby webweb
 kubectl wait --for condition=Ready --timeout 60s pod/webweb
 kubectl delete pod webweb --now
 kubectl apply -f ../yaml/webweb-deploy.yaml
