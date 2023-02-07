@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: # name of container
-    image: # name of the image to use
+    image: registry.gitlab.com/alta3/webby # name of the image to use
     ports:
     - name: # name for port mapping
       containerPort: # we mapped this with the port-forward command
