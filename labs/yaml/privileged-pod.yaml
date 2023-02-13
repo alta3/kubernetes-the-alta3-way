@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged-pod
+spec:
+  serviceAccountName: privileged-sa
+  containers:
+  - name: privileged-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
