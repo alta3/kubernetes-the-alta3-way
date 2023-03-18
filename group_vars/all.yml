@@ -287,12 +287,12 @@ node_binaries:
    mode: "0775"
 
  - name: "runsc"
-   url: "https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc"
+   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/runsc"
    path: "/usr/local/bin/runsc"
    mode: "0775"
    
  - name: "containerd-shim-runsc-v1"
-   url: "https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/containerd-shim-runsc-v1"
+   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/containerd-shim-runsc-v1"
    path: "/usr/local/bin/containerd-shim-runsc-v1"
    mode: "0775"
 
