@@ -286,7 +286,7 @@ node_binaries:
    mode: "0775"
 
  - name: "runsc"
-   url: "https://storage.googleapis.com/kubernetes-the-hard-way/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17"
+   url: "https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc"
    path: "/usr/local/bin/runsc"
    mode: "0775"
 
