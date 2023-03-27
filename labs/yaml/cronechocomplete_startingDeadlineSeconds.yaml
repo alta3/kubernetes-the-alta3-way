@@ -6,7 +6,7 @@ spec:
   schedule: "*/1 * * * *"
   jobTemplate:
     spec:
-      startingDeadlineSeconds: 60
+      startingDeadlineSeconds: 100
       parallelism: 1
       completions: 1
       template:
@@ -15,5 +15,5 @@ spec:
           - name: echo
             image: alpine:3.2
             command: ["/bin/sh"]
-            args: ["-c", "echo hello; sleep 10"]
+            args: ["-c", "echo hello; sleep 85"]
           restartPolicy: Never
