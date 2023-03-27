@@ -4,9 +4,9 @@ metadata:
   name: cronechocomplete
 spec:
   schedule: "*/1 * * * *"
+  startingDeadlineSeconds: 100
   jobTemplate:
     spec:
-      startingDeadlineSeconds: 100
       parallelism: 1
       completions: 1
       template:
