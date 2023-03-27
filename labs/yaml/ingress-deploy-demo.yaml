@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: demo
-  name: ingress-deploy-demo
+  name: demo-ingress
   namespace: default
 spec:
   progressDeadlineSeconds: 600
