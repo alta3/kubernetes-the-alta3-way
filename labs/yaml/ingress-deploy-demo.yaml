@@ -19,12 +19,11 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: demo
     spec:
       containers:
-      - image: docker.io/library/httpd@sha256:f3e9eb9acace5bbc13c924293d2247a65bb59b8f062bcd98cd87ee4e18f86733
+      - image: docker.io/library/httpd:2.4.56
         name: httpd
         ports:
         - containerPort: 80
