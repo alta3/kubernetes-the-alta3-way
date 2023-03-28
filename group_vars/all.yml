@@ -12,6 +12,7 @@ runc_version: "1.1.4"        # https://github.com/opencontainers/runc/releases
 coredns_version: "1.10.0"    # https://github.com/coredns/coredns/releases
 calico_version: "3.24.5"     # https://github.com/projectcalico/calico/releases
 helm_version: "3.10.2"       # https://github.com/helm/helm/releases
+gvisor_version: "latest"     # https://github.com/google/gvisor/releases
 
 # cluster specifics
 kube_verbose_level: 2
@@ -286,8 +287,13 @@ node_binaries:
    mode: "0775"
 
  - name: "runsc"
-   url: "https://storage.googleapis.com/kubernetes-the-hard-way/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17"
+   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/runsc"
    path: "/usr/local/bin/runsc"
+   mode: "0775"
+   
+ - name: "containerd-shim-runsc-v1"
+   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/containerd-shim-runsc-v1"
+   path: "/usr/local/bin/containerd-shim-runsc-v1"
    mode: "0775"
 
  - name: "runc"
