@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-paradise-svc
+  namespace: coconut
+spec:
+  selector:
+    coconuts: migrate
+  ports:
+    - protocol: TCP
+      port: 3423
+      targetPort: 80
