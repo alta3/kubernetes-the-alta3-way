@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: upsetti-spaghetti
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: upsetti-spaghetti-rq
+  namespace: upsetti-spaghetti
+spec:
+  hard:
+    requests.cpu: 1
+    requests.memory: 500Mi
+    limits.cpu: 1
+    limits.memory: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spaghetti-monster
+  namespace: upsetti-spaghetti
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      status: itsfine
+  template:
+    metadata:
+      labels:
+        app: nginx
+        status: itsfine
+    spec:
+      containers:
+      - name: spahetti-minion
+        image: nginx
+        ports:
+        - name: http
+          containerPort: 80
+        resources:
+          requests:
+            cpu: 400m
+            memory: 100Mi
+          limits:
+            cpu: 400m
+            memory: 125Mi
