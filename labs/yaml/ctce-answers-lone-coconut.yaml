@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lone-coconut
+  namespace: coconut
+  labels:
+    coconuts: migrate
+spec:
+  containers:
+  - name: lone-coconut
+    image: nginx:1.9.1
+    ports:
+    - name: http
+      containerPort: 80
+      protocol: TCP
