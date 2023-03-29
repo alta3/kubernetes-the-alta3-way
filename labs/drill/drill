@@ -1,0 +1,48 @@
+#!/bin/bash
+set -uo pipefail
+
+function now() {
+    printf '%x' "$(date +%s%3N)"
+}
+
+# cd into the drill directory
+DRILL_SETUP_DIR=$(dirname "$(readlink -f "$0")")
+pushd "${DRILL_SETUP_DIR}" >> /dev/null || exit 1 
+
+if [ -z ${1+x} ]; then 
+    echo "[-] missing lab-name, to run:"
+    printf "\tdrill lab-name\n"
+    exit 1
+fi
+LAB_ID=$1
+
+if [ ! -d "$LAB_ID" ]; then
+    echo "[-] ${LAB_ID} drill dir ${LAB_ID} not found"
+    exit 1
+fi
+
+if [ ! -f "$LAB_ID/drill.sh" ]; then
+    echo "[-] File ${LAB_ID}/drill.sh not found"
+    exit 1
+fi
+
+if [ "${LAB_ID}" != cka-exam ]; then
+    # check if a cluster exists
+    kubectl get nodes >> /dev/null
+    if [ $? -ne 0 ]; then
+        echo "[-] No kubernetes cluster found"
+        exit 1
+    fi
+fi
+
+# run this drill setup
+echo "[+] Preparing ${LAB_ID}"
+DRILL_LOG="/tmp/$(now)_${LAB_ID}_drill.log"
+bash "${LAB_ID}/drill.sh" > "${DRILL_LOG}" 2>&1
+if [ $? -ne 0 ]; then
+    cat "${DRILL_LOG}"
+    echo "[-] Drill failed"
+    exit 1
+fi
+popd >> /dev/null || exit 1 
+echo "[+] Drill Setup complete"
