@@ -1,37 +1,12 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-    name: dev
+    name: pineapple
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-    name: test
----
-apiVersion: v1
-kind: Namespace
-metadata:
-    name: prod
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: cherry
-  namespace: dev
-spec:
-  containers:
-    - name: pomegranate-seed
-      image: nginx
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: mango
-  namespace: prod
-spec:
-  containers:
-    - name: pina-colada
-      image: nginx
+    name: banana
 ---
 apiVersion: v1
 kind: Pod
