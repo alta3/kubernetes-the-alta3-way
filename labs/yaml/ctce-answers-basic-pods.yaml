@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: alphapod
-  namespace: default
+  name: singer
+  namespace: talent
 spec:
   containers:
-  - name: nginx
+  - name: opera
     image: nginx:1.7.9
