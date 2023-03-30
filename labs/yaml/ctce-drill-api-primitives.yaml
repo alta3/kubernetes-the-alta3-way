@@ -12,7 +12,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: apricot
-  namespace: test
+  namespace: pineapple
 spec:
   containers:
     - name: banana-boat
