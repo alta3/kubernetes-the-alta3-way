@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: namespace
+metadata:
+  name: banana
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mega-banana-v5
+  namespace: banana
