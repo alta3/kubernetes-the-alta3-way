@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: banana-peel
+  namespace: banana
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fruit
+  template:
+    metadata:
+      labels:
+        app: fruit
+    spec:
+      containers:
+      - name: banana-container
+        image: nginx:1.9.1
+        ports:
+        - containerPort: 80
+      serviceAccountName: mega-banana-v5
