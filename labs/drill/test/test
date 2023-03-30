@@ -1,0 +1,18 @@
+deploy-kubernetes using ansible
+api-primitives
+pod-basics
+multi-container-pods
+deploy-rolling updates
+deploy-rollbacks
+jobs-and cronjobs
+storage
+configmaps
+securitycontexts
+secrets
+serviceaccounts
+adding-probes
+container-logging
+application-monitoring
+troubleshooting
+services
+network-policies
