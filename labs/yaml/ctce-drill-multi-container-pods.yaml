@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfruit
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snooper
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: snooper
+      role: spy
+  template:
+    metadata:
+      labels:
+        app: snooper
+        role: spy
+    spec:
+      containers:
+      - name: snooper-con
+        image: busybox:1.28
+        args:
+        - /bin/sh
+        - -c
+        - >
+          i=0;
+          while true;
+          do
+            echo "$i: $(date)" >> /var/log/snooper.log;
+            i=$((i+1));
+            sleep 1;
+          done
+        volumeMounts:
+        - name: snooper-log
+          mountPath: /var/log
+      volumes:
+      - name: snooper-log
+        emptyDir: {}
