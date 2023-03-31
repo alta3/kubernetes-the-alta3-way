@@ -7,6 +7,9 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: manticore
+  labels:
+    lion: "true"
+    dragon: "true"
 spec:
   containers:
   - name: nginx
