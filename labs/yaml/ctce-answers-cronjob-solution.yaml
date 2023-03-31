@@ -1,17 +1,21 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: date-output
+  name: kronos
+  namespace: titans
 spec:
-  schedule: "* * * * *"
+  schedule: "*/1 * * * *"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            fear: his-children
         spec:
           containers:
-          - name: hello
+          - name: hunger
             image: busybox:1.28
-            command: [/bin/sh, -c, date]
+            command: [/bin/sh, -c, 'sleep 2 && echo done']
           restartPolicy: OnFailure
