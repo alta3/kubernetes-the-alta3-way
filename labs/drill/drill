@@ -30,7 +30,9 @@ if [ "${LAB_ID}" != cka-exam ]; then
     # check if a cluster exists
     kubectl get nodes >> /dev/null
     if [ $? -ne 0 ]; then
-        echo "[-] No kubernetes cluster found"
+        RED='\033[0;31m'
+        echo -e ${RED} "[-] No kubernetes cluster found"
+        echo -e ${RED} "Run the Deploying Kubernetes using Ansible lab to proceed"
         exit 1
     fi
 fi
@@ -41,7 +43,8 @@ DRILL_LOG="/tmp/$(now)_${LAB_ID}_drill.log"
 bash "${LAB_ID}/drill.sh" > "${DRILL_LOG}" 2>&1
 if [ $? -ne 0 ]; then
     cat "${DRILL_LOG}"
-    echo "[-] Drill failed"
+    RED='\033[0;31m'
+    echo -e ${RED} "[-] Drill failed"
     exit 1
 fi
 popd >> /dev/null || exit 1 
