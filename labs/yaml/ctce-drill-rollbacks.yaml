@@ -9,13 +9,16 @@ metadata:
   name: mufasa
   labels:
     app: nginx
+  namespace: king-of-lions
   annotations:
     kubernetes.io/change-cause: "Sarabi and I didn't see you at the presentation of Simba."
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: nginx
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
@@ -33,13 +36,16 @@ metadata:
   name: mufasa
   labels:
     app: nginx
+  namespace: king-of-lions
   annotations:
     kubernetes.io/change-cause: "Before sunrise, he's your son."
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: nginx
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
@@ -57,13 +63,16 @@ metadata:
   name: mufasa
   labels:
     app: nginx
+  namespace: king-of-lions
   annotations:
     kubernetes.io/change-cause: "One day, Simba, the sun will set on my time here and will rise with you as the new king."
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: nginx
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
@@ -81,13 +90,16 @@ metadata:
   name: mufasa
   labels:
     app: nginx
+  namespace: king-of-lions
   annotations:
     kubernetes.io/change-cause: "Long Live the King -- BROKEN!"
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: nginx
-  replicas: 3
+  replicas: 2
   template:
     metadata:
       labels:
