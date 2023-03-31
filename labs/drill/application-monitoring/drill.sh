@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-set -eou pipeline
+
 echo STARTING ----------
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 CYAN='\033[0;36m'
