@@ -14,7 +14,7 @@ metadata:
     kubernetes.io/change-cause: "Sarabi and I didn't see you at the presentation of Simba."
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: nginx
@@ -41,7 +41,7 @@ metadata:
     kubernetes.io/change-cause: "Before sunrise, he's your son."
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: nginx
@@ -68,7 +68,7 @@ metadata:
     kubernetes.io/change-cause: "One day, Simba, the sun will set on my time here and will rise with you as the new king."
 spec:
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: nginx
