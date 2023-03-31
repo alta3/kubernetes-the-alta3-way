@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mythical-creatures
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: manticore
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
