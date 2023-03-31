@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: king-of-lions
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mufasa
+  labels:
+    app: nginx
+  annotations:
+    kubernetes.io/change-cause: "Sarabi and I didn't see you at the presentation of Simba."
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.18.0
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mufasa
+  labels:
+    app: nginx
+  annotations:
+    kubernetes.io/change-cause: "Before sunrise, he's your son."
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.22.1
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mufasa
+  labels:
+    app: nginx
+  annotations:
+    kubernetes.io/change-cause: "One day, Simba, the sun will set on my time here and will rise with you as the new king."
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.23.4
+        ports:
+        - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mufasa
+  labels:
+    app: nginx
+  annotations:
+    kubernetes.io/change-cause: "Long Live the King -- BROKEN!"
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginxx
+        ports:
+        - containerPort: 80
