@@ -88,7 +88,7 @@ metadata:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-configured
+  name: vampire-hunter
   namespace: lincoln
   labels:
     app: nginx-configured
