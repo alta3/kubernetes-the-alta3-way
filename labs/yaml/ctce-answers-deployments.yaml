@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    dragon: "true"
+    lion: "true"
+  name: manticore-prime
+  namespace: mythical-creatures
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      dragon: "true"
+      lion: "true"
+  template:
+    metadata:
+      labels:
+        dragon: "true"
+        lion: "true"
+    spec:
+      containers:
+      - image: nginx:1.14.2
+        name: nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
