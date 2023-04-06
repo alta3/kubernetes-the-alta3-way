@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snooper
+  namespace: starfruit
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: snooper
+      role: spy
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: snooper
+        role: spy
+    spec:
+      containers:
+      - args:
+        - /bin/sh
+        - -c
+        - |
+          i=0; while true; do
+            echo "$i: $(date)" >> /var/log/snooper.log;
+            i=$((i+1));
+            sleep 1;
+          done
+        image: busybox:1.28
+        name: snooper-con
+        volumeMounts:
+        - mountPath: /var/log
+          name: snooper-log
+      - name: kennylogger
+        image: k8s.gcr.io/fluentd-gcp:1.30
+        volumeMounts:
+        - name: snooper-fluentd
+          mountPath: /etc/fluentd-config/fluentd.conf
+          subPath: fluentd.conf
+        - mountPath: /var/log
+          name: snooper-log
+      volumes:
+      - emptyDir: {}
+        name: snooper-log
+      - name: snooper-fluentd
+        configMap:
+          name: snooper-fluentd
