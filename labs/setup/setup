@@ -26,32 +26,34 @@ if [ ! -f "$LAB_ID/setup.sh" ]; then
     exit 1
 fi
 
-if [[ "${LAB_ID}" != kubeadm-prerequisites-lab && "${LAB_ID}" != kubeadm-network-plugins-lab && "${LAB_ID}" != kubeadm-install-lab && "${LAB_ID}" != kubeadm-join-node-lab && "${LAB_ID}" != etc_backup && "${LAB_ID}" != kubeadmn_upgrade && "${LAB_ID}" != purge_kubeadm && "${LAB_ID}" != deploy-kubernetes-using-ansible && "${LAB_ID}" != cka-exam ]]; then
-    # check if a k8sta3w cluster exists
-    kubectl get nodes >> /dev/null
-    if [ $? -ne 0 ]; then
-        echo "[-] No kubernetes cluster found"
-        exit 1
-    fi
-    # run all teardowns
-    echo "[+] Cleaning cluster"
-    TD_LOG_DIR=$(mktemp --directory --tmpdir "teardown.${LAB_ID}.XXXX")
-    for f in *; do
-        export WAIT="false"
-        if [ "${f}" = "${LAB_ID}" ]; then
-            export WAIT="true"
+if [[ "${LAB_ID}" != cka-exam ]]; then
+    if [[ "${LAB_ID}" != kubeadm-prerequisites-lab && "${LAB_ID}" != kubeadm-network-plugins-lab && "${LAB_ID}" != kubeadm-install-lab && "${LAB_ID}" != kubeadm-join-node-lab && "${LAB_ID}" != etc_backup && "${LAB_ID}" != kubeadmn_upgrade && "${LAB_ID}" != purge_kubeadm && "${LAB_ID}" != deploy-kubernetes-using-ansible ]]; then
+        # check if a k8sta3w cluster exists
+        kubectl get nodes >> /dev/null
+        if [ $? -ne 0 ]; then
+            echo "[-] No kubernetes cluster found"
+            exit 1
         fi
-        if [ -d "$f" ]; then
-            bash "${f}/teardown.sh" > "${TD_LOG_DIR}/$(now)_${f}_teardown.log" 2>&1 &
+        # run all teardowns
+        echo "[+] Cleaning cluster"
+        TD_LOG_DIR=$(mktemp --directory --tmpdir "teardown.${LAB_ID}.XXXX")
+        for f in *; do
+            export WAIT="false"
+            if [ "${f}" = "${LAB_ID}" ]; then
+                export WAIT="true"
+            fi
+            if [ -d "$f" ]; then
+                bash "${f}/teardown.sh" > "${TD_LOG_DIR}/$(now)_${f}_teardown.log" 2>&1 &
+            fi
+        done
+        wait
+    else
+        # check if a kubeadm cluster exists
+        ssh controller "kubectl get nodes >> /dev/null"
+        if [ $? -ne 0 ]; then
+            echo "[-] No kubeadm cluster found"
+            exit 1
         fi
-    done
-    wait
-else
-    # check if a kubeadm cluster exists
-    ssh controller "kubectl get nodes >> /dev/null"
-    if [ $? -ne 0 ]; then
-        echo "[-] No kubeadm cluster found"
-        exit 1
     fi
 fi
 
