@@ -17,5 +17,5 @@ subjects:
   namespace: default
 roleRef:
   kind: Role
-  name: privileged-sa
+  name: privileged-sa-r
   apiGroup: rbac.authorization.k8s.io
