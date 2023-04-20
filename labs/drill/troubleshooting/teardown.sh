@@ -1,4 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-
-echo "[-] No teardown"
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-debugging.yaml
+kubectl delete --ignore-not-found deploy -n upsetti-spaghetti spaghetti-monster
+echo "Teardown complete"
