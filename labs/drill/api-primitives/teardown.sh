@@ -1,4 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-kubectl delete pods apricot -n pineapple
-echo "[-] No teardown"
+kubectl delete --ignore-not-found pods apricot -n pineapple
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-api-primitives.yaml
+echo "Teardown complete"
