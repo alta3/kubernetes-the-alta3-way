@@ -19,19 +19,20 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 * End-to-end TLS encryption between components
 * RBAC authenticated services and users
 * Isolated and default-deny networking
+* gVisor runtime protection on nodes
 
 Components and versions:
 
 ```yaml
-k8s_version: "1.25.5"        # https://kubernetes.io/releases/#release-v1-25
-etcd_version: "3.5.6"        # https://github.com/etcd-io/etcd/releases
-cni_version: "1.1.1"         # https://github.com/containernetworking/cni/releases
-containerd_version: "1.6.12" # https://github.com/containerd/containerd/releases
-cri_tools_version: "1.25.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
-cfssl_version: "1.6.3"       # https://github.com/cloudflare/cfssl/releases
-runc_version: "1.1.4"        # https://github.com/opencontainers/runc/releases
-coredns_version: "1.10.0"    # https://github.com/coredns/coredns/releases
-calico_version: "3.24.5"     # https://github.com/projectcalico/calico/releases
-helm_version: "3.10.2"       # https://github.com/helm/helm/releases
+k8s_version: "1.26.5"        # https://kubernetes.io/releases/#release-v1-26
+etcd_version: "3.5.9"        # https://github.com/etcd-io/etcd/releases
+cni_version: "1.1.2"         # https://github.com/containernetworking/cni/releases
+containerd_version: "1.7.1"  # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.26.1"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.4"       # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.7"        # https://github.com/opencontainers/runc/releases
+coredns_version: "1.10.1"    # https://github.com/coredns/coredns/releases
+calico_version: "3.25.1"     # https://github.com/projectcalico/calico/releases
+helm_version: "3.12.0"       # https://github.com/helm/helm/releases
 gvisor_version: "latest"     # https://github.com/google/gvisor/releases
 ```
