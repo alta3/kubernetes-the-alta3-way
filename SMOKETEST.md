@@ -39,6 +39,9 @@ grep '\`setup' lab-name.md | cut -d '`' -f 4 | cut -d ' ' -f 2
 
 # all together now
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
+
+# alternative (in content)
+grep -R "\$\` \`setup" | egrep -v "kubeadm|cka-exam" | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 ```
 
 ### Super basic functionality testing (DNS + Network)
