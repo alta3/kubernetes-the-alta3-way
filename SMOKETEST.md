@@ -53,8 +53,8 @@ popd
 { 
   kubectl delete ns test
   kubectl create ns test
-  kubectl run d1 --image=k8s.gcr.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
-  kubectl run d2 --image=k8s.gcr.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-2"} }' --command sleep 10000
+  kubectl run d1 --image=registry.k8s.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
+  kubectl run d2 --image=registry.k8s.io/e2e-test-images/jessie-dnsutils:1.3 -n test --overrides='{"spec": {"nodeName": "node-2"} }' --command sleep 10000
   kubectl run c1 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-1"} }' --command sleep 10000
   kubectl run c2 --image=busybox -n test --overrides='{"spec": {"nodeName": "node-2"} }' --command sleep 10000
   kubectl run --namespace=test nginx --image=nginx
