@@ -32,7 +32,7 @@ spec:
         - mountPath: /var/log
           name: snooper-log
       - name: kennylogger
-        image: k8s.gcr.io/fluentd-gcp:1.30
+        image: registry.k8s.io/fluentd-gcp:1.30
         volumeMounts:
         - name: snooper-fluentd
           mountPath: /etc/fluentd-config/fluentd.conf

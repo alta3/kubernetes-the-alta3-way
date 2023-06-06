@@ -1,3 +1,37 @@
+## from `1.25.5` to `1.26.4`
+
+#### Kubernetes v1.25: Combiner
+
+<img src="https://user-images.githubusercontent.com/116113/207213140-2d7827ca-f8dc-45b2-9fe7-c9f4c8fe0350.png" width="400" height="400" />
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.26.4
+- https://kubernetes.io/blog/2022/12/09/kubernetes-v1-26-release
+
+```yaml
+k8s_version: "1.26.5"        # https://kubernetes.io/releases/#release-v1-26
+etcd_version: "3.5.9"        # https://github.com/etcd-io/etcd/releases
+cni_version: "1.3.0"         # https://github.com/containernetworking/cni/releases
+containerd_version: "1.7.1"  # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.26.1"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.4"       # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.7"        # https://github.com/opencontainers/runc/releases
+coredns_version: "1.10.1"    # https://github.com/coredns/coredns/releases
+calico_version: "3.25.1"     # https://github.com/projectcalico/calico/releases
+helm_version: "3.12.0"       # https://github.com/helm/helm/releases
+gvisor_version: "latest"     # https://github.com/google/gvisor/releases
+```
+
+Supporting release links
+- https://github.com/etcd-io/etcd/releases/tag/v3.5.9 
+- https://github.com/containernetworking/cni/releases/tag/v1.1.2
+- https://github.com/containerd/containerd/releases/tag/v1.7.1 
+- https://github.com/kubernetes-sigs/cri-tools/releases/tag/v1.26.1 
+- https://github.com/cloudflare/cfssl/releases/tag/v1.6.4 
+- https://github.com/opencontainers/runc/releases/tag/v1.1.7 
+- https://github.com/coredns/coredns/releases/tag/v1.10.1 
+- https://github.com/projectcalico/calico/releases/tag/v3.25.1 
+- https://github.com/helm/helm/releases/tag/v3.12.0 
+
 ## from `1.24.4` to `1.25.5`
 
 #### Kubernetes v1.25: Combiner
