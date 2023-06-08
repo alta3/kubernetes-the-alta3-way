@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found pods apricot -n pineapple
 if [ -e ~/mycode/yaml/ctce-drill-api-primitives.yaml ] 
 then

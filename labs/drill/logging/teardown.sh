@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-logging.yaml
 rm ~/lincoln-logs.txt
 if [ -e ~/lincoln vampire-hunter ] 

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-services.yaml
 if [ -e ~/lone-coconut.yaml ] 
 then

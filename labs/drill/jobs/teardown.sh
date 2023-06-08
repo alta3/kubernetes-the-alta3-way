@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-jobs.yaml
 if [ -e ~/kronos-job.yaml ] 
 then

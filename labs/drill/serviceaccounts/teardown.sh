@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-service-accounts.yaml
 if [ -e ~/banana-deployment.yaml ] 
 then

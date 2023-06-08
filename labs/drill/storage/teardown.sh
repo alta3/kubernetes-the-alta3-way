@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 if [ -e ~/alta3-pv.yaml ] 
 then
   echo "deleting"
@@ -20,4 +21,5 @@ then
 else
   echo "file does not exist"
 fi
+set -euo pipefail
 echo "Teardown complete"

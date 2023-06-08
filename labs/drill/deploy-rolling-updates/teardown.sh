@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-deployments.yaml
 if [ -e ~/manticore-deployment.yaml ] 
 then

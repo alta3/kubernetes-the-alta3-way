@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-probes.yaml
 if [ -e ~/plumpod.yaml ] 
 then
