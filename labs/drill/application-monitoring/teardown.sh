@@ -4,4 +4,4 @@ kubectl delete --ignore-not-found -f https://github.com/kubernetes-sigs/metrics-
 kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-monitoring.yaml
 sleep 60
 rm ~/cpu-consume.txt
- "Teardown complete"
+echo "Teardown complete"
