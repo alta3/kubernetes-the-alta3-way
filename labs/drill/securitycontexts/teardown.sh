@@ -1,6 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-security-contexts.yaml
 if [ -e ~/gold-bar.yaml ] 
 then
   echo "deleting"
@@ -8,4 +7,6 @@ then
 else
   echo "file does not exist"
 fi
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-security-contexts.yaml
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-answers-security-contexts.yaml
 echo "Teardown complete"

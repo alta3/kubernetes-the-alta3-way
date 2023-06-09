@@ -1,7 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-multi-container-pods.yaml
-kubectl delete --ignore-not-found -f snooper-fluentd.yaml
 if [ -e ~/snooper-fluentd.yaml ] 
 then
   echo "deleting"
@@ -9,4 +7,15 @@ then
 else
   echo "file does not exist"
 fi
+if [ -e ~/snooper.yaml ] 
+then
+  echo "deleting"
+  kubectl delete --ignore-not-found -f snooper.yaml
+else
+  echo "file does not exist"
+fi
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-multi-container-pods.yaml
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-answers-multi-container-pods.yaml
+kubectl delete --ignore-not-found -f ~/mycode/yaml/snooper-fluentd.yaml
+kubectl delete --ignore-not-found -f ~/mycode/yaml/snooper-fluentd.conf
 echo "Teardown complete"

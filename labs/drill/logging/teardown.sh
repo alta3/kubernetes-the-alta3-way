@@ -1,7 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-logging.yaml
-rm ~/lincoln-logs.txt
 if [ -e ~/lincoln vampire-hunter ] 
 then
   echo "deleting"
@@ -9,4 +7,12 @@ then
 else
   echo "file does not exist"
 fi
+if [ -e ~/lincoln-logs.txt ] 
+then
+  echo "deleting"
+  rm ~/lincoln-logs.txt
+else
+  echo "file does not exist"
+fi
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-drill-logging.yaml
 echo "Teardown complete"
