@@ -24,7 +24,7 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 Components and versions:
 
 ```yaml
-k8s_version: "1.27.6"        # https://kubernetes.io/releases/#release-v1-27
+k8s_version: "1.28.2"        # https://kubernetes.io/releases/#release-v1-28
 etcd_version: "3.5.9"        # https://github.com/etcd-io/etcd/releases
 cni_version: "1.3.0"         # https://github.com/containernetworking/plugins/releases 
 containerd_version: "1.7.6"  # https://github.com/containerd/containerd/releases
