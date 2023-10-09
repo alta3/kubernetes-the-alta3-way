@@ -3,11 +3,11 @@ kind: CronJob
 metadata:
   name: historylimitechocomplete
 spec:
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
   schedule: "*/1 * * * *"
   jobTemplate:
     spec:
-      successfulJobsHistoryLimit: 2
-      failedJobsHistoryLimit: 1
       parallelism: 1
       completions: 1
       template:

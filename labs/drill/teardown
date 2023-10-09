@@ -38,7 +38,7 @@ if [ "${LAB_ID}" != cka-exam ]; then
 fi
 
 # run this drill setup
-echo "[+] Tearding Down ${LAB_ID}"
+echo "[+] Tearing Down ${LAB_ID}"
 DRILL_LOG="/tmp/$(now)_${LAB_ID}_drill.log"
 bash "${LAB_ID}/teardown.sh" > "${DRILL_LOG}" 2>&1
 if [ $? -ne 0 ]; then
