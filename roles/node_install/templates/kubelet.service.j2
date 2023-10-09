@@ -7,9 +7,7 @@ Requires=containerd.service
 [Service]
 ExecStart=/usr/local/bin/kubelet \
   --config={{ kubelet_config_file }} \
-  --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \
   --kubeconfig={{ kubelet_kubeconfig_file }} \
-  --register-node=true \
   --v={{ kube_verbose_level }}
 Restart=on-failure
 RestartSec=5

@@ -1,5 +1,5 @@
 kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1
+apiVersion: kubelet.config.k8s.io/v1beta1
 authentication:
   anonymous:
     enabled: false
@@ -15,6 +15,8 @@ clusterDNS:
 runtimeRequestTimeout: "15m"
 tlsCertFile: /var/lib/kubelet/{{ hostvars[inventory_hostname]['public_fqdn'] }}.pem
 tlsPrivateKeyFile: /var/lib/kubelet/{{ hostvars[inventory_hostname]['public_fqdn'] }}-key.pem
+containerRuntimeEndpoint: "unix:///var/run/containerd/containerd.sock"
+registerNode: true
   
   
 
