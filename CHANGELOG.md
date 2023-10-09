@@ -1,8 +1,31 @@
+## From `1.26.4` to `1.27.6`
+
+#### Kubernetes v1.27: Chill Vibes
+
+<img src="https://github.com/alta3/kubernetes-the-alta3-way/assets/116113/e892eb51-2ca1-4c37-8ed3-567ddab315ee" width="200" height="200" />
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.27.1
+- https://kubernetes.io/blog/2023/04/11/kubernetes-v1-27-release/
+- https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-27
+
+```yaml 
+k8s_version: "1.27.6"        # https://kubernetes.io/releases/#release-v1-27                          etcd_version: "3.5.9"        # https://github.com/etcd-io/etcd/releases                             
+cni_version: "1.3.0"         # https://github.com/containernetworking/plugins/releases 
+containerd_version: "1.7.6"  # https://github.com/containerd/containerd/releases       
+cri_tools_version: "1.27.1"  # https://github.com/kubernetes-sigs/cri-tools/releases   
+cfssl_version: "1.6.4"       # https://github.com/cloudflare/cfssl/releases            
+runc_version: "1.1.9"        # https://github.com/opencontainers/runc/releases         
+coredns_version: "1.11.1"    # https://github.com/coredns/coredns/releases             
+calico_version: "3.26.3"     # https://github.com/projectcalico/calico/releases        
+helm_version: "3.13.0"       # https://github.com/helm/helm/releases                   
+gvisor_version: "latest"     # https://github.com/google/gvisor/releases               
+```   
+
 ## from `1.25.5` to `1.26.4`
 
 #### Kubernetes v1.25: Combiner
 
-<img src="https://user-images.githubusercontent.com/116113/207213140-2d7827ca-f8dc-45b2-9fe7-c9f4c8fe0350.png" width="400" height="400" />
+<img src="https://user-images.githubusercontent.com/116113/207213140-2d7827ca-f8dc-45b2-9fe7-c9f4c8fe0350.png" width="200" height="200" />
 
 - https://github.com/kubernetes/kubernetes/releases/tag/v1.26.4
 - https://kubernetes.io/blog/2022/12/09/kubernetes-v1-26-release
