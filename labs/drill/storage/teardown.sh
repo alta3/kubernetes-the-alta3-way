@@ -1,12 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-if [ -e ~/alta3-pv.yaml ] 
-then
-  echo "deleting"
-  kubectl delete --ignore-not-found -f ~/alta3-pv.yaml
-else
-  echo "file does not exist"
-fi
+
 if [ -e ~/nginx-pvc.yaml ] 
 then
   echo "deleting"
@@ -14,12 +8,16 @@ then
 else
   echo "file does not exist"
 fi
-if [ -e ~/nginx-with-pv.yaml ] 
+
+if [ -e ~/alta3-pv.yaml ] 
 then
   echo "deleting"
-  kubectl delete --ignore-not-found -f ~/nginx-with-pv.yaml
+  kubectl delete --ignore-not-found -f ~/alta3-pv.yaml
 else
   echo "file does not exist"
 fi
-set -euo pipefail
+
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-answers-storage-nginx-pvc.yaml
+kubectl delete --ignore-not-found -f ~/mycode/yaml/ctce-answers-storage-nginx-pv.yaml
+
 echo "Teardown complete"
