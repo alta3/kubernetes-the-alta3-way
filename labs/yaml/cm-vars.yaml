@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-cm
+data:
+  map: positive
+  dab: negative
