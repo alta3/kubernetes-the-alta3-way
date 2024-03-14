@@ -101,9 +101,12 @@ grep '\`setup' lab-name.md | cut -d '`' -f 4
 # this step is just a test
 grep '\`setup' lab-name.md | cut -d '`' -f 4 | cut -d ' ' -f 2
 
-# all together now, this is the script you will actually run
+# Now that we know the above 3 steps work, we can run them all together as follows
+# This is the step that does the work
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 
-# alternative (in content)
+# Alternate full path if run from (in content)
 grep -R "\$\` \`setup" | egrep -v "kubeadm|cka-exam" | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 ```
+
+### TODO: Replace the above with a python script derived equivilant that we can cut-paste and just run. 
