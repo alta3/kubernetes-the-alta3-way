@@ -88,15 +88,20 @@ Generate lists of setup directories used by labs
 
 ```bash
 # within a mdBook, find labs and print their source (between parens)
+# This simply prints the name of the lab markdown file to standard out
+# Just to confirm the sed is properly selecting
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/'
 
-# find setup commands
+# This will parse a selected lab "lab-name.md" and extract the 'setup' command argument.
+# This requires all labs to have a `setup command` within them.
+# This step is just a test
 grep '\`setup' lab-name.md | cut -d '`' -f 4
 
 # get only the setup folder name
+# this step is just a test
 grep '\`setup' lab-name.md | cut -d '`' -f 4 | cut -d ' ' -f 2
 
-# all together now
+# all together now, this is the script you will actually run
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 
 # alternative (in content)
