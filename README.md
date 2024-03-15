@@ -36,3 +36,17 @@ calico_version: "3.26.3"     # https://github.com/projectcalico/calico/releases
 helm_version: "3.13.0"       # https://github.com/helm/helm/releases
 gvisor_version: "latest"     # https://github.com/google/gvisor/releases
 ```
+
+## Upgrade Schedule
+
+Kubernetes the Alta3 Way aligns its release cycle closely with Kubernetes, adopting a strategic one-version-behind approach to ensure stability and thorough integration with the latest developments.
+
+#### Kubernetes Release Cycle:
+- **Frequency:** Kubernetes issues new releases [three times a year](https://kubernetes.io/releases/release/).
+- **Support:** The Kubernetes project supports the three most recent minor releases. Detailed information on the release cycle can be found [here](https://kubernetes.io/releases/).
+
+#### Approach:
+- **One Version Behind:** To ensure stability and thorough integration, **Kubernetes the Alta3 Way** is maintained one major version behind the latest Kubernetes Upstream Release. This strategy allows for adequate time to manage subcomponent updates and gracefully handle any deprecations.
+- **Release Branches:** With each new major release of Kubernetes a corresponding branch is created, named after the version number, dedicated to testing and adaptations.
+- **Repository Tags:** Each major release is tagged to facilitate easy access to specific versions.
+
