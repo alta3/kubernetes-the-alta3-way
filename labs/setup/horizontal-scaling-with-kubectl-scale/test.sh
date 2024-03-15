@@ -1,9 +1,7 @@
 #!/usr/bin/bash
 
 kubectl apply -f ../yaml/webby-deploy-filled-out.yaml
-kubectl wait --for condition=Available --timeout 30s deployments/sise-deploy
-kubectl scale deployment sise-deploy --replicas=3
-kubectl apply -f ../yaml/webby-deploy-filled-out.yaml
-kubectl wait --for condition=Available --timeout 30s -f deployments/webby-deploy
+kubectl wait --for condition=Available --timeout 5s deployments/webservice
+kubectl scale deployment webservice --replicas=1
+kubectl wait deployment/webservice --for jsonpath='{.status.readyReplicas}'=1
 kubectl get deployment webservice
-kubectl get deployment sise-deploy

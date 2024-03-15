@@ -1,3 +1,28 @@
+## From `1.27.6` to `1.28.7`
+
+#### Kubernetes v1.28: Planternetes
+
+<img src="https://github.com/alta3/kubernetes-the-alta3-way/assets/116113/e0f645cb-4959-4432-a7e5-a0bacea0ed89" width="200" height="200" />
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.28.0
+- https://kubernetes.io/blog/2023/08/15/kubernetes-v1-28-release/
+- https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-29
+
+## Supporting component releases
+
+```yaml
+k8s_version: "1.28.7"        # https://kubernetes.io/releases/#release-v1-28
+etcd_version: "3.5.12"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.4.1"         # https://github.com/containernetworking/plugins/releases 
+containerd_version: "1.7.14" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.28.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.5"       # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.9"        # https://github.com/opencontainers/runc/releases
+coredns_version: "1.11.12"   # https://github.com/coredns/coredns/releases
+calico_version: "3.27.2"     # https://github.com/projectcalico/calico/releases
+helm_version: "3.14.3"       # https://github.com/helm/helm/releases
+gvisor_version: "latest"     # https://github.com/google/gvisor/releases
+```
 ## From `1.26.4` to `1.27.6`
 
 #### Kubernetes v1.27: Chill Vibes

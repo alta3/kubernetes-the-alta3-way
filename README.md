@@ -24,15 +24,29 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 Components and versions:
 
 ```yaml
-k8s_version: "1.27.6"        # https://kubernetes.io/releases/#release-v1-27
-etcd_version: "3.5.9"        # https://github.com/etcd-io/etcd/releases
-cni_version: "1.3.0"         # https://github.com/containernetworking/plugins/releases 
-containerd_version: "1.7.6"  # https://github.com/containerd/containerd/releases
-cri_tools_version: "1.27.1"  # https://github.com/kubernetes-sigs/cri-tools/releases
-cfssl_version: "1.6.4"       # https://github.com/cloudflare/cfssl/releases
+k8s_version: "1.28.7"        # https://kubernetes.io/releases/#release-v1-28
+etcd_version: "3.5.12"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.4.1"         # https://github.com/containernetworking/plugins/releases 
+containerd_version: "1.7.14" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.28.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.5"       # https://github.com/cloudflare/cfssl/releases
 runc_version: "1.1.9"        # https://github.com/opencontainers/runc/releases
-coredns_version: "1.11.1"    # https://github.com/coredns/coredns/releases
-calico_version: "3.26.3"     # https://github.com/projectcalico/calico/releases
-helm_version: "3.13.0"       # https://github.com/helm/helm/releases
+coredns_version: "1.11.12"   # https://github.com/coredns/coredns/releases
+calico_version: "3.27.2"     # https://github.com/projectcalico/calico/releases
+helm_version: "3.14.3"       # https://github.com/helm/helm/releases
 gvisor_version: "latest"     # https://github.com/google/gvisor/releases
 ```
+
+## Upgrade Schedule
+
+Kubernetes the Alta3 Way aligns its release cycle closely with Kubernetes, adopting a strategic one-version-behind approach to ensure stability and thorough integration with the latest developments.
+
+#### Kubernetes Release Cycle:
+- **Frequency:** Kubernetes issues new releases [three times a year](https://kubernetes.io/releases/release/).
+- **Support:** The Kubernetes project supports the three most recent minor releases. Detailed information on the release cycle can be found [here](https://kubernetes.io/releases/).
+
+#### Approach:
+- **One Version Behind:** To ensure stability and thorough integration, **Kubernetes the Alta3 Way** is maintained one major version behind the latest Kubernetes Upstream Release. This strategy allows for adequate time to manage subcomponent updates and gracefully handle any deprecations.
+- **Release Branches:** With each new major release of Kubernetes a corresponding branch is created, named after the version number, dedicated to testing and adaptations.
+- **Repository Tags:** Each major release is tagged to facilitate easy access to specific versions.
+
