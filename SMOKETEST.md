@@ -102,21 +102,28 @@ Generate lists of setup directories used by labs
 
 ```bash
 # within a mdBook, find labs and print their source (between parens)
+# This simply prints the name of the lab markdown file to standard out
+# Just to confirm the sed is properly selecting
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/'
 
-# find setup commands
+# This will parse a selected lab "lab-name.md" and extract the 'setup' command argument.
+# This requires all labs to have a `setup command` within them.
+# This step is just a test
 grep '\`setup' lab-name.md | cut -d '`' -f 4
 
 # get only the setup folder name
+# this step is just a test
 grep '\`setup' lab-name.md | cut -d '`' -f 4 | cut -d ' ' -f 2
 
-# all together now
+# Now that we know the above 3 steps work, we can run them all together as follows
+# This is the step that does the work
 grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 
-# alternative (in content)
+# Alternate full path if run from (in content)
 grep -R "\$\` \`setup" | egrep -v "kubeadm|cka-exam" | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 ```
 
 ### Update `smoketest.sh`
 
 [smoketest.sh](https://github.com/alta3/kubernetes-the-alta3-way/blob/main/labs/scripts/smoketest.sh)
+
