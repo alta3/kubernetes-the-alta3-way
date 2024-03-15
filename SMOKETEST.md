@@ -5,6 +5,8 @@
 ```bash
 # find any references to deprecated api's
 {
+  # 1.32
+  grep -Ri flowcontrol.apiserver.k8s.io/v1beta3
   # 1.29
   grep -Ri flowcontrol.apiserver.k8s.io/v1beta2
   # 1.27
