@@ -113,3 +113,7 @@ grep 💻 SUMMARY.md | sed 's/.*(\(.*\))/\1/' | xargs -I {} grep "\`setup" {} | 
 # alternative (in content)
 grep -R "\$\` \`setup" | egrep -v "kubeadm|cka-exam" | cut -d '`' -f 4 | cut -d ' ' -f 2 | shuf - | xargs -I {} echo -e "tl {}"
 ```
+
+### Update `smoketest.sh`
+
+[smoketest.sh](https://github.com/alta3/kubernetes-the-alta3-way/blob/main/labs/scripts/smoketest.sh)
