@@ -1,3 +1,10 @@
+#!/bin/bash
+set -euxo pipefail
+
+# ***********************************************************
+# *Do not modify, this script is generated. See SMOKETEST.md*
+# ***********************************************************
+
 {
 tl resources-and-scheduling
 tl setting-an-applications-resource-requirements
