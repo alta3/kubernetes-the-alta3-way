@@ -1,8 +1,9 @@
 ### Deprecations 
 
+ https://kubernetes.io/docs/reference/using-api/deprecation-guide/
+
 ```bash
 # find any references to deprecated api's
-# https://kubernetes.io/docs/reference/using-api/deprecation-guide/
 {
   # 1.29
   grep -Ri flowcontrol.apiserver.k8s.io/v1beta2
