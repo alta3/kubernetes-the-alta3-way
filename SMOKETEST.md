@@ -23,6 +23,17 @@
 }
 ```
 
+### Calico Upgrade
+
+#### https://github.com/projectcalico/calico/releases
+
+- [Documentation on deploying Calico for a Kubernetes + ETCD cluster](https://docs.tigera.io/calico/latest/getting-started/kubernetes/self-managed-onprem/onpremises#install-calico-with-etcd-datastore)
+  - Install Calico > Manifest > Scroll to Install Calico with etcd datastore
+- [Alta3's Calico manifest calico.yaml.j2](https://github.com/alta3/kubernetes-the-alta3-way/blob/main/roles/calico/templates/calico.yaml.j2) 
+- [Calico's Official calico-etcd.yaml](https://github.com/projectcalico/calico/blob/master/manifests/calico-etcd.yaml)
+- [Calico's Official calico-etcd.yaml Commit History](https://github.com/projectcalico/calico/commits/master/manifests/calico-etcd.yaml)
+
+
 ### Basic functionality testing (DNS + Network)
 
 #### run playbook
