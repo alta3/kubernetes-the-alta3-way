@@ -11,11 +11,11 @@
 ## Supporting component releases
 
 ```yaml
-k8s_version: "1.29.2"        # https://kubernetes.io/releases/#release-v1-29
+k8s_version: "1.29.4"        # https://kubernetes.io/releases/#release-v1-28
 etcd_version: "3.5.12"       # https://github.com/etcd-io/etcd/releases
 cni_version: "1.4.1"         # https://github.com/containernetworking/plugins/releases 
-containerd_version: "1.7.14" # https://github.com/containerd/containerd/releases
-cri_tools_version: "1.28.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
+containerd_version: "1.7.16" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.30.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
 cfssl_version: "1.6.5"       # https://github.com/cloudflare/cfssl/releases
 runc_version: "1.1.9"        # https://github.com/opencontainers/runc/releases
 coredns_version: "1.11.12"   # https://github.com/coredns/coredns/releases
