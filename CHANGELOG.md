@@ -1,17 +1,17 @@
-## From `1.27.6` to `1.28.7`
+## From `1.28.7` to `1.29.4`
 
-#### Kubernetes v1.28: Planternetes
+##### Kubernetes v1.29: Mandala 
 
-<img src="https://github.com/alta3/kubernetes-the-alta3-way/assets/116113/e0f645cb-4959-4432-a7e5-a0bacea0ed89" width="200" height="200" />
+<img src="https://github.com/alta3/kubernetes-the-alta3-way/assets/104811936/6ebbcac9-ba27-4777-8388-9ef40a2522fb" width="400" height="400" />
 
-- https://github.com/kubernetes/kubernetes/releases/tag/v1.28.0
-- https://kubernetes.io/blog/2023/08/15/kubernetes-v1-28-release/
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.29.2
+- https://kubernetes.io/blog/2023/12/13/kubernetes-v1-29-release/
 - https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-29
 
 ## Supporting component releases
 
 ```yaml
-k8s_version: "1.28.7"        # https://kubernetes.io/releases/#release-v1-28
+k8s_version: "1.29.2"        # https://kubernetes.io/releases/#release-v1-29
 etcd_version: "3.5.12"       # https://github.com/etcd-io/etcd/releases
 cni_version: "1.4.1"         # https://github.com/containernetworking/plugins/releases 
 containerd_version: "1.7.14" # https://github.com/containerd/containerd/releases
