@@ -1,3 +1,29 @@
+## From `1.28.7` to `1.29.4`
+
+##### Kubernetes v1.29: Mandala 
+
+<img src="https://github.com/alta3/kubernetes-the-alta3-way/assets/104811936/6ebbcac9-ba27-4777-8388-9ef40a2522fb" width="400" height="400" />
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.29.2
+- https://kubernetes.io/blog/2023/12/13/kubernetes-v1-29-release/
+- https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-29
+
+## Supporting component releases
+
+```yaml
+k8s_version: "1.29.4"        # https://kubernetes.io/releases/#release-v1-28
+etcd_version: "3.5.12"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.4.1"         # https://github.com/containernetworking/plugins/releases 
+containerd_version: "1.7.16" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.30.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.5"       # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.1.9"        # https://github.com/opencontainers/runc/releases
+coredns_version: "1.11.12"   # https://github.com/coredns/coredns/releases
+calico_version: "3.27.2"     # https://github.com/projectcalico/calico/releases
+helm_version: "3.14.3"       # https://github.com/helm/helm/releases
+gvisor_version: "latest"     # https://github.com/google/gvisor/releases
+```
+
 ## From `1.27.6` to `1.28.7`
 
 #### Kubernetes v1.28: Planternetes
@@ -23,6 +49,7 @@ calico_version: "3.27.2"     # https://github.com/projectcalico/calico/releases
 helm_version: "3.14.3"       # https://github.com/helm/helm/releases
 gvisor_version: "latest"     # https://github.com/google/gvisor/releases
 ```
+
 ## From `1.26.4` to `1.27.6`
 
 #### Kubernetes v1.27: Chill Vibes
