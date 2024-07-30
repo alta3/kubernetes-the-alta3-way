@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-statefulset
+  labels:
+    env: app
+    owner: nginxss
+spec:
+  selector:
+    matchLabels:
+      app: nginxss
+  replicas: 4
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: nginxss
+    spec:
+      containers:
+      - name: nginxss
+        image: nginx:1.23.4
+        ports:
+        - containerPort: 80
