@@ -39,7 +39,7 @@ helm:
 
 # controllers, nodes and localhost all need kubectl
 kubectl:
-  url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+  url: "https://dl.k8s.io/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
   path: "/usr/local/bin/kubectl"
 
 # config and cert dirs
@@ -213,7 +213,7 @@ controller_api_localhost_url: "https://127.0.0.1:{{ controller_api_port }}"
 controller_services:
  - display_name: "Kubernetes API Server"
    name: "kube-apiserver"
-   url:  "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
+   url:  "https://dl.k8s.io/release/v{{ k8s_version }}/bin/linux/amd64/kube-apiserver"
    path: "/usr/local/bin/kube-apiserver"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-apiserver.service.j2"
@@ -221,7 +221,7 @@ controller_services:
 
  - display_name: "Kubernetes Manager"
    name: "kube-controller-manager"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager"
+   url: "https://dl.k8s.io/release/v{{ k8s_version }}/bin/linux/amd64/kube-controller-manager"
    path: "/usr/local/bin/kube-controller-manager"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-controller-manager.service.j2"
@@ -229,7 +229,7 @@ controller_services:
 
  - display_name: "Kubernetes Scheduler"
    name: "kube-scheduler"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
+   url: "https://dl.k8s.io/release/v{{ k8s_version }}/bin/linux/amd64/kube-scheduler"
    path: "/usr/local/bin/kube-scheduler"
    mode: "0775"
    service_j2: "{{ role_path }}/templates/kube-scheduler.service.j2"
@@ -277,12 +277,12 @@ kube_proxy_mode: "iptables"
 
 node_binaries:
  - name: "kubelet"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version}}/bin/linux/amd64/kube-proxy"
+   url: "https://dl.k8s.io/release/v{{ k8s_version}}/bin/linux/amd64/kube-proxy"
    path: "/usr/local/bin/kube-proxy"
    mode: "0775"
 
  - name: "kube-proxy"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{k8s_version}}/bin/linux/amd64/kubelet"
+   url: "https://dl.k8s.io/release/v{{k8s_version}}/bin/linux/amd64/kubelet"
    path: "/usr/local/bin/kubelet"
    mode: "0775"
 
@@ -302,7 +302,7 @@ node_binaries:
    mode: "0775"
 
  - name: "kubectl"
-   url: "https://storage.googleapis.com/kubernetes-release/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
+   url: "https://dl.k8s.io/release/v{{ k8s_version }}/bin/linux/amd64/kubectl"
    path: "/usr/local/bin/kubectl"
    mode: "0775"
 
