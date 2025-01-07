@@ -1,3 +1,5 @@
+> Be sure to do this in a student environment
+
 ### Deprecations 
 
  https://kubernetes.io/docs/reference/using-api/deprecation-guide/
