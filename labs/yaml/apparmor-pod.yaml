@@ -10,4 +10,4 @@ spec:
     securityContext:
       appArmorProfile:
         type: Localhost
-        localhostProfile: k8s-apparmor-example-allow-write
+        localhostProfile: k8s-apparmor-example-deny-write
