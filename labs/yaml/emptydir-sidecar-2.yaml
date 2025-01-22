@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: song-pod2
+spec:
+  containers:
+  - name: writer
+    image: busybox:1.34.0
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        i=1;
+        while true; do
+          echo "${i} bottles of beer on the wall, ${i} bottles of beer!" >> /wall/bottles.log;
+          i=$((i+1));
+          sleep 3;
+        done
+    volumeMounts:
+    - name: wall-volume
+      mountPath: /wall
+  - name: reader
+    image: busybox:1.34.0
+    command: ["/bin/sh", "-c"]
+    args:
+      - |
+        while true; do
+          last_line=$(tail -n 1 /wall/bottles.log 2>/dev/null);
+          if [ ! -z "$last_line" ]; then
+            echo "$last_line You take one down, pass it around...";
+          fi;
+          sleep 3;
+        done
+    volumeMounts:
+    - name: wall-volume
+      mountPath: /wall
+  volumes:
+  - name: wall-volume
+    emptyDir: {}
