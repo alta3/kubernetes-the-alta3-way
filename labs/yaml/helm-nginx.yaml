@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
-  metadata:
-    name: {{ include "myapp.fullname" . }}
-    labels:
-      app: {{ include "myapp.name" . }}
+metadata:
+  name: {{ include "myapp.fullname" . }}
+  labels:
+    app: {{ include "myapp.name" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
