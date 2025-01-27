@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "Initializing your CKA exam environment! Please wait, this process will take approximately 3 minutes. No additional output will be displayed until the setup is complete."
+
 scp -o StrictHostKeyChecking=no $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh controller:/tmp/kubeadm-deps.sh
 scp -o StrictHostKeyChecking=no $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh node-1:/tmp/kubeadm-deps.sh
 scp -o StrictHostKeyChecking=no $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh node-2:/tmp/kubeadm-deps.sh
@@ -10,17 +12,18 @@ ssh node-2 "bash /tmp/kubeadm-deps.sh" &
 wait
 
 ssh -o StrictHostKeyChecking=no controller << "KUBEADM_INIT"
-export PUBLIC_IP=$(dig controller +search +noall +short)
+sudo export PUBLIC_IP=$(dig controller +search +noall +short)
+
 sudo kubeadm init \
 --pod-network-cidr=192.168.0.0/16 \
 --apiserver-advertise-address=${PUBLIC_IP} \
 --control-plane-endpoint=${PUBLIC_IP} \
---kubernetes-version=1.24.0-rc.1
+--kubernetes-version=1.31.4
 
 mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
 KUBEADM_INIT
 
@@ -45,55 +48,12 @@ ssh controller sudo systemctl restart kubelet
 for CSR in `kubectl get csr -o name`; do kubectl certificate approve $CSR; done
 echo STARTING TASK SETUP
 
-# 1 Dragon Deployment
-kubectl apply -f https://static.alta3.com/courses/cka/exam/dragon.yml
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/baremetal/deploy.yaml
 
-# 2 Deppy
-kubectl apply -f https://static.alta3.com/courses/cka/exam/deppy.yml
-
-# 3 Pre-made PV (for PVC and Pod use)
-kubectl apply -f https://static.alta3.com/courses/cka/exam/rwopv.yml
-
-# 4 - Nothing needed
-
-# 5 Ingress
-kubectl apply -f https://static.alta3.com/courses/cka/exam/aloha.yml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.2/deploy/static/provider/baremetal/deploy.yaml
-
-# 6 CPU Topper
-kubectl create ns integration
-kubectl apply -f https://static.alta3.com/courses/cka/exam/basenginx.yml
-kubectl apply -f https://static.alta3.com/courses/cka/exam/lowcpunginx.yml
-kubectl apply -f https://static.alta3.com/courses/cka/exam/highcpunginx.yml
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
 # 7 Node Selector
 kubectl label node node-1 disk=nvme --overwrite
-
-
-# 10 Log inspection (file not found)
-kubectl apply -f https://static.alta3.com/courses/cka/exam/filenotfound.yml
-
-# 11 Add container to existing Pod
-kubectl apply -f https://static.alta3.com/courses/cka/exam/loggy.yml
-
-# 12 - Nothing needed
-
-# 13 - Nothing needed
-
-# 14 - ?
-
-# 15 - ?
-
-# 16 - ?
-
-# 17 - ?
-
-# 18 - ?
-
-# 19 - Nothing Needed
-
-# 20 - Nothing Needed
 
 # 21 Etcd Backup and Restore
 ssh -o StrictHostKeyChecking=no controller << "ETCD_BACKUP"
