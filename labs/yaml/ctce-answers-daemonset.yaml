@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: crowley
+  namespace: goodomens
+spec:
+  selector:
+    matchLabels:
+      app: crowley
+  template:
+    metadata:
+      labels:
+        app: crowley
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
