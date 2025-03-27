@@ -1,0 +1,17 @@
+# Create a group of targets called "k8nodes"
+upstream k8nodes {
+  server node-1:31200;
+  server node-2:31200;
+}
+
+server {
+
+  listen 2224 default_server;
+  listen [::]:2224 default_server;
+
+  location / {
+    # map the entire root path to "k8nodes"
+    proxy_pass http://k8nodes;  # IMPORTANT, this selects HTTP protocol
+    proxy_set_header Host $http_host;
+  }
+}
