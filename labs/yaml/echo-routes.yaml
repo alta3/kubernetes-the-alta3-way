@@ -12,12 +12,5 @@ spec:
         type: PathPrefix
         value: /
     backendRefs:
-    - name: web-backend
-      port: 80
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /tester
-    backendRefs:
     - name: nginx-backend
       port: 80
