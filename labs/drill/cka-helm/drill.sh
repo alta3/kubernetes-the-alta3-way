@@ -13,7 +13,7 @@ helm version &>/dev/null || {
 }
 
 # Add Traefik repo and update charts
-helm repo add traefik https://traefik.github.io/charts &>/dev/null || true
+helm repo add bitnami https://charts.bitnami.com/bitnami &>/dev/null || true
 helm repo update &>/dev/null
 
 echo "✅ Environment ready"
