@@ -1,21 +1,26 @@
 #!/bin/bash
 set -euo pipefail
 
-# Ensure the local-path provisioner supports fast-storage
-kubectl -n local-path-storage get cm local-path-config -o yaml | grep 'fast-storage:' >/dev/null 2>&1 || {
-  kubectl -n local-path-storage get configmap local-path-config -o yaml > /tmp/lpc.yaml
-  yq e '.data["config.json"]' /tmp/lpc.yaml | \
-    yq e '.storageClassMap["fast-storage"] = {
-      "hostDir": "/opt/local-path-provisioner",
-      "mountDir": "/opt/local-path-provisioner",
-      "blockCleanerCommand": ["/scripts/shred.sh", "2", "0"],
-      "volumeBindingMode": "Immediate"
-    }' - > /tmp/lpc-patched.json
+echo "📦  Installing local-path-provisioner..."
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 
-  kubectl -n local-path-storage patch configmap local-path-config --type merge \
-    --patch "$(jq -n --argjson data "{\"config.json\":$(cat /tmp/lpc-patched.json | jq -Rs .)}" '{data: $data}')"
+echo "⌛ Waiting for provisioner pod to be ready..."
+kubectl -n local-path-storage wait --for=condition=Ready pod -l app=local-path-provisioner --timeout=60s
 
-  kubectl -n local-path-storage delete pod -l app=local-path-provisioner --wait
-}
+echo "🔥 Deleting default local-path StorageClass..."
+kubectl delete storageclass local-path --ignore-not-found --wait=true
+
+echo "🛠️  Recreating StorageClass with reclaimPolicy=Retain..."
+cat <<EOF | kubectl create -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+EOF
 
 echo "✅ Environment ready"
