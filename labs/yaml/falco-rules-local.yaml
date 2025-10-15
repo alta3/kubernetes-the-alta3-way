@@ -1,0 +1,176 @@
+# falco-rules-local.yaml
+customRules:
+  falco_rules.local.yaml: |
+    #
+    # ===== Lists & Macros =====
+    #
+    - list: prod_namespaces
+      items: [ "prod", "production", "payments" ]
+
+    - list: corp_source_cidrs
+      items: [ "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16" ]
+
+    - list: allowed_secret_readers
+      items: [ "system:serviceaccount:kube-system:default", "alice@example.com" ]
+
+    # Audit stages to evaluate (per Falco's k8s audit guidance)
+    - list: k8s_audit_stages
+      items: [ "ResponseComplete" ]
+
+    # Only fire on completed requests
+    - macro: kevt
+      condition: (jevt.value[/stage] in (k8s_audit_stages))
+
+    # Common verb groupings
+    - macro: kcreate
+      condition: (ka.verb=create)
+    - macro: kmodify
+      condition: (ka.verb in (create,update,patch))
+    - macro: kread
+      condition: (ka.verb in (get,list,watch))
+
+    #
+    # ===== Rules =====
+    #
+
+    # 1) kubectl exec into prod namespaces
+    - rule: Kubectl exec into prod namespace
+      desc: Alert when a user execs into a pod in a production namespace
+      condition: kevt and
+                 ka.verb=connect and
+                 ka.target.resource=pods and
+                 ka.target.subresource=exec and
+                 ka.target.namespace in (prod_namespaces)
+      output: >
+        K8s exec in prod | user=%ka.user.name ns=%ka.target.namespace
+        pod=%ka.target.name verb=%ka.verb uri=%ka.uri srcip=%ka.source.ip
+      priority: NOTICE
+      source: k8s_audit
+      tags: [k8s, audit, exec, prod]
+
+    # 2) ClusterRoleBinding grants cluster-admin
+    - rule: ClusterRoleBinding grants cluster-admin
+      desc: Detect binding of cluster-admin role
+      condition: kevt and kmodify and
+                 ka.target.resource=clusterrolebindings and
+                 ka.req.binding.roleRef.name=cluster-admin
+      output: >
+        CRB grants cluster-admin | user=%ka.user.name
+        subjects=%ka.req.binding.subjects
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s, audit, rbac]
+
+    # 3) RBAC with wildcards (verbs/resources)
+    - rule: RBAC rule grants wildcard privileges
+      desc: Detect Roles/ClusterRoles that include wildcard verbs or resources
+      condition: kevt and kmodify and
+                 ka.target.resource in (roles,clusterroles) and
+                 (ka.req.role.rules.verbs intersects ("*") or
+                  ka.req.role.rules.resources intersects ("*"))
+      output: >
+        RBAC wildcard detected | user=%ka.user.name kind=%ka.target.resource
+        name=%ka.target.name verbs=%ka.req.role.rules.verbs
+        resources=%ka.req.role.rules.resources
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s, audit, rbac]
+
+    # 4) Secret reads in prod by non-approved principals
+    - rule: Secret read in prod by non-allowlisted principal
+      desc: Detect reads of Secrets in production by users not in the allowlist
+      condition: kevt and kread and
+                 ka.target.resource=secrets and
+                 ka.target.namespace in (prod_namespaces) and
+                 not (ka.user.name in (allowed_secret_readers))
+      output: >
+        Secret read in prod | user=%ka.user.name ns=%ka.target.namespace
+        secret=%ka.target.name verb=%ka.verb srcip=%ka.source.ip
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s, audit, secrets, prod]
+
+    # 5) Delete of production namespace
+    - rule: Delete of production namespace
+      desc: Detect deletion of a production namespace
+      condition: kevt and ka.verb=delete and
+                 ka.target.resource=namespaces and
+                 ka.target.name in (prod_namespaces)
+      output: >
+        Namespace deletion | user=%ka.user.name ns=%ka.target.name
+        verb=%ka.verb srcip=%ka.source.ip
+      priority: CRITICAL
+      source: k8s_audit
+      tags: [k8s, audit, destructive, prod]
+
+    # 6) NetworkPolicy deletion/disable in prod
+    - rule: NetworkPolicy removed in prod
+      desc: Detect deletion of NetworkPolicies in production namespaces
+      condition: kevt and ka.verb=delete and
+                 ka.target.resource=networkpolicies and
+                 ka.target.namespace in (prod_namespaces)
+      output: >
+        NetworkPolicy removed | user=%ka.user.name ns=%ka.target.namespace
+        name=%ka.target.name
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s, audit, network, prod]
+
+    # 7) External access from non-corporate IPs
+    - rule: Kubernetes API access from non-corporate IP range
+      desc: Detect API calls coming from outside approved CIDRs
+      condition: kevt and
+                 not ip_in(ka.source.ip, corp_source_cidrs)
+      output: >
+        API call from non-corporate IP | user=%ka.user.name srcip=%ka.source.ip
+        verb=%ka.verb uri=%ka.uri
+      priority: NOTICE
+      source: k8s_audit
+      tags: [k8s, audit, perimeter]
+
+    # 8) Creating/Updating ConfigMaps containing credentials (adaptable keywords)
+    - list: suspicious_kv_markers
+      items: [ "password", "passphrase", "aws_access_key_id", "aws-access-key-id" ]
+
+    - macro: configmap_contains_creds
+      condition: (ka.req.configmap.obj contains_any (suspicious_kv_markers))
+
+    - rule: ConfigMap likely contains credentials
+      desc: Detect create/update/patch of ConfigMaps that contain sensitive markers
+      condition: kevt and kmodify and
+                 ka.target.resource=configmaps and
+                 configmap_contains_creds
+      output: >
+        ConfigMap with possible creds | user=%ka.user.name ns=%ka.target.namespace
+        name=%ka.req.configmap.name markers=%suspicious_kv_markers
+      priority: WARNING
+      source: k8s_audit
+      tags: [k8s, audit, configmap, secrets]
+
+    # 9) Wildcard Subject access via ClusterRoleBinding (catch-all)
+    - rule: ClusterRoleBinding adds subject in system:masters
+      desc: Detect CRBs that add subjects to system:masters group
+      condition: kevt and kmodify and
+                 ka.target.resource=clusterrolebindings and
+                 ka.req.binding.subjects contains "system:masters"
+      output: >
+        CRB adds system:masters | user=%ka.user.name subjects=%ka.req.binding.subjects
+      priority: CRITICAL
+      source: k8s_audit
+      tags: [k8s, audit, rbac]
+
+    # 10) High-risk verb on custom resources (CRDs)
+    - list: risky_verbs
+      items: [ "deletecollection" ]
+
+    - rule: Risky verb used on custom resource
+      desc: Detect dangerous verbs on CRDs
+      condition: kevt and
+                 ka.verb in (risky_verbs) and
+                 ka.target.resource not in (pods,services,deployments,configmaps,secrets,roles,rolebindings,clusterroles,clusterrolebindings)
+      output: >
+        Risky verb on CRD | user=%ka.user.name verb=%ka.verb
+        resource=%ka.target.resource ns=%ka.target.namespace
+      priority: NOTICE
+      source: k8s_audit
+      tags: [k8s, audit, crd]
