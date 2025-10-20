@@ -1,0 +1,42 @@
+# Create a group of targets called "k8nodes"
+upstream k8nodes {
+  server node-1:30200;
+  server node-2:30200;
+  keepalive 64;
+}
+
+# ---- Web UI host -> local 2231 -> ingress ----
+server {
+  listen 2231 default_server;
+  listen [::]:2231 default_server;
+
+  location / {
+    # map the entire root path to "k8nodes"
+    proxy_pass http://k8nodes;
+    proxy_set_header Host $http_host;
+  }
+}
+
+# ---- API host -> local 2232 -> ingress ----
+server {
+  listen 2232 default_server;
+  listen [::]:2232 default_server;
+
+  location / {
+    # map the entire root path to "k8nodes"
+    proxy_pass http://k8nodes;
+    proxy_set_header Host $http_host;
+  }
+}
+
+# ---- File host -> local 2233 -> ingress ----
+server {
+  listen 2233 default_server;
+  listen [::]:2233 default_server;
+
+  location / {
+    # map the entire root path to "k8nodes"
+    proxy_pass http://k8nodes;
+    proxy_set_header Host $http_host;
+  }
+}
