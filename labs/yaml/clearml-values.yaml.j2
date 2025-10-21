@@ -1,0 +1,67 @@
+# Rendered by Jinja2 before Helm. NEVER commit the rendered file with secrets.
+# Ingress / hostnames
+
+apiserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "{{ APIURL | default('api-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+webserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "{{ APPURL | default('app-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+fileserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "files-eef68976-86c8-4c05-b2cc-0b7ff2a945f5.live.alta3.com"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  persistence:
+    enabled: true
+    storageClass: nfs-csi
+    size: 50Gi
+
+# Persistence: uses your NFS-CSI default SC
+mongodb:
+  enabled: true
+  architecture: replicaset
+  persistence:
+    enabled: true
+    storageClass: nfs-csi
+    size: 20Gi
+
+elasticsearch:
+  enabled: true
+  master:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
+      size: 50Gi
+  data:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
+      size: 100Gi
+
+redis:
+  master:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
