@@ -28,7 +28,7 @@ fileserver:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: "files-eef68976-86c8-4c05-b2cc-0b7ff2a945f5.live.alta3.com"
+    hostName: "{{ APIURL | default('files-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
