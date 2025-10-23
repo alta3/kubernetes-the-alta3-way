@@ -1,7 +1,7 @@
 # Create a group of targets called "k8nodes"
 upstream k8nodes {
-  server node-1:30200;
-  server node-2:30200;
+  server node-1:30300;
+  server node-2:30300;
   keepalive 64;
 }
 
@@ -12,7 +12,7 @@ server {
 
   location / {
     # map the entire root path to "k8nodes"
-    proxy_pass http://k8nodes;
+    proxy_pass https://k8nodes;
     proxy_set_header Host $http_host;
   }
 }
@@ -24,7 +24,7 @@ server {
 
   location / {
     # map the entire root path to "k8nodes"
-    proxy_pass http://k8nodes;
+    proxy_pass https://k8nodes;
     proxy_set_header Host $http_host;
   }
 }
@@ -36,7 +36,7 @@ server {
 
   location / {
     # map the entire root path to "k8nodes"
-    proxy_pass http://k8nodes;
+    proxy_pass https://k8nodes;
     proxy_set_header Host $http_host;
   }
 }
