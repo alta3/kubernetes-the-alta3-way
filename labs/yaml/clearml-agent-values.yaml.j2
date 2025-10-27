@@ -1,33 +1,31 @@
 clearml:
-  apiServerUrlReference: "{{ APIURL }}"
-  webServerUrlReference: "{{ APPURL }}"
-  fileServerUrlReference: "{{ FILESURL }}"
-  agentk8sglueKey: "{{ CLEARML_ACCESS_KEY }}"
-  agentk8sglueSecret: "{{ CLEARML_SECRET_KEY }}"
+  # Use chart-generated Secret (don’t set existingAgentk8sglueSecret)
+  existingAgentk8sglueSecret: "clearml-credentials"
 
 agentk8sglue:
-  # Automatically create queues if they don't exist
-  createQueues: true
+  # ClearML Server endpoints (these become env vars)
+  apiServerUrlReference:  "{{ APIURL }}"
+  webServerUrlReference:  "{{ APPURL }}"
+  fileServerUrlReference: "{{ FILESURL }}"
 
-  # Define our default queue and pod behavior
-  queues:
-    default:
-      templateOverrides:
-        # Constrain scheduling to labeled worker nodes
-        nodeSelector:
-          role: clearml-worker
-        # Resource sizing for average workloads
-        resources:
-          requests:
-            cpu: "500m"
-            memory: "1Gi"
-          limits:
-            cpu: "2"
-            memory: "4Gi"
-        # Optional cache volume to accelerate repeated runs
-        volumes:
-        - name: cache
-          emptyDir: {}
-        volumeMounts:
-        - name: cache
-          mountPath: /root/.cache
+  # Queue settings
+  queue: default
+  createQueueIfNotExists: false
+
+  # Default pod behavior for tasks spawned by the agent
+  basePodTemplate:
+    nodeSelector:
+      role: clearml-worker
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "2"
+        memory: "4Gi"
+    volumes:
+      - name: cache
+        emptyDir: {}
+    volumeMounts:
+      - name: cache
+        mountPath: /root/.cache
