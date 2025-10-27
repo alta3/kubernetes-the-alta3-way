@@ -1,0 +1,33 @@
+clearml:
+  apiServerUrlReference: "{{ APIURL }}"
+  webServerUrlReference: "{{ APPURL }}"
+  fileServerUrlReference: "{{ FILESURL }}"
+  agentk8sglueKey: "{{ CLEARML_ACCESS_KEY }}"
+  agentk8sglueSecret: "{{ CLEARML_SECRET_KEY }}"
+
+agentk8sglue:
+  # Automatically create queues if they don't exist
+  createQueues: true
+
+  # Define our default queue and pod behavior
+  queues:
+    default:
+      templateOverrides:
+        # Constrain scheduling to labeled worker nodes
+        nodeSelector:
+          role: clearml-worker
+        # Resource sizing for average workloads
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        # Optional cache volume to accelerate repeated runs
+        volumes:
+        - name: cache
+          emptyDir: {}
+        volumeMounts:
+        - name: cache
+          mountPath: /root/.cache
