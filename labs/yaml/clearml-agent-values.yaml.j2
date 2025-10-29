@@ -1,31 +1,43 @@
 clearml:
-  # Use chart-generated Secret (don’t set existingAgentk8sglueSecret)
+  # Use an existing Secret with API creds (recommended for prod).
+  # The Secret must contain:
+  #   CLEARML_API_ACCESS_KEY
+  #   CLEARML_API_SECRET_KEY
   existingAgentk8sglueSecret: "clearml-credentials"
 
 agentk8sglue:
+
   # ClearML Server endpoints (these become env vars)
   apiServerUrlReference:  "{{ APIURL }}"
   webServerUrlReference:  "{{ APPURL }}"
   fileServerUrlReference: "{{ FILESURL }}"
 
   # Queue settings
-  queue: default
-  createQueueIfNotExists: false
+  queue: k8s
+  queuePollingIntervalSec: 5
+  createQueues: true
+
+  # Set Default Container Image
+  defaultContainerImage: "python:3.10-bookworm"
+
+  # Set Namespace where Jobs will run (if the chart supports it)
+  k8sNamespace: clearml-workers
 
   # Default pod behavior for tasks spawned by the agent
   basePodTemplate:
     nodeSelector:
       role: clearml-worker
-    resources:
-      requests:
-        cpu: "500m"
-        memory: "1Gi"
-      limits:
-        cpu: "2"
-        memory: "4Gi"
     volumes:
       - name: cache
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: 1Gi
     volumeMounts:
       - name: cache
         mountPath: /root/.cache
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+  queues:
+    k8s: {}
