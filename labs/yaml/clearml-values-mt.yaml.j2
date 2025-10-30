@@ -13,6 +13,7 @@ apiserver:
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
   # (keep your existing service/ingress keys)
   extraEnv:
+    # ----- enable "multi-tenancy" -----
     - name: CLEARML__enterprise__multi_tenant
       value: "true"
     - name: CLEARML__enterprise__superuser__name
@@ -22,6 +23,13 @@ apiserver:
         secretKeyRef:
           name: clearml-secrets
           key: superadmin-password
+    
+    # ----- enable "fixed users" web login auth -----
+    - name: CLEARML__apiserver__auth__fixed_users__enabled
+      value: "true"
+    - name: CLEARML__apiserver__auth__fixed_users__pass_hashed
+      value: "false"
+
 
 webserver:
   service: { type: ClusterIP }
