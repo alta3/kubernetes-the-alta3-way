@@ -1,9 +1,9 @@
 clearml:
-  # Use an existing Secret with API creds (recommended for prod).
-  # The Secret must contain:
-  #   CLEARML_API_ACCESS_KEY
-  #   CLEARML_API_SECRET_KEY
-  existingAgentk8sglueSecret: "clearml-credentials"
+  agentk8sglueKey: {{ CLEARML_ACCESS_KEY }}
+  agentk8sglueSecret: {{ CLEARML_SECRET_KEY }}
+
+imageCredentials:
+  password: "{{ CLEAML_DKR_TKN }}"
 
 agentk8sglue:
 
@@ -41,3 +41,5 @@ agentk8sglue:
 
   queues:
     k8s: {}
+      templateOverrides: {}
+      queueSettings: {}
