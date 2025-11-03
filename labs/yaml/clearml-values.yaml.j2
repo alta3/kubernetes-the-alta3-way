@@ -1,6 +1,12 @@
 # Rendered by Jinja2 before Helm. NEVER commit the rendered file with secrets.
 # Ingress / hostnames
 
+imageCredentials:
+  password: "{{ CLEAML_DKR_TKN }}"
+
+clearml:
+  cookieDomain: "live.alta3.com"
+
 apiserver:
   service: { type: ClusterIP }
   ingress:
