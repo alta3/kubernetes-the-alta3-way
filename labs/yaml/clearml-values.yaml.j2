@@ -7,6 +7,9 @@ imageCredentials:
 clearml:
   cookieDomain: "live.alta3.com"
 
+clearmlApplications:
+  enabled: true
+
 apiserver:
   service: { type: ClusterIP }
   ingress:
@@ -17,6 +20,23 @@ apiserver:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  # ClearML Requires either fixed users or an SSO (Identity Provider) configuration. We'll provide Fixed Users for now.
+  additionalConfigs:
+    apiserver.conf: |
+      auth {
+        fixed_users {
+          enabled: true
+          pass_hashed: false
+          users: [
+            {
+              username: "Student"
+              password: "alta3"
+              name: "Alta3 Student"
+              admin: true
+            },
+          ]
+        }
+      }
 
 webserver:
   service: { type: ClusterIP }
