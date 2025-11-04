@@ -12,24 +12,44 @@ apiserver:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
   # (keep your existing service/ingress keys)
-  extraEnv:
-    # ----- enable "multi-tenancy" -----
-    - name: CLEARML__enterprise__multi_tenant
-      value: "true"
-    - name: CLEARML__enterprise__superuser__name
-      value: "{{ CLEARML_SUPERUSER_NAME | default('superadmin') }}"
-    - name: CLEARML__enterprise__superuser__password
-      valueFrom:
-        secretKeyRef:
-          name: clearml-secrets
-          key: superadmin-password
-    
-    # ----- enable "fixed users" web login auth -----
-    - name: CLEARML__apiserver__auth__fixed_users__enabled
-      value: "true"
-    - name: CLEARML__apiserver__auth__fixed_users__pass_hashed
-      value: "false"
+  # --- BEGIN: Multi-Tenant Feature Flags ---
+  extraEnvs:
+  - name: CLEARML__services__organization__features__user_management_advanced
+    value: "true"
+  - name: CLEARML__apiserver__company__unique_names
+    value: "true"
+  - name: CLEARML__services__workers__resource_usages__supervisor_company
+    value: "alta3"
+  # System-scoped supervisor identity
+  - name: CLEARML__secure__credentials__supervisor__role
+    value: "system"
+  - name: CLEARML__secure__credentials__supervisor__sec_groups
+    value: "[\"users\", \"admins\", \"queue_admins\"]"
+  - name: CLEARML__secure__credentials__supervisor__user_key
+    valueFrom:
+      secretKeyRef: { name: clearml-supervisor-credentials, key: user_key }
+  - name: CLEARML__secure__credentials__supervisor__user_secret
+    valueFrom:
+      secretKeyRef: { name: clearml-supervisor-credentials, key: user_secret }
+  # --- END: Multi-Tenant Feature Flags ---
 
+  # ClearML Requires either fixed users or an SSO (Identity Provider) configuration.
+  additionalConfigs:
+    apiserver.conf: |
+      auth {
+        fixed_users {
+          enabled: true
+          pass_hashed: false
+          users: [
+            {
+              username: "Student"
+              password: "alta3"
+              name: "Alta3 Student"
+              admin: true
+            },
+          ]
+        }
+      }
 
 webserver:
   service: { type: ClusterIP }
