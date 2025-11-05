@@ -11,16 +11,14 @@ apiserver:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-  # (keep your existing service/ingress keys)
+
   # --- BEGIN: Multi-Tenant Feature Flags ---
   extraEnvs:
   - name: CLEARML__services__organization__features__user_management_advanced
     value: "true"
-  - name: CLEARML__apiserver__company__unique_names
-    value: "true"
   - name: CLEARML__services__workers__resource_usages__supervisor_company
-    value: "alta3"
-  # System-scoped supervisor identity
+    value: "{{ LICENSE_USERNAME }}"
+  # System-scoped supervisor identity (Service User, NOT a human login)
   - name: CLEARML__secure__credentials__supervisor__role
     value: "system"
   - name: CLEARML__secure__credentials__supervisor__sec_groups
