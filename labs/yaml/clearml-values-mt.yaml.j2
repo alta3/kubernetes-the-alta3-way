@@ -16,6 +16,8 @@ apiserver:
   extraEnvs:
   - name: CLEARML__services__organization__features__user_management_advanced
     value: "true"
+  - name: CLEARML__apiserver__company__unique_names
+    value: "true"
   - name: CLEARML__services__workers__resource_usages__supervisor_company
     value: "{{ LICENSE_USERNAME }}"
   # System-scoped supervisor identity (Service User, NOT a human login)
