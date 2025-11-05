@@ -5,7 +5,7 @@ imageCredentials:
   password: "{{ CLEAML_DKR_TKN }}"
 
 clearml:
-  cookieDomain: "live.alta3.com"
+  cookieDomain: "live.charlie.alta3.com"
 
 clearmlApplications:
   enabled: true
@@ -15,7 +15,7 @@ apiserver:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: "{{ APIURL | default('api-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
+    hostName: "{{ APIURL | default('api-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -43,7 +43,7 @@ webserver:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: "{{ APPURL | default('app-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
+    hostName: "{{ APPURL | default('app-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -54,7 +54,7 @@ fileserver:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: "{{ FILESURL | default('files-' ~ CLUSTER_ID ~ '.live.alta3.com') }}"
+    hostName: "{{ FILESURL | default('files-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
