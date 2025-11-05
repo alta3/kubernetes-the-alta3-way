@@ -15,6 +15,7 @@ apiserver:
     enabled: true
     ingressClassName: nginx
     hostName: "{{ APIURL | default('api-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
+    tlsSecretName: clearml-tls # Add in TLS Secret Here
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -65,6 +66,7 @@ webserver:
     enabled: true
     ingressClassName: nginx
     hostName: "{{ APPURL | default('app-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
+    tlsSecretName: clearml-tls # Add in TLS Secret Here
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
@@ -80,6 +82,7 @@ fileserver:
     enabled: true
     ingressClassName: nginx
     hostName: "{{ FILESURL | default('files-' ~ CLUSTER_ID ~ '.live.charlie.alta3.com') }}"
+    tlsSecretName: clearml-tls # Add in TLS Secret Here
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
