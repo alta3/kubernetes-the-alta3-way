@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: tenant-gpu-limits
+  namespace: acme-ai
+spec:
+  limits: # This LimitRange prevents an individual container from consuming more than 1 gpu
+  - type: Container
+    max:
+      nvidia.com/gpu: "1"
+    min:
+      nvidia.com/gpu: "0"
