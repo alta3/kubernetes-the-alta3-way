@@ -1,0 +1,27 @@
+# clearml-enterprise-app-gateway-values.yaml.j2
+# Rendered by Jinja2 before Helm. NEVER commit the rendered file with secrets.
+
+imageCredentials:
+  password: "{{ CLEAML_DKR_TKN }}"
+
+clearml:
+  apiKey: "{{ CLEARML_ACCESS_KEY }}"
+  apiSecret: "{{ CLEARML_SECRET_KEY }}"
+  apiServerUrlReference: "https://{{ APIURL }}"
+  authCookieName: clearml-token-k8s
+
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
+  hostName: "{{ APPGWURL }}"
+
+externalURL: "https://agw-{{ CLUSTER_ID }}.live.charlie.alta3.com"  # what the UI should publish
+
+tcpSession:
+  enabled: true
+  routerAddress: "agw-{{ CLUSTER_ID }}.live.charlie.alta3.com"
+  service:
+    type: NodePort
+  portRange:
+    start: 32000
+    end: 32100
