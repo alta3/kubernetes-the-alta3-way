@@ -33,7 +33,7 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
 2.  **Create the S3 State Bucket:**
       * Go to the **S3** service.
       * Click **"Create bucket"**.
-      * **Bucket name:** Give it a **globally unique name**. Example: `my-company-clearml-tfstate-20251107`.
+      * **Bucket name:** `alta3-clearml-ie-demo-tfstate`
       * **Region:** Select `us-east-1` (N. Virginia).
       * **Block all public access:** Keep this **checked**.
       * Click **"Create bucket"**.
