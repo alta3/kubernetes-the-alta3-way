@@ -45,7 +45,8 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
       * **Important:** Write this bucket name down. You'll need it in a moment.
 3.  **Create the `iac_runner` IAM User:**
       * Go to the **IAM** service.
-      * Click **"Users"** in the left-hand menu, then **"Create user"**.
+      * Click **"Users"** in the left-hand menu
+      * **"Create user"**.
       * **User name:** `iac-runner`
       * Click **Next**.
       * Select **"Attach policies directly"**.
