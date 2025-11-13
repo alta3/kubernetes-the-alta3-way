@@ -37,7 +37,7 @@ variable "key_name" {
 variable "ssh_cidr" {
   description = "Your IP for SSH access (e.g., 203.0.113.10/32)"
   type        = string
-  default     = "136.57.215.58/32"  # WARNING: Change to your IP!
+  default     = "71.251.147.234/32"  # WARNING: Change to your IP!
 }
 
 variable "tags" {

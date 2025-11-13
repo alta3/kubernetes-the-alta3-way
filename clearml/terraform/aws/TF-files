@@ -1,0 +1,495 @@
+# alb-controller.tf
+
+# 1. We manually define the IAM policy for the ALB Controller
+data "aws_iam_policy_document" "alb_controller_policy" {
+  statement {
+    sid = "AWSLoadBalancerControllerIAMPolicy"
+    actions = [
+      "iam:CreateServiceLinkedRole", "iam:DeleteServiceLinkedRole",
+      "ec2:DescribeAccountAttributes", "ec2:DescribeAddresses", "ec2:DescribeAvailabilityZones",
+      "ec2:DescribeInternetGateways", "ec2:DescribeVpcs", "ec2:DescribeVpcPeeringConnections",
+      "ec2:DescribeSubnets", "ec2:DescribeSecurityGroups", "ec2:DescribeInstances",
+      "ec2:DescribeNetworkInterfaces", "ec2:DescribeTags", "ec2:GetCoipPoolUsage",
+      "ec2:DescribeCoipPools", "ec2:CreateNetworkInterface", "ec2:DeleteNetworkInterface",
+      "ec2:CreateSecurityGroup", "ec2:DeleteSecurityGroup", "ec2:DescribeNetworkInterfacePermissions",
+      "ec2:CreateNetworkInterfacePermission", "ec2:DeleteNetworkInterfacePermission",
+      "ec2:AuthorizeSecurityGroupIngress", "ec2:RevokeSecurityGroupIngress",
+      "ec2:AuthorizeSecurityGroupEgress", "ec2:RevokeSecurityGroupEgress",
+      "ec2:CreateTags", "ec2:DeleteTags",
+      "elasticloadbalancing:DescribeLoadBalancers", "elasticloadbalancing:DescribeLoadBalancerAttributes",
+      "elasticloadbalancing:DescribeListeners", "elasticloadbalancing:DescribeListenerCertificates",
+      "elasticloadbalancing:DescribeSSLPolicies", "elasticloadbalancing:DescribeRules",
+      "elasticloadbalancing:DescribeTargetGroups", "elasticloadbalancing:DescribeTargetGroupAttributes",
+      "elasticloadbalancing:DescribeTargetHealth", "elasticloadbalancing:DescribeTags",
+      "elasticloadbalancing:CreateLoadBalancer", "elasticloadbalancing:DeleteLoadBalancer",
+      "elasticloadbalancing:ModifyLoadBalancerAttributes", "elasticloadbalancing:SetIpAddressType",
+      "elasticloadbalancing:SetSecurityGroups", "elasticloadbalancing:SetSubnets",
+      "elasticloadbalancing:CreateListener", "elasticloadbalancing:DeleteListener",
+      "elasticloadbalancing:ModifyListener", "elasticloadbalancing:AddListenerCertificates",
+      "elasticloadbalancing:RemoveListenerCertificates", "elasticloadbalancing:CreateRule",
+      "elasticloadbalancing:DeleteRule", "elasticloadbalancing:ModifyRule",
+      "elasticloadbalancing:CreateTargetGroup", "elasticloadbalancing:DeleteTargetGroup",
+      "elasticloadbalancing:ModifyTargetGroup", "elasticloadbalancing:ModifyTargetGroupAttributes",
+      "elasticloadbalancing:RegisterTargets", "elasticloadbalancing:DeregisterTargets",
+      "elasticloadbalancing:SetTags", "elasticloadbalancing:RemoveTags",
+      "cognito-idp:DescribeUserPoolClient", "acm:ListCertificates", "acm:DescribeCertificate",
+      "acm:GetCertificate", "waf-regional:GetWebACLForResource", "waf-regional:GetWebACL",
+      "waf-regional:AssociateWebACL", "waf-regional:DisassociateWebACL",
+      "wafv2:GetWebACLForResource", "wafv2:GetWebACL", "wafv2:AssociateWebACL",
+      "wafv2:DisassociateWebACL", "shield:GetSubscriptionState", "shield:DescribeProtection",
+      "shield:CreateProtection", "shield:DeleteProtection", "shield:DescribeDRTAccess",
+      "shield:GetProtectionGroup", "shield:DescribeProtectionGroup", "shield:ListProtections",
+      "shield:ListProtectionGroups"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "alb_controller" {
+  name        = "${var.cluster_name}-ALBController-IAMPolicy"
+  path        = "/"
+  description = "IAM policy for the AWS Load Balancer Controller"
+  policy      = data.aws_iam_policy_document.alb_controller_policy.json
+}
+
+# 2. We create the IAM Role (IRSA) for the controller to use
+module "alb_controller_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.30"
+
+  role_name = "${var.cluster_name}-alb-controller"
+  
+  # This is the corrected line: { "key" = "value" }
+  role_policy_arns = {
+    alb_controller_policy = aws_iam_policy.alb_controller.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+    }
+  }
+
+  tags = var.tags
+}
+# 3. We install the controller using its official Helm chart
+resource "helm_release" "alb_controller" {
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+  version    = "1.7.1" # A recent, stable version
+
+  set {
+    name  = "clusterName"
+    value = var.cluster_name
+  }
+  set {
+    name  = "serviceAccount.create"
+    value = "false" # We are providing our own IRSA role
+  }
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller" # Must match the name in the IRSA role
+  }
+
+  # This annotation is the magic that links the pod to the IAM role
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.alb_controller_irsa_role.iam_role_arn
+  }
+
+  # This waits for the cluster and its node groups to be ready
+  depends_on = [
+    module.eks.eks_managed_node_groups
+  ]
+}
+# backend.tf
+terraform {
+  backend "s3" {
+    bucket  = "alta3-clearml-tfbucket" # Your new bucket name
+    key     = "clearml-eks/terraform.tfstate"
+    region  = "us-east-2" # <-- This MUST match your bucket's region
+    encrypt = true
+  }
+}
+
+# eks-cluster.tf
+# REPLACED: eks-cluster.tf
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.0"
+
+  cluster_name                    = var.cluster_name
+  cluster_version                 = var.kubernetes_version # "1.32"
+  vpc_id                          = module.vpc.vpc_id
+  subnet_ids                      = module.vpc.private_subnets
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
+  enable_irsa                     = true
+
+  # --- THIS IS THE FIX ---
+  # We hardcode the versions for the addons that EXIST,
+  # and we REMOVE the aws-load-balancer-controller.
+  cluster_addons = {
+    coredns = {
+      addon_version = "v1.11.4-eksbuild.2" # From your command
+    }
+    kube-proxy = {
+      addon_version = "v1.32.6-eksbuild.12" # From your command
+    }
+    vpc-cni = {
+      addon_version = "v1.20.4-eksbuild.2" # From your command
+    }
+    aws-ebs-csi-driver = {
+      addon_version = "v1.52.1-eksbuild.1" # From your command
+    }
+    # aws-load-balancer-controller = {}  <-- REMOVED
+  }
+  
+  authentication_mode = "API_AND_CONFIG_MAP"
+  enable_cluster_creator_admin_permissions = true
+
+  eks_managed_node_groups = {
+    clearml = {
+      desired_size = var.desired_nodes
+      min_size     = 1
+      max_size     = 5
+      instance_types = [var.node_instance_type]
+      key_name       = null 
+
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size = 50
+            volume_type = "gp3"
+            encrypted   = true
+          }
+        }
+      }
+
+      labels = {
+        role = "clearml-worker"
+      }
+
+    iam_role_additional_policies = {
+        ebs_csi_driver = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      }
+    }
+  }
+
+  node_security_group_id = module.eks_sg.security_group_id
+
+  tags = {
+    Environment = "dev"
+    Project     = "ClearML"
+  }
+}
+
+# heml-clearml.tf 
+
+resource "random_pet" "bucket_suffix" {
+  length = 2
+}
+
+resource "aws_s3_bucket" "clearml_artifacts" {
+  bucket        = "clearml-artifacts-${var.cluster_name}-${random_pet.bucket_suffix.id}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_versioning" "clearml_artifacts" {
+  bucket = aws_s3_bucket.clearml_artifacts.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "clearml_artifacts" {
+  bucket = aws_s3_bucket.clearml_artifacts.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# === Install ClearML (The RIGHT way) ===
+
+resource "helm_release" "clearml" {
+  name       = "clearml"
+  chart      = "clearml"
+  repository = "https://clearml.github.io/clearml-helm-charts"
+  namespace  = "clearml"
+  
+  create_namespace = true
+  wait             = true
+  timeout          = 1800 # 30 minutes
+
+  values = [
+    yamlencode({
+      s3 = {
+        bucket = aws_s3_bucket.clearml_artifacts.bucket
+      }
+      mongodb = {
+        auth = {
+          enabled = false
+        }
+      }
+      redis = {
+        auth = {
+          enabled = false
+        }
+      }
+      elasticsearch = {
+        replicas = 1
+      }
+      
+      webserver = {
+        ingress = {
+          enabled     = true
+          className   = "alb"
+          annotations = {
+            "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
+            "alb.ingress.kubernetes.io/target-type" = "ip"
+          }
+          hosts = [
+            {
+              paths = [
+                {
+                  path = "/"
+                  port = 8080
+                }
+              ]
+            }
+          ]
+        }
+      }
+      
+      apiserver = {
+        ingress = {
+          enabled = false
+        }
+      }
+      
+      fileserver = {
+        # --- THIS FIX IS INCLUDED ---
+        # Explicitly disable persistence, as we are using S3.
+        persistence = {
+          enabled = false
+        }
+        ingress = {
+          enabled = false
+        }
+      }
+    })
+  ]
+
+  depends_on = [
+    module.eks.eks_managed_node_groups,
+    helm_release.alb_controller
+  ]
+}
+# main.tf
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"
+
+  name = "${var.cluster_name}-vpc"
+  cidr = "10.0.0.0/16"
+
+  azs             = data.aws_availability_zones.available.names
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+
+  enable_nat_gateway = true
+  single_nat_gateway = true
+  enable_vpn_gateway = false
+
+  tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+  }
+
+  # These tags tell the ALB controller which subnets are public
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                  = "1"
+  }
+
+  # These tags tell EKS and the ALB which subnets are for internal
+  # resources, like your worker nodes and internal LBs
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"         = "1"
+  }
+}
+
+# Security Group: Allow SSH + ClearML ports
+module "eks_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 5.0"
+
+  name        = "${var.cluster_name}-eks-sg"
+  vpc_id      = module.vpc.vpc_id
+  description = "EKS cluster security group"
+
+  ingress_cidr_blocks = [var.ssh_cidr]
+  ingress_rules       = ["ssh-tcp"]
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      description = "HTTP"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "HTTPS"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+
+  egress_rules = ["all-all"]
+}
+
+# outputs.tf
+# MODIFIED: outputs.tf
+
+output "cluster_name" {
+  value = module.eks.cluster_name
+}
+
+output "get_clearml_web_url" {
+  description = "The ClearML URL is not available immediately. Wait ~5 mins, then run this command to get the URL:"
+  value       = "kubectl get ingress clearml-webserver -n clearml -o jsonpath='{.status.load_balancer.ingress[0].hostname}'"
+}
+
+output "s3_bucket" {
+  value = aws_s3_bucket.clearml_artifacts.bucket
+}
+
+output "configure_kubectl" {
+  value = "aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.aws_region}"
+}
+# providers.tf
+# MODIFIED: providers.tf
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# Add these new provider blocks:
+
+data "aws_eks_cluster" "cluster" {
+  name = module.eks.cluster_name
+  depends_on = [
+    # Wait for the worker nodes to be fully created
+    module.eks.eks_managed_node_groups
+  ]
+}
+
+data "aws_eks_cluster_auth" "cluster" {
+  name = module.eks.cluster_name
+  depends_on = [
+    # Wait for the worker nodes to be fully created
+    module.eks.eks_managed_node_groups
+  ]
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.cluster.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_availability_zones" "available" {}
+# variables.tf
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "cluster_name" {
+  description = "EKS cluster name"
+  type        = string
+  default     = "clearml-dev"
+}
+
+variable "kubernetes_version" {
+  description = "Kubernetes version"
+  type        = string
+  default     = "1.32"
+}
+
+variable "node_instance_type" {
+  description = "EC2 instance type for worker nodes"
+  type        = string
+  default     = "m6i.xlarge"
+}
+
+variable "desired_nodes" {
+  description = "Desired number of worker nodes"
+  type        = number
+  default     = 2
+}
+
+variable "key_name" {
+  description = "EC2 Key Pair name"
+  type        = string
+  default     = "my-clearml-key"
+}
+
+variable "ssh_cidr" {
+  description = "Your IP for SSH access (e.g., 203.0.113.10/32)"
+  type        = string
+  default     = "71.251.147.234/32"  # WARNING: Change to your IP!
+}
+
+variable "tags" {
+  description = "A map of tags to add to all resources"
+  type        = map(string)
+  default = {
+    Environment = "dev"
+    Project     = "ClearML"
+  }
+}
+
+# versions.tf
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
+  }
+}
+
