@@ -25,7 +25,7 @@ resource "aws_s3_bucket_public_access_block" "clearml_artifacts" {
 }
 
 # === Install ClearML (The RIGHT way) ===
-
+/*
 resource "helm_release" "clearml" {
   name       = "clearml"
   chart      = "clearml"
@@ -100,3 +100,4 @@ resource "helm_release" "clearml" {
     helm_release.alb_controller
   ]
 }
+*/

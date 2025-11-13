@@ -1,0 +1,56 @@
+# This file will configure the ClearML Helm chart
+
+# 1. Use the 'gp3' StorageClass we created in Terraform
+mongodb:
+  persistence:
+    storageClass: "gp3"
+elasticsearch:
+  persistence:
+    storageClass: "gp3"
+redis:
+  master:
+    persistence:
+      storageClass: "gp3"
+  replica:
+    persistence:
+      storageClass: "gp3"
+
+# 2. Tell ClearML which S3 bucket to use
+# We'll need to get this value from Terraform after the apply
+global:
+  s3:
+    bucket: "YOUR_S3_BUCKET_NAME_HERE" # We will update this after the apply
+
+# 3. Enable the Ingress (web URL)
+apiserver:
+  ingress:
+    enabled: true
+    className: "alb"
+    annotations:
+      "alb.ingress.kubernetes.io/scheme": "internet-facing"
+      "alb.ingress.kubernetes.io/target-type": "ip"
+    hosts:
+      - host: "clearml.alta3.training.com" # You will define this
+        paths:
+          - path: "/"
+            port: 8008
+
+webserver:
+  ingress:
+    enabled: true
+    className: "alb"
+    hosts:
+      - host: "clearml.alta3.training.com" # You will define this
+        paths:
+          - path: "/"
+            port: 8080
+
+fileserver:
+  ingress:
+    enabled: true
+    className: "alb"
+    hosts:
+      - host: "clearml.alta3.training.com" # You will define this
+        paths:
+          - path: "/"
+            port: 8081
