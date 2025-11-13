@@ -87,7 +87,7 @@ resource "helm_release" "alb_controller" {
   }
   set {
     name  = "serviceAccount.create"
-    value = "false" # We are providing our own IRSA role
+    value = "true" # We are providing our own IRSA role
   }
   set {
     name  = "serviceAccount.name"
@@ -102,6 +102,7 @@ resource "helm_release" "alb_controller" {
 
   # This waits for the cluster and its node groups to be ready
   depends_on = [
-    module.eks.eks_managed_node_groups
+    module.eks.eks_managed_node_groups,
+    module.alb_controller_irsa_role
   ]
 }
