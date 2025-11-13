@@ -33,9 +33,14 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
 2.  **Create the S3 State Bucket:**
       * Go to the **S3** service.
       * Click **"Create bucket"**.
+      * **Region:** Select `us-east-1` (N. Virginia) *if applicable*
+      * **Bucket type:** `General Purpose`
       * **Bucket name:** `alta3-clearml-ie-demo-tfstate`
-      * **Region:** Select `us-east-1` (N. Virginia).
+      * **Object Ownership:** `ACLs disabled (recommended)`
       * **Block all public access:** Keep this **checked**.
+      * **Bucket Versioning:** `Disable`
+      * **Encryption type:** `Server-side encryption with Amazon S3 managed keys (SSE-S3)`
+      * **Bucket Key:** `Enable`      
       * Click **"Create bucket"**.
       * **Important:** Write this bucket name down. You'll need it in a moment.
 3.  **Create the `iac_runner` IAM User:**
