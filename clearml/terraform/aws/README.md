@@ -54,11 +54,12 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
         > **Note:** For a real production setup, you'd create a custom policy with fewer permissions. For a sandbox, `AdministratorAccess` is the simplest way to guarantee it works.
       * Click **Next**, then **"Create user"**.
 4.  **Get Your Keys:**
-      * You'll be on a confirmation screen. Click the `iac-runner` username.
+      * You'll be on a confirmation screen. Click the `view user` for the iac-runner user you created.
       * Click the **"Security credentials"** tab.
       * Scroll down to **"Access keys"** and click **"Create access key"**.
       * Select **"Command Line Interface (CLI)"**.
       * Check the "I understand" box and click **Next**.
+      * Type in a value like "sean-test-key"
       * Click **"Create access key"**.
       * **THIS IS THE MOST IMPORTANT STEP:** You will see an **Access key ID** and a **Secret access key**. Copy both of these into a secure notepad immediately. You will *never* see the secret key again.
 5.  **Configure Your Local AWS CLI:**
