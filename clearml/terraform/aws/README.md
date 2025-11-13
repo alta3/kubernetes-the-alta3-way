@@ -33,14 +33,20 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
 2.  **Create the S3 State Bucket:**
       * Go to the **S3** service.
       * Click **"Create bucket"**.
-      * **Bucket name:** Give it a **globally unique name**. Example: `my-company-clearml-tfstate-20251107`.
-      * **Region:** Select `us-east-1` (N. Virginia).
+      * **Region:** Select `us-east-1` (N. Virginia) *if applicable*
+      * **Bucket type:** `General Purpose`
+      * **Bucket name:** `alta3-clearml-ie-demo-tfstate`
+      * **Object Ownership:** `ACLs disabled (recommended)`
       * **Block all public access:** Keep this **checked**.
+      * **Bucket Versioning:** `Disable`
+      * **Encryption type:** `Server-side encryption with Amazon S3 managed keys (SSE-S3)`
+      * **Bucket Key:** `Enable`      
       * Click **"Create bucket"**.
       * **Important:** Write this bucket name down. You'll need it in a moment.
 3.  **Create the `iac_runner` IAM User:**
       * Go to the **IAM** service.
-      * Click **"Users"** in the left-hand menu, then **"Create user"**.
+      * Click **"Users"** in the left-hand menu
+      * **"Create user"**.
       * **User name:** `iac-runner`
       * Click **Next**.
       * Select **"Attach policies directly"**.
@@ -48,11 +54,12 @@ You only need to do this part once. We'll create the S3 bucket for Terraform's s
         > **Note:** For a real production setup, you'd create a custom policy with fewer permissions. For a sandbox, `AdministratorAccess` is the simplest way to guarantee it works.
       * Click **Next**, then **"Create user"**.
 4.  **Get Your Keys:**
-      * You'll be on a confirmation screen. Click the `iac-runner` username.
+      * You'll be on a confirmation screen. Click the `view user` for the iac-runner user you created.
       * Click the **"Security credentials"** tab.
       * Scroll down to **"Access keys"** and click **"Create access key"**.
       * Select **"Command Line Interface (CLI)"**.
       * Check the "I understand" box and click **Next**.
+      * Type in a value like "sean-test-key"
       * Click **"Create access key"**.
       * **THIS IS THE MOST IMPORTANT STEP:** You will see an **Access key ID** and a **Secret access key**. Copy both of these into a secure notepad immediately. You will *never* see the secret key again.
 5.  **Configure Your Local AWS CLI:**
