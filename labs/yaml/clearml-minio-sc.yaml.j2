@@ -4,10 +4,10 @@ metadata:
   name: nfs-files
 provisioner: nfs.csi.k8s.io
 parameters:
-  server: 10.0.0.1
+  server: {{ NFS_IP }}
   share: /srv/clearml-files
-  subDir: "${pvc.namespace}-${pvc.name}"   # auto-create a folder per PVC
 mountOptions:
+  - nconnect=8
   - nfsvers=4.1
 reclaimPolicy: Retain
 volumeBindingMode: Immediate
