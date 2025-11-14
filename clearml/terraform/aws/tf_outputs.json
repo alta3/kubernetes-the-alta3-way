@@ -1,0 +1,22 @@
+{
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "clearml-dev"
+  },
+  "configure_kubectl": {
+    "sensitive": false,
+    "type": "string",
+    "value": "aws eks update-kubeconfig --name clearml-dev --region us-east-1"
+  },
+  "get_clearml_web_url": {
+    "sensitive": false,
+    "type": "string",
+    "value": "kubectl get ingress clearml-webserver -n clearml -o jsonpath='{.status.load_balancer.ingress[0].hostname}'"
+  },
+  "s3_bucket": {
+    "sensitive": false,
+    "type": "string",
+    "value": "clearml-artifacts-clearml-dev-adapted-cowbird"
+  }
+}
