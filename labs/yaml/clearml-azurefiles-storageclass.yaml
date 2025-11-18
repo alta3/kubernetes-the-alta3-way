@@ -1,0 +1,14 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azurefiles-csi
+provisioner: file.csi.azure.com
+parameters:
+  skuName: Standard_LRS
+  storageAccount: STORAGE_ACCOUNT_NAME_REPLACE_ME
+  secretName: azure-files-secret
+  secretNamespace: default
+  shareName: clearml-artifacts
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
