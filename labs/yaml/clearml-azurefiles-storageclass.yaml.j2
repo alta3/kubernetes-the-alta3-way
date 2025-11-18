@@ -5,7 +5,7 @@ metadata:
 provisioner: file.csi.azure.com
 parameters:
   skuName: Standard_LRS
-  storageAccount: STORAGE_ACCOUNT_NAME_REPLACE_ME
+  storageAccount: {{ STORAGE_ACCOUNT_NAME }}
   secretName: azure-files-secret
   secretNamespace: default
   shareName: clearml-artifacts
