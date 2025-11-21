@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sise-sp
+  labels:
+    app: sise-sp
+spec:
+  containers:
+  - name: sise-sp
+    image: mhausenblas/simpleservice:0.5.0
+    ports:
+    - containerPort: 9876
+    env:
+    - name: HEALTH_MIN
+      value: "1000"
+    - name: HEALTH_MAX
+      value: "3000"
+
+    # Startup Probe
+    startupProbe:
+      httpGet:                  # Kubernetes will send an HTTP GET request for the probe
+        path: /health           # The endpoint inside the container to check
+        port: 9876              # The container port where the health endpoint is running
+      initialDelaySeconds: 2    # Wait 2 seconds after the container starts before running the first check
+      timeoutSeconds: 1         # The probe must respond within 1 second or it is considered a failure
+      periodSeconds: 5          # Run the startup probe every 5 seconds
+      failureThreshold: 30      # Allow up to 30 failed checks before giving up and restarting the container
+
+    # Liveness Probe (starts AFTER startup probe succeeds)
+    livenessProbe:
+      httpGet:
+        path: /health
+        port: 9876
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 5
+      failureThreshold: 3
+
+    # Readiness Probe (also gated by startup probe)
+    readinessProbe:
+      httpGet:
+        path: /health
+        port: 9876
+      initialDelaySeconds: 10
+      timeoutSeconds: 2
+      periodSeconds: 3
+      failureThreshold: 3
