@@ -1,0 +1,93 @@
+# Rendered by Jinja2 before Helm. NEVER commit the rendered file with secrets.
+# Ingress / hostnames
+
+imageCredentials:
+  password: "{{ CLEAML_DKR_TKN }}"
+
+clearml:
+  cookieDomain: "{{ COOKIEDOMAIN }}"
+
+clearmlApplications:
+  enabled: true
+
+apiserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "{{ APIURL }}"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  # ClearML Requires either fixed users or an SSO (Identity Provider) configuration. We'll provide Fixed Users for now.
+  additionalConfigs:
+    apiserver.conf: |
+      auth {
+        fixed_users {
+          enabled: true
+          pass_hashed: false
+          users: [
+            {
+              username: "Student"
+              password: "alta3"
+              name: "Alta3 Student"
+              admin: true
+            },
+          ]
+        }
+      }
+
+webserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "{{ APPURL }}"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+fileserver:
+  service: { type: ClusterIP }
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostName: "{{ FILESURL }}"
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+  persistence:
+    enabled: true
+    storageClass: clearml-azurefiles-csi
+    size: 50Gi
+
+# Persistence: uses your NFS-CSI default SC
+mongodb:
+  enabled: true
+  architecture: replicaset
+  persistence:
+    enabled: true
+    storageClass: clearml-azurefiles-csi
+    size: 20Gi
+
+elasticsearch:
+  enabled: true
+  master:
+    persistence:
+      enabled: true
+      storageClass: clearml-azurefiles-csi
+      size: 50Gi
+  data:
+    persistence:
+      enabled: true
+      storageClass: clearml-azurefiles-csi
+      size: 100Gi
+
+redis:
+  master:
+    persistence:
+      enabled: true
+      storageClass: clearml-azurefiles-csi
