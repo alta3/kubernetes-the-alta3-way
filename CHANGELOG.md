@@ -1,4 +1,30 @@
-## From '1.29.4 to 1.31.1'
+## From '1.31.4 to 1.34.3'
+
+# Kubernetes v1.34: Of Wind & Will (O' WaW) 
+
+<img src="https://kubernetes.io/blog/2025/08/27/kubernetes-v1-34-release/k8s-v1.34.png" width="400" height="400"/>
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.34.3
+- https://kubernetes.io/blog/2025/08/27/kubernetes-v1-34-release/
+- https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-34
+
+## Supporting component releases
+
+```yaml
+k8s_version: "1.34.3"         # https://kubernetes.io/releases/
+etcd_version: "3.5.26"        # https://github.com/etcd-io/etcd/releases
+cni_version: "1.9.0"          # https://github.com/containernetworking/plugins/releases
+containerd_version: "1.7.25"  # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.34.0"   # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.5"        # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.2.4"         # https://github.com/opencontainers/runc/releases
+coredns_version: "1.14.1"     # https://github.com/coredns/coredns/releases
+calico_version: "3.31.3"      # https://github.com/projectcalico/calico/releases
+helm_version: "4.0.0"         # https://github.com/helm/helm/releases
+gvisor_version: "latest"      # https://github.com/google/gvisor/releases
+```
+
+## From '1.29.4 to 1.31.4'
 
 # Kubernetes v1.31: Elli 
 
