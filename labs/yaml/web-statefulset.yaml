@@ -9,10 +9,12 @@ spec:
   selector:
     matchLabels:
       app: nginx
+      role: stateful
   template:
     metadata:
       labels:
         app: nginx
+        role: stateful
     spec:
       containers:
       - name: nginx
