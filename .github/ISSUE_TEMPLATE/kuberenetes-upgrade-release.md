@@ -20,6 +20,8 @@ type: Task
 - https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-31
 
 ## Supporting component releases
+> **Find current dependencies in build/dependencies.yaml From Source Code in Release.**  
+    Example: https://github.com/kubernetes/kubernetes/archive/refs/tags/v1.35.4.zip
 
 ```yaml
 k8s_version: "1.31.4"        # https://kubernetes.io/releases/#release-v1-31
