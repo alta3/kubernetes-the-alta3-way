@@ -1,3 +1,35 @@
+## From '1.34.3 to 1.35.3'
+
+# Kubernetes v1.35.3: Timbernetes
+
+<img src="https://kubernetes.io/blog/2025/12/17/kubernetes-v1-35-release/k8s-v1.35.png" width="400" height="400"/>
+
+- https://github.com/kubernetes/kubernetes/releases/tag/v1.35.3
+- https://kubernetes.io/blog/2025/12/17/kubernetes-v1-35-release/
+- https://kubernetes.io/docs/reference/using-api/deprecation-guide/#v1-35
+
+## Supporting component releases
+> **Find current dependencies in build/dependencies.yaml From Source Code in Release.**  
+    Example: https://github.com/kubernetes/kubernetes/archive/refs/tags/v1.35.3.zip
+
+```yaml
+k8s_version: "1.35.3"        # https://kubernetes.io/releases/#release-v1-35
+etcd_version: "3.6.6"       # https://github.com/etcd-io/etcd/releases
+cni_version: "1.8.0"         # https://github.com/containernetworking/plugins/releases 
+containerd_version: "1.7.31" # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.35.0"  # https://github.com/kubernetes-sigs/cri-tools/releases
+cfssl_version: "1.6.5"       # https://github.com/cloudflare/cfssl/releases
+runc_version: "1.3.4"        # https://github.com/opencontainers/runc/releases
+coredns_version: "1.13.1"   # https://github.com/coredns/coredns/releases
+calico_version: "3.31.0"     # https://github.com/projectcalico/calico/releases
+helm_version: "4.1.5"       # https://github.com/helm/helm/releases
+gvisor_version: "20260406.0"     # https://github.com/google/gvisor/releases
+```
+
+
+
+
+
 ## From '1.31.4 to 1.34.3'
 
 # Kubernetes v1.34: Of Wind & Will (O' WaW) 
