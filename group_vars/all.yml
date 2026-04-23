@@ -47,6 +47,7 @@ localhost_home_dir: "{{ lookup('env', 'HOME') }}"
 cert_dir: "{{ localhost_home_dir }}/k8s-certs"
 config_dir: "{{ localhost_home_dir }}/k8s-config"
 systemd_dir: "/etc/systemd/system"
+front_proxy_client_cn: "front-proxy-client"
 
 # csr config
 csr_dir: "{{ config_dir }}/csr/"
