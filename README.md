@@ -24,16 +24,16 @@ Kubernetes The Alta3 Way guides you through bootstrapping a highly available Kub
 Components and versions:
 
 ```yaml
-k8s_version: "1.34.3"         # https://kubernetes.io/releases/
-etcd_version: "3.5.26"        # https://github.com/etcd-io/etcd/releases
+k8s_version: "1.35.3"         # https://kubernetes.io/releases/
+etcd_version: "3.6.6"        # https://github.com/etcd-io/etcd/releases
 cni_version: "1.9.0"          # https://github.com/containernetworking/plugins/releases
-containerd_version: "1.7.25"  # https://github.com/containerd/containerd/releases
-cri_tools_version: "1.34.0"   # https://github.com/kubernetes-sigs/cri-tools/releases
+containerd_version: "1.7.31"  # https://github.com/containerd/containerd/releases
+cri_tools_version: "1.35.0"   # https://github.com/kubernetes-sigs/cri-tools/releases
 cfssl_version: "1.6.5"        # https://github.com/cloudflare/cfssl/releases
-runc_version: "1.2.4"         # https://github.com/opencontainers/runc/releases
+runc_version: "1.3.4"         # https://github.com/opencontainers/runc/releases
 coredns_version: "1.14.1"     # https://github.com/coredns/coredns/releases
 calico_version: "3.31.3"      # https://github.com/projectcalico/calico/releases
-helm_version: "4.0.0"         # https://github.com/helm/helm/releases
+helm_version: "4.1.5"         # https://github.com/helm/helm/releases
 gvisor_version: "latest"      # https://github.com/google/gvisor/releases
 ```
 
