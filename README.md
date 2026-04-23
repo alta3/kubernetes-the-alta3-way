@@ -33,7 +33,7 @@ cfssl_version: "1.6.5"        # https://github.com/cloudflare/cfssl/releases
 runc_version: "1.3.4"         # https://github.com/opencontainers/runc/releases
 coredns_version: "1.14.1"     # https://github.com/coredns/coredns/releases
 calico_version: "3.31.3"      # https://github.com/projectcalico/calico/releases
-helm_version: "4.1.5"         # https://github.com/helm/helm/releases
+helm_version: "4.1.4"         # https://github.com/helm/helm/releases
 gvisor_version: "latest"      # https://github.com/google/gvisor/releases
 ```
 
