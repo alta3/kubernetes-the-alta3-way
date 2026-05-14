@@ -64,7 +64,7 @@ gid=$(id -g)
 sudo chown "${uid}:${gid}" "$HOME/.kube/config"
 
 kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/master/manifests/calico.yaml
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.32.0/manifests/calico.yaml
 KUBEADM_INIT
 
 # 5. Get join command and run it on node-1
