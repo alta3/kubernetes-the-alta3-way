@@ -152,15 +152,15 @@ rules:
       - watch
       - list
   # Service and services/status permissions are required by Calico kube-controllers.
-     - apiGroups: [""]
-       resources:
-         - services
-         - services/status
-       verbs:
-         - get
-         - list
-         - update
-         - watch
+  - apiGroups: [""]
+    resources:
+      - services
+      - services/status
+    verbs:
+      - get
+      - list
+      - update
+      - watch
 ---
 # Source: calico/templates/calico-node-rbac.yaml
 # Include a clusterrole for the calico-node DaemonSet,
