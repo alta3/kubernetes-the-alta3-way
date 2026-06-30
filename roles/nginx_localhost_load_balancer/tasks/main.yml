@@ -1,7 +1,9 @@
 ---
  - name: Install nginx for localhost loadbalancing access to the HA controllers
    apt:
-    name: nginx
+    name:
+      - nginx
+      - libnginx-mod-stream
     state: present
    become: yes
  
