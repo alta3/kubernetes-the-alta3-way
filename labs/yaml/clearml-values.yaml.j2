@@ -54,7 +54,7 @@ fileserver:
   ingress:
     enabled: true
     ingressClassName: nginx
-    hostName: "{{ FILESURL | default('api-bchd-lab-' ~ CLUSTER_ID ~ '.lms-us-east-1.alta3.com') }}"
+    hostName: "{{ FILESURL | default('files-bchd-lab-' ~ CLUSTER_ID ~ '.lms-us-east-1.alta3.com') }}"
     annotations:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
