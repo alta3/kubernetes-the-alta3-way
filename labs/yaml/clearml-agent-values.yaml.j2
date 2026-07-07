@@ -6,12 +6,14 @@ imageCredentials:
   password: "{{ CLEAML_DKR_TKN }}"
 
 agentk8sglue:
+  # Internal ClearML Server endpoints
+  apiServerUrlReference:  "http://clearml-enterprise-apiserver.clearml.svc.cluster.local:8008"
+  webServerUrlReference:  "http://clearml-enterprise-webserver.clearml.svc.cluster.local:8080"
+  fileServerUrlReference: "http://clearml-enterprise-fileserver.clearml.svc.cluster.local:8081"
 
-  # ClearML Server endpoints (these become env vars)
-  apiServerUrlReference:  "{{ APIURL }}"
-  webServerUrlReference:  "{{ APPURL }}"
-  fileServerUrlReference: "{{ FILESURL }}"
-
+  # Disable TLS certificate checking because these are internal HTTP service URLs.
+  clearmlcheckCertificate: false
+  
   # Queue settings
   queue: k8s
   queuePollingIntervalSec: 5
