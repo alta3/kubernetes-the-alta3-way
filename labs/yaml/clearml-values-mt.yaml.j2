@@ -93,3 +93,30 @@ fileserver:
     enabled: true
     storageClass: nfs-csi
     size: 50Gi
+
+# Persistence: uses your NFS-CSI default SC
+mongodb:
+  enabled: true
+  persistence:
+    enabled: true
+    storageClass: nfs-csi
+    size: 20Gi
+
+elasticsearch:
+  enabled: true
+  master:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
+      size: 50Gi
+  data:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
+      size: 100Gi
+
+redis:
+  master:
+    persistence:
+      enabled: true
+      storageClass: nfs-csi
