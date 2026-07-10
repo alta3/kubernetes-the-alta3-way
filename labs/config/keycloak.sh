@@ -7,15 +7,16 @@
 # 1. IDENTIFY UUID & CONSTRUCT URL
 # ------------------------------------------
 if [ -f /var/lib/cloud/data/instance-id ]; then
-    # Extracts the UUID (e.g., d62b0f5e...) from "bchd.d62b0f5e..."
+    # Extracts the environment ID from the instance-id file
     VM_ID=$(cut -d. -f2 /var/lib/cloud/data/instance-id)
 else
     echo "ERROR: Could not find instance-id file. Cannot determine UUID."
     exit 1
 fi
 
-# We use the requested 'kc-' subdomain prefix
-KC_URL="kc-${VM_ID}.lms-us-east-1.alta3.com"
+# Construct the external Keycloak hostname and HTTPS URL
+KC_HOST="kc-${VM_ID}.lms-us-east-1.alta3.com"
+KC_URL="https://${KC_HOST}"
 
 echo "Detected Environment ID: $VM_ID"
 echo "Target Keycloak URL:     $KC_URL"
@@ -48,14 +49,15 @@ export KEYCLOAK_ADMIN_PASSWORD=admin
 
 # Start command
 # We use 'nohup' so it keeps running if the shell closes.
-# We redirect logs to keycloak.log so we don't spam the student's terminal.
+# We redirect logs to keycloak.log so we do not spam the student's terminal.
 nohup /opt/keycloak/bin/kc.sh start-dev \
   --db=dev-file \
   --http-port=3456 \
   --http-enabled=true \
   --proxy-headers=xforwarded \
   --hostname="$KC_URL" \
-  --hostname-strict=false > /opt/keycloak/keycloak.log 2>&1 &
+  --hostname-strict=true \
+  > /opt/keycloak/keycloak.log 2>&1 &
 
 # Store the PID so we can check it
 KC_PID=$!
@@ -84,22 +86,35 @@ echo "[5/5] Configuring 'clearml' Realm and Student User..."
 KCADM="/opt/keycloak/bin/kcadm.sh"
 
 # Authenticate CLI as Admin
-$KCADM config credentials --server http://localhost:3456 --realm master --user admin --password admin
+$KCADM config credentials \
+  --server http://localhost:3456 \
+  --realm master \
+  --user admin \
+  --password admin
 
 # Create Realm
-$KCADM create realms -s realm=clearml -s enabled=true
+$KCADM create realms \
+  -s realm=clearml \
+  -s enabled=true
 
 # Create User 'student'
-$KCADM create users -r clearml -s username=student -s enabled=true
+$KCADM create users \
+  -r clearml \
+  -s username=student \
+  -s enabled=true
 
 # Set Password to 'student'
-$KCADM set-password -r clearml --username student --new-password student
+$KCADM set-password \
+  -r clearml \
+  --username student \
+  --new-password student
 
 # Create Permissive Client 'lab-app'
 # publicClient=true (No client secret required)
 # redirectUris=["*"] (Allows redirects to anywhere - permissive for labs)
 # webOrigins=["*"] (Allows CORS from anywhere)
-$KCADM create clients -r clearml \
+$KCADM create clients \
+  -r clearml \
   -s clientId=lab-app \
   -s enabled=true \
   -s publicClient=true \
