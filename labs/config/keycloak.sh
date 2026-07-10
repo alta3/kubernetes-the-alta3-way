@@ -15,7 +15,7 @@ else
 fi
 
 # We use the requested 'kc-' subdomain prefix
-KC_URL="https://kc-${VM_ID}.live.charlie.alta3.com"
+KC_URL="kc-${VM_ID}.lms-us-east-1.alta3.com"
 
 echo "Detected Environment ID: $VM_ID"
 echo "Target Keycloak URL:     $KC_URL"
