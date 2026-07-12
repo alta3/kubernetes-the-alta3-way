@@ -2,9 +2,6 @@
 
 set -euo pipefail
 
-# Temporary proof that this setup script executed.
-date --iso-8601=seconds > /home/student/proof.txt
-
 ssh controller 'sudo bash -s' <<'EOF'
 set -euo pipefail
 
