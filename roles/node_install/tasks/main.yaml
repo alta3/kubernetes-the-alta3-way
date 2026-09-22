@@ -70,6 +70,30 @@
      mode: '0755'
   become: True
 
+- name: Download gVisor release tarball
+  get_url:
+    url: "https://github.com/google/gvisor/releases/download/{{ gvisor_version }}/gvisor-x86_64.tar.bz2"
+    dest: "/tmp/gvisor-x86_64.tar.bz2"
+    mode: "0644"
+  become: True
+
+- name: Ensure bzip2 is installed (required to extract gVisor tarball)
+  package:
+    name: bzip2
+    state: present
+  become: True
+
+- name: Extract runsc and containerd-shim-runsc-v1 from the gVisor tarball
+  unarchive:
+    src: "/tmp/gvisor-x86_64.tar.bz2"
+    dest: "/usr/local/bin"
+    remote_src: True
+    include:
+      - runsc
+      - containerd-shim-runsc-v1
+    mode: "0775"
+  become: True
+
 - name: Download the Node binaries
   get_url:
     url: "{{ item.url }}"
