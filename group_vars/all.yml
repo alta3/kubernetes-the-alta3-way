@@ -12,7 +12,7 @@ runc_version: "1.3.4"         # https://github.com/opencontainers/runc/releases
 coredns_version: "1.14.1"     # https://github.com/coredns/coredns/releases
 calico_version: "3.31.3"      # https://github.com/projectcalico/calico/releases
 helm_version: "4.1.4"         # https://github.com/helm/helm/releases
-gvisor_version: "latest"      # https://github.com/google/gvisor/releases
+gvisor_version: "release-20260914.0"      # https://github.com/google/gvisor/releases
 
 # cluster specifics
 kube_verbose_level: 2
@@ -285,16 +285,6 @@ node_binaries:
  - name: "kube-proxy"
    url: "https://dl.k8s.io/release/v{{k8s_version}}/bin/linux/amd64/kubelet"
    path: "/usr/local/bin/kubelet"
-   mode: "0775"
-
- - name: "runsc"
-   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/runsc"
-   path: "/usr/local/bin/runsc"
-   mode: "0775"
-   
- - name: "containerd-shim-runsc-v1"
-   url: "https://storage.googleapis.com/gvisor/releases/release/{{ gvisor_version }}/x86_64/containerd-shim-runsc-v1"
-   path: "/usr/local/bin/containerd-shim-runsc-v1"
    mode: "0775"
 
  - name: "runc"
