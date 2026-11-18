@@ -9,11 +9,14 @@ scp -o StrictHostKeyChecking=no $HOME/git/kubernetes-the-alta3-way/labs/setup/ku
 scp -o StrictHostKeyChecking=no $HOME/git/kubernetes-the-alta3-way/labs/setup/kubeadm-deps.sh node-2:/tmp/kubeadm-deps.sh
 
 # 2. Run kubeadm-deps.sh in parallel on all nodes
+#    Each job's PID is captured so a failure on any node stops the script.
 echo "Installing dependencies on all nodes..."
-ssh controller "bash /tmp/kubeadm-deps.sh" &
-ssh node-1 "bash /tmp/kubeadm-deps.sh" &
-ssh node-2 "bash /tmp/kubeadm-deps.sh" &
-wait
+ssh controller "bash /tmp/kubeadm-deps.sh" & p1=$!
+ssh node-1 "bash /tmp/kubeadm-deps.sh" & p2=$!
+ssh node-2 "bash /tmp/kubeadm-deps.sh" & p3=$!
+wait $p1
+wait $p2
+wait $p3
 
 # -------------------------------------------------------------------------
 # ### FIX CONTAINERD CONFIGURATION ###
@@ -49,7 +52,6 @@ set -euo pipefail
 
 PUBLIC_IP=$(dig controller +search +noall +short)
 
-# Added --ignore-preflight-errors just in case of minor warnings, though the fix above should resolve the fatal one.
 sudo kubeadm init \
   --pod-network-cidr=192.168.0.0/16 \
   --apiserver-advertise-address="${PUBLIC_IP}" \
